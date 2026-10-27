@@ -1,0 +1,27 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# macOS metadata
+.DS_Store
+
+# Test and tool caches
+.pytest_cache/
+.ruff_cache/
+
+# Local tooling config
+.zcodeignore
+
+# Runtime outputs
+*.work/
+output/
+work/
+
+.python-version
