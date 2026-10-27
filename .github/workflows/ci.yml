@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint and formatting
+        run: |
+          uv run --locked ruff check src tests examples
+          uv run --locked ruff format --check src tests examples
+
+      - name: Run tests
+        run: uv run --locked pytest -q
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build distributions and check metadata
+        run: |
+          uv build
+          uv run --no-project --with twine python -m twine check --strict dist/*
+
+      - name: Verify isolated wheel installation
+        shell: bash
+        run: |
+          uv venv "$RUNNER_TEMP/wheel-env" --python 3.11
+          uv pip install --python "$RUNNER_TEMP/wheel-env/bin/python" dist/*.whl
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/wheel-env/bin/python" -I "$GITHUB_WORKSPACE/tests/smoke_distribution.py"
+
+      - name: Run tests from the source distribution
+        shell: bash
+        run: |
+          mkdir "$RUNNER_TEMP/source"
+          tar -xzf dist/*.tar.gz -C "$RUNNER_TEMP/source"
+          cd "$RUNNER_TEMP"/source/onnx_reduce-*
+          uv sync --locked
+          uv run --locked pytest -q
+
+      - name: Save distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: distributions
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error

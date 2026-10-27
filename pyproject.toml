@@ -1,0 +1,78 @@
+[project]
+name = "onnx-reduce"
+version = "0.1.0"
+description = "Reduce an ONNX model to a minimal reproducer while preserving a user-defined failure"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "XuMoheng", email = "XuMoheng21@163.com" }
+]
+keywords = ["onnx", "reducer", "delta-debugging", "test-case-reduction", "compiler-bug"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Compilers",
+    "Topic :: Software Development :: Testing",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "onnx>=1.23.2",
+    "onnxscript>=0.7.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/XuMoheng/onnx-reduce"
+Repository = "https://github.com/XuMoheng/onnx-reduce"
+Changelog = "https://github.com/XuMoheng/onnx-reduce/blob/main/CHANGELOG.md"
+Issues = "https://github.com/XuMoheng/onnx-reduce/issues"
+
+[project.scripts]
+onnx-reduce = "onnx_reduce.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E4", "E7", "E9", # pycodestyle errors
+    "F",              # pyflakes
+    "I",              # isort
+    "UP",             # pyupgrade
+    "B",              # flake8-bugbear
+    "C4",             # flake8-comprehensions
+    "RUF",            # ruff-specific rules
+]
+
+[build-system]
+requires = ["uv_build>=0.12.12,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+source-include = [
+    "tests/**",
+    "examples/**",
+    "docs/**",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "uv.lock",
+    ".python-version",
+]
