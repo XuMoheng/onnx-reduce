@@ -1,4 +1,4 @@
-"""Teaching oracle: interesting iff the main graph contains Relu."""
+"""Teaching failure check: interesting iff the main graph contains Relu."""
 
 import sys
 

@@ -191,7 +191,7 @@ class OnnxModel:
 
     def validate(self, mode: str = "strict") -> ValidationResult:
         if mode not in {"strict", "structural", "permissive"}:
-            raise ValueError(f"unknown checker mode: {mode}")
+            raise ValueError(f"unknown validation mode: {mode}")
         graph = self._model.graph
         domains = self.custom_domains()
         if len(graph.outputs) == 0:
