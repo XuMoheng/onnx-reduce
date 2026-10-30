@@ -65,7 +65,7 @@ def test_custom_domain_checker_semantics():
     strict = adapter.validate("strict")
     structural = adapter.validate("structural")
     permissive = adapter.validate("permissive")
-    assert strict.valid and strict.checker_mode == "structural"
-    assert structural.valid and structural.checker_mode == "structural"
-    assert permissive.valid and permissive.checker_mode == "permissive"
+    assert strict.valid and strict.validation_mode == "structural"
+    assert structural.valid and structural.validation_mode == "structural"
+    assert permissive.valid and permissive.validation_mode == "permissive"
     assert strict.custom_domains == ("com.example",)

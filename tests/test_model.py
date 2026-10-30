@@ -80,7 +80,7 @@ def test_custom_domain_downgrades_strict_to_structural():
     model = OnnxModel.from_proto(custom_domain_model())
     result = model.validate("strict")
     assert result.valid, result.reason
-    assert result.checker_mode == "structural"
+    assert result.validation_mode == "structural"
     assert result.custom_domains == ("com.example",)
 
 

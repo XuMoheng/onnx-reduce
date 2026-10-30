@@ -11,9 +11,9 @@ from pathlib import Path
 
 from onnx_reduce import __version__
 from onnx_reduce.engine import EngineConfig, ReductionEngine, ReductionError
+from onnx_reduce.failure_check.contract import make_failure_check_config
+from onnx_reduce.failure_check.runner import FailureCheckError, FailureCheckRunner
 from onnx_reduce.model import OnnxModel
-from onnx_reduce.oracle.contract import make_spec
-from onnx_reduce.oracle.runner import OracleError, OracleRunner
 from onnx_reduce.storage import write_json
 
 
@@ -34,12 +34,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--report", type=Path, help="write a JSON summary to this path")
     parser.add_argument("--timeout", type=float, default=60.0, help="per-test timeout in seconds")
     parser.add_argument(
-        "--checker",
+        "--validation-mode",
         choices=("strict", "structural", "permissive"),
         default="strict",
         help="candidate validation mode (custom domains automatically use structural checks)",
     )
-    parser.add_argument("--max-tests", type=int, help="maximum candidate oracle calls")
+    parser.add_argument(
+        "--max-candidate-check-calls",
+        type=int,
+        help="maximum candidate failure check calls",
+    )
     parser.add_argument(
         "--time-budget-seconds",
         type=float,
@@ -92,9 +96,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     logger = logging.getLogger("onnx-reduce")
 
     try:
-        config = EngineConfig(
-            checker_mode=args.checker,
-            max_tests=args.max_tests,
+        engine_config = EngineConfig(
+            validation_mode=args.validation_mode,
+            max_candidate_check_calls=args.max_candidate_check_calls,
             time_budget_seconds=args.time_budget_seconds,
             cache_enabled=not args.no_cache,
             target_mode=args.target_mode,
@@ -108,23 +112,23 @@ def main(argv: Sequence[str] | None = None) -> int:
                     and args.report.samefile(model_path)
                 ):
                     raise ValueError("--report must not overwrite the input or output model")
-        codes = tuple(args.inconclusive_code or (125,))
-        spec = make_spec(
+        inconclusive_exit_codes = tuple(args.inconclusive_code or (125,))
+        failure_check_config = make_failure_check_config(
             args.test,
             timeout_seconds=args.timeout,
             crash_is_interesting=not args.no_crash_interesting,
             timeout_is_interesting=args.timeout_interesting,
-            inconclusive_exit_codes=codes,
+            inconclusive_exit_codes=inconclusive_exit_codes,
         )
-        runner = OracleRunner(spec)
+        failure_check_runner = FailureCheckRunner(failure_check_config)
         model = OnnxModel.load(args.model)
         engine = ReductionEngine(
-            config=config,
+            config=engine_config,
             progress=logger.info,
         )
         workdir = args.work_dir or args.output.with_name(args.output.name + ".work")
         logger.info("retaining logs and checkpoints under %s", workdir)
-        _, report = engine.run(model, runner, workdir, output_path=args.output)
+        _, report = engine.run(model, failure_check_runner, workdir, output_path=args.output)
         payload = report.to_dict()
         if args.report:
             write_json(args.report, payload)
@@ -143,7 +147,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 130
-    except (OracleError, ReductionError, ValueError, OSError, re.error) as exc:
+    except (FailureCheckError, ReductionError, ValueError, OSError, re.error) as exc:
         print(f"onnx-reduce: error: {exc}", file=sys.stderr)
         return 2
 

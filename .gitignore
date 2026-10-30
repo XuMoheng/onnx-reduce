@@ -17,6 +17,7 @@ wheels/
 .ruff_cache/
 
 # Local tooling config
+.zcode/
 .zcodeignore
 
 # Runtime outputs

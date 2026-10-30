@@ -12,9 +12,9 @@ from onnx import TensorProto, helper
 from onnx_reduce.cli import main
 from onnx_reduce.edits import Candidate, DeleteNodes
 from onnx_reduce.engine import EngineConfig, InitialNotInteresting, ReductionEngine
+from onnx_reduce.failure_check.contract import FailureCheckResult
+from onnx_reduce.failure_check.runner import FailureCheckRunner
 from onnx_reduce.model import OnnxModel
-from onnx_reduce.oracle.contract import OracleResult
-from onnx_reduce.oracle.runner import OracleRunner
 from onnx_reduce.types import ValidationResult
 from tests.helpers import chain_model, external_data_model
 
@@ -52,17 +52,19 @@ def test_unsupported_ir_type_is_a_diagnostic_cli_error(tmp_path, capsys):
     assert not (tmp_path / "out").exists()
 
 
-@pytest.mark.parametrize("outcome", [OracleResult.INCONCLUSIVE, OracleResult.NOT_INTERESTING])
+@pytest.mark.parametrize(
+    "outcome", [FailureCheckResult.INCONCLUSIVE, FailureCheckResult.NOT_INTERESTING]
+)
 def test_initial_failure_distinguishes_unknown_from_rejected(tmp_path, outcome):
-    class Oracle:
+    class FailureCheck:
         def run(self, path):
             return outcome
 
     with pytest.raises(InitialNotInteresting) as caught:
-        ReductionEngine().run(OnnxModel.from_proto(chain_model()), Oracle(), tmp_path)
+        ReductionEngine().run(OnnxModel.from_proto(chain_model()), FailureCheck(), tmp_path)
     assert caught.value.result is outcome
     message = str(caught.value)
-    if outcome is OracleResult.INCONCLUSIVE:
+    if outcome is FailureCheckResult.INCONCLUSIVE:
         assert "inconclusive" in message
         assert "direction" not in message
     else:
@@ -71,7 +73,7 @@ def test_initial_failure_distinguishes_unknown_from_rejected(tmp_path, outcome):
     assert record["outcome"] == outcome.value
 
 
-def test_candidate_rejections_retain_reasons_without_oracle_calls(tmp_path, monkeypatch):
+def test_candidate_rejections_retain_reasons_without_failure_check_calls(tmp_path, monkeypatch):
     class Proposals:
         name = "diagnostics"
 
@@ -80,9 +82,9 @@ def test_candidate_rejections_retain_reasons_without_oracle_calls(tmp_path, monk
             yield Candidate(())
             yield Candidate((DeleteNodes((0,)),))
 
-    class Oracle:
+    class FailureCheck:
         def run(self, path):
-            return OracleResult.INTERESTING
+            return FailureCheckResult.INTERESTING
 
     validate = OnnxModel.validate
 
@@ -94,7 +96,7 @@ def test_candidate_rejections_retain_reasons_without_oracle_calls(tmp_path, monk
     monkeypatch.setattr(OnnxModel, "validate", candidate_invalid)
     _, report = ReductionEngine(passes=[Proposals()]).run(
         OnnxModel.from_proto(chain_model()),
-        Oracle(),
+        FailureCheck(),
         tmp_path,
     )
     records = [
@@ -105,7 +107,7 @@ def test_candidate_rejections_retain_reasons_without_oracle_calls(tmp_path, monk
     assert "out of range" in records[0]["reason"]
     assert records[2]["validation"]["reason"] == "simulated missing type"
     assert [r["candidate"]["sequence_number"] for r in records] == [0, 1, 2]
-    assert report.oracle_calls == 2
+    assert report.failure_check_calls == 2
     assert report.candidates_invalid == 2
     assert report.candidates_not_cheaper == 1
     assert report.to_dict()["candidates"]["valid_rate"] == 0
@@ -115,9 +117,9 @@ def test_evaluated_candidates_have_correlated_diagnostics(tmp_path):
     class Reject:
         def run(self, path):
             return (
-                OracleResult.NOT_INTERESTING
+                FailureCheckResult.NOT_INTERESTING
                 if "candidates" in Path(path).parts
-                else OracleResult.INTERESTING
+                else FailureCheckResult.INTERESTING
             )
 
     _, report = ReductionEngine().run(OnnxModel.from_proto(chain_model()), Reject(), tmp_path)
@@ -146,11 +148,11 @@ def test_cli_interrupt_preserves_checkpoint_and_returns_130(tmp_path, capsys, mo
         calls += 1
         if calls == 3:
             raise KeyboardInterrupt
-        from onnx_reduce.oracle.runner import OracleObservation
+        from onnx_reduce.failure_check.runner import FailureCheckObservation
 
-        return OracleObservation(OracleResult.INTERESTING, 0)
+        return FailureCheckObservation(FailureCheckResult.INTERESTING, 0)
 
-    monkeypatch.setattr(OracleRunner, "observe", observe)
+    monkeypatch.setattr(FailureCheckRunner, "observe", observe)
     assert main([str(source), "--test", "unused", "-o", str(output)]) == 130
     assert "checkpoint.json" in capsys.readouterr().err
     checkpoint = next((tmp_path / "output.onnx.work").glob("run-*/checkpoint.json"))
@@ -182,12 +184,12 @@ def test_candidate_call_budget_is_recorded(tmp_path):
     class Reject:
         def run(self, path):
             return (
-                OracleResult.NOT_INTERESTING
+                FailureCheckResult.NOT_INTERESTING
                 if "candidates" in Path(path).parts
-                else OracleResult.INTERESTING
+                else FailureCheckResult.INTERESTING
             )
 
-    _, report = ReductionEngine(config=EngineConfig(max_tests=1)).run(
+    _, report = ReductionEngine(config=EngineConfig(max_candidate_check_calls=1)).run(
         OnnxModel.from_proto(chain_model()),
         Reject(),
         tmp_path,
@@ -198,5 +200,5 @@ def test_candidate_call_budget_is_recorded(tmp_path):
     ]
     assert records[-1]["status"] == "budget_exhausted"
     assert records[-1]["reason"] == "calls"
-    assert report.oracle_calls == 3
+    assert report.failure_check_calls == 3
     assert report.minimality["status"] == "unproven"

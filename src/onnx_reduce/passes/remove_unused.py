@@ -11,11 +11,11 @@ from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInpu
 class RemoveUnusedPass:
     name = "remove_unused"
     # Dead nodes can still be the sole carrier of a compiler bug.  Unlike an
-    # optimizer, the reducer must never remove them without asking the oracle,
-    # so this cleanup is oracle-gated.
+    # optimizer, the reducer must never remove them without running the failure check,
+    # so this cleanup is gated by failure checks.
 
     def generate(self, model: Any) -> Iterator[Candidate]:
-        # Each cleanup is independently oracle-gated.
+        # Each cleanup is independently gated by failure checks.
         dead_indices = model.dead_node_indices()
         if dead_indices:
             yield Candidate((DeleteNodes(tuple(dead_indices)),))

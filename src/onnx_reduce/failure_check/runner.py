@@ -11,20 +11,24 @@ import time
 from dataclasses import dataclass
 from typing import Protocol
 
-from onnx_reduce.oracle.contract import OracleResult, OracleSpec, classify_return_code
+from onnx_reduce.failure_check.contract import (
+    FailureCheckConfig,
+    FailureCheckResult,
+    classify_return_code,
+)
 
 
-class OracleRunnable(Protocol):
-    def run(self, model_path: str | os.PathLike[str]) -> OracleResult: ...
+class FailureCheckRunnable(Protocol):
+    def run(self, model_path: str | os.PathLike[str]) -> FailureCheckResult: ...
 
 
-class OracleError(RuntimeError):
+class FailureCheckError(RuntimeError):
     """The interestingness command could not be executed."""
 
 
 @dataclass(frozen=True)
-class OracleObservation:
-    outcome: OracleResult
+class FailureCheckObservation:
+    outcome: FailureCheckResult
     returncode: int | None = None
     timed_out: bool = False
     duration_seconds: float = 0.0
@@ -43,29 +47,29 @@ class OracleObservation:
         return f"exit:{self.returncode}"
 
 
-class OracleRunner:
+class FailureCheckRunner:
     """Append the model path to command argv; preserve the caller's cwd.
 
     run() retains the original enum API. observe() exposes execution evidence.
     Output is drained continuously, retaining at most log_limit bytes per stream.
     """
 
-    def __init__(self, spec: OracleSpec, *, log_limit: int = 1024 * 1024):
+    def __init__(self, failure_check_config: FailureCheckConfig, *, log_limit: int = 1024 * 1024):
         if log_limit <= 0:
             raise ValueError("log_limit must be positive")
-        self.spec = spec
+        self.failure_check_config = failure_check_config
         self.log_limit = log_limit
 
     @property
     def display_command(self) -> str:
-        return shlex.join(self.spec.command)
+        return shlex.join(self.failure_check_config.command)
 
-    def run(self, model_path: str | os.PathLike[str]) -> OracleResult:
+    def run(self, model_path: str | os.PathLike[str]) -> FailureCheckResult:
         return self.observe(model_path).outcome
 
-    def observe(self, model_path: str | os.PathLike[str]) -> OracleObservation:
+    def observe(self, model_path: str | os.PathLike[str]) -> FailureCheckObservation:
         started = time.monotonic()
-        argv = (*self.spec.command, os.fspath(model_path))
+        argv = (*self.failure_check_config.command, os.fspath(model_path))
         try:
             process = subprocess.Popen(
                 argv,
@@ -75,7 +79,7 @@ class OracleRunner:
                 start_new_session=True,
             )
         except OSError as exc:
-            raise OracleError(
+            raise FailureCheckError(
                 f"cannot execute interestingness test {self.display_command!r}: {exc}"
             ) from exc
 
@@ -83,13 +87,13 @@ class OracleRunner:
 
         if timed_out:
             outcome = (
-                OracleResult.INTERESTING
-                if self.spec.timeout_is_interesting
-                else OracleResult.INCONCLUSIVE
+                FailureCheckResult.INTERESTING
+                if self.failure_check_config.timeout_is_interesting
+                else FailureCheckResult.INCONCLUSIVE
             )
         else:
-            outcome = classify_return_code(process.returncode, self.spec)
-        return OracleObservation(
+            outcome = classify_return_code(process.returncode, self.failure_check_config)
+        return FailureCheckObservation(
             outcome=outcome,
             returncode=process.returncode,
             timed_out=timed_out,
@@ -125,7 +129,7 @@ class OracleRunner:
             try:
                 for index, stream in enumerate((process.stdout, process.stderr)):
                     selector.register(stream, selectors.EVENT_READ, index)
-                deadline = started + self.spec.timeout_seconds
+                deadline = started + self.failure_check_config.timeout_seconds
                 while process.poll() is None:
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
