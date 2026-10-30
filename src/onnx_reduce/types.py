@@ -24,7 +24,7 @@ class ModelCost:
 class ValidationResult:
     valid: bool
     reason: str | None = None
-    checker_mode: str | None = None
+    validation_mode: str | None = None
     custom_domains: tuple[str, ...] = ()
 
 

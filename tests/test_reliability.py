@@ -15,16 +15,16 @@ from onnx import TensorProto, helper
 from onnx_reduce.cli import main
 from onnx_reduce.edits import Candidate, DeleteNodes
 from onnx_reduce.engine import EngineConfig, ReductionEngine
+from onnx_reduce.failure_check.contract import FailureCheckResult, make_failure_check_config
+from onnx_reduce.failure_check.evaluator import Evaluator
+from onnx_reduce.failure_check.runner import FailureCheckObservation, FailureCheckRunner
 from onnx_reduce.model import OnnxModel
-from onnx_reduce.oracle.contract import OracleResult, make_spec
-from onnx_reduce.oracle.evaluator import Evaluator
-from onnx_reduce.oracle.runner import OracleObservation, OracleRunner
 from tests.helpers import chain_model, external_data_model, tensor_value
 
 
 class Always:
     def run(self, path):
-        return OracleResult.INTERESTING
+        return FailureCheckResult.INTERESTING
 
 
 def two_outputs():
@@ -58,16 +58,16 @@ def test_last_node_can_be_removed(tmp_path):
 
 
 def test_first_output_is_tried_and_dead_bug_is_preserved(tmp_path):
-    class SecondOutputOracle:
+    class SecondOutputFailureCheck:
         def run(self, path):
             m = OnnxModel.load(path)
             return (
-                OracleResult.INTERESTING
+                FailureCheckResult.INTERESTING
                 if "second" in m.output_names and "Relu" in m.op_types
-                else OracleResult.NOT_INTERESTING
+                else FailureCheckResult.NOT_INTERESTING
             )
 
-    reduced, _ = ReductionEngine().run(two_outputs(), SecondOutputOracle(), tmp_path)
+    reduced, _ = ReductionEngine().run(two_outputs(), SecondOutputFailureCheck(), tmp_path)
     assert reduced.output_names == ("second",)
     assert "Relu" in reduced.op_types  # The now-dead node still carries the bug.
 
@@ -140,9 +140,9 @@ def test_inconclusive_neighbors_do_not_prove_minimality(tmp_path):
         def run(self, path):
             self.calls += 1
             return (
-                OracleResult.INTERESTING
+                FailureCheckResult.INTERESTING
                 if "initial" in str(path) or "final" in str(path)
-                else OracleResult.INCONCLUSIVE
+                else FailureCheckResult.INCONCLUSIVE
             )
 
     _, report = ReductionEngine().run(
@@ -150,7 +150,7 @@ def test_inconclusive_neighbors_do_not_prove_minimality(tmp_path):
     )
     assert report.stop_reason == "fixed_point"
     assert report.minimality["status"] == "unproven"
-    assert report.minimality["unresolved_candidates"] > 0
+    assert report.minimality["sweep_inconclusive_candidate_count"] > 0
 
 
 def test_duplicate_candidates_are_cached_and_have_unique_paths(tmp_path):
@@ -168,18 +168,18 @@ def test_duplicate_candidates_are_cached_and_have_unique_paths(tmp_path):
         def run(self, path):
             self.paths.append(path)
             return (
-                OracleResult.NOT_INTERESTING
+                FailureCheckResult.NOT_INTERESTING
                 if "candidates" in Path(path).parts
-                else OracleResult.INTERESTING
+                else FailureCheckResult.INTERESTING
             )
 
-    oracle = Reject()
+    failure_check_runner = Reject()
     _, report = ReductionEngine(passes=[Duplicates()]).run(
         OnnxModel.from_proto(chain_model()),
-        oracle,
+        failure_check_runner,
         tmp_path,
     )
-    assert report.oracle_calls == 3
+    assert report.failure_check_calls == 3
     assert report.cache_hits == 1
     records = [
         json.loads(line)
@@ -192,7 +192,7 @@ def test_duplicate_candidates_are_cached_and_have_unique_paths(tmp_path):
     assert candidates[1]["cache_hit"]
 
 
-def test_no_free_pass_bypasses_oracle(tmp_path):
+def test_no_free_pass_bypasses_failure_check(tmp_path):
     class Unsafe:
         name = "unsafe"
         is_free = True
@@ -203,37 +203,39 @@ def test_no_free_pass_bypasses_oracle(tmp_path):
     class Reject:
         def run(self, path):
             return (
-                OracleResult.NOT_INTERESTING
+                FailureCheckResult.NOT_INTERESTING
                 if "candidates" in Path(path).parts
-                else OracleResult.INTERESTING
+                else FailureCheckResult.INTERESTING
             )
 
     model = OnnxModel.from_proto(chain_model())
     reduced, report = ReductionEngine(passes=[Unsafe()]).run(model, Reject(), tmp_path)
     assert reduced.canonical_hash() == model.canonical_hash()
-    assert report.oracle_calls == 3
+    assert report.failure_check_calls == 3
 
 
 def test_signature_rejects_another_bug_and_does_not_cache_inconclusive(tmp_path):
     class Observations:
         def observe(self, path):
             if path.name == "initial":
-                return OracleObservation(OracleResult.INTERESTING, 0, stderr="assertion A")
-            return OracleObservation(OracleResult.INTERESTING, 0, stderr="assertion B")
+                return FailureCheckObservation(
+                    FailureCheckResult.INTERESTING, 0, stderr="assertion A"
+                )
+            return FailureCheckObservation(FailureCheckResult.INTERESTING, 0, stderr="assertion B")
 
     evaluator = Evaluator(Observations(), tmp_path, signature_regex=r"assertion (\w+)")
     assert (
         evaluator.evaluate(tmp_path / "initial", "a", initial=True, mandatory=True).outcome
-        is OracleResult.INTERESTING
+        is FailureCheckResult.INTERESTING
     )
     result = evaluator.evaluate(tmp_path / "candidate", "b")
-    assert result.outcome is OracleResult.NOT_INTERESTING
-    assert result.signature_mismatch
+    assert result.outcome is FailureCheckResult.NOT_INTERESTING
+    assert result.target_identity_mismatch
     assert evaluator.evaluate(tmp_path / "candidate", "b").cache_hit
 
     class Unknown:
         def run(self, path):
-            return OracleResult.INCONCLUSIVE
+            return FailureCheckResult.INCONCLUSIVE
 
     uncertain = Evaluator(Unknown(), tmp_path / "uncertain")
     for _ in range(2):
@@ -242,19 +244,21 @@ def test_signature_rejects_another_bug_and_does_not_cache_inconclusive(tmp_path)
 
 
 def test_baseline_signal_matching():
-    from onnx_reduce.oracle.evaluator import TargetMatcher
+    from onnx_reduce.failure_check.evaluator import TargetMatcher
 
     matcher = TargetMatcher()
     assert (
-        matcher.match(OracleObservation(OracleResult.INTERESTING, -6), initial=True).outcome
-        is OracleResult.INTERESTING
+        matcher.match(
+            FailureCheckObservation(FailureCheckResult.INTERESTING, -6), initial=True
+        ).outcome
+        is FailureCheckResult.INTERESTING
     )
-    result = matcher.match(OracleObservation(OracleResult.INTERESTING, -11))
-    assert result.outcome is OracleResult.NOT_INTERESTING
-    assert result.signature_mismatch
+    result = matcher.match(FailureCheckObservation(FailureCheckResult.INTERESTING, -11))
+    assert result.outcome is FailureCheckResult.NOT_INTERESTING
+    assert result.target_identity_mismatch
 
 
-def test_checkpoint_survives_oracle_failure(tmp_path):
+def test_checkpoint_survives_failure_check_failure(tmp_path):
     class Failing:
         calls = 0
 
@@ -262,7 +266,7 @@ def test_checkpoint_survives_oracle_failure(tmp_path):
             self.calls += 1
             if self.calls == 3:
                 raise RuntimeError("backend unavailable")
-            return OracleResult.INTERESTING
+            return FailureCheckResult.INTERESTING
 
     with pytest.raises(RuntimeError, match="backend unavailable"):
         ReductionEngine().run(OnnxModel.from_proto(chain_model()), Failing(), tmp_path)
@@ -292,7 +296,7 @@ def test_cli_final_output_recheck_fails_with_nonzero_exit(tmp_path):
                 command,
                 "-o",
                 str(output),
-                "--max-tests",
+                "--max-candidate-check-calls",
                 "0",
                 "--report",
                 str(report_path),
@@ -310,14 +314,16 @@ def test_cli_final_output_recheck_fails_with_nonzero_exit(tmp_path):
 def test_runner_observes_bounded_output_and_quoted_argv(tmp_path):
     script = tmp_path / "script with spaces.py"
     script.write_text("import sys\nprint(sys.argv[1])\nprint('x' * 10000, file=sys.stderr)\n")
-    spec = make_spec(
+    failure_check_config = make_failure_check_config(
         shlex.join([sys.executable, str(script), "argument with spaces"]),
         timeout_seconds=5,
         crash_is_interesting=True,
         timeout_is_interesting=False,
     )
-    observation = OracleRunner(spec, log_limit=100).observe(tmp_path / "model.onnx")
-    assert observation.outcome is OracleResult.INTERESTING
+    observation = FailureCheckRunner(failure_check_config, log_limit=100).observe(
+        tmp_path / "model.onnx"
+    )
+    assert observation.outcome is FailureCheckResult.INTERESTING
     assert observation.stdout.strip() == "argument with spaces"
     assert len(observation.stderr) == 100
     assert observation.output_truncated
@@ -326,13 +332,13 @@ def test_runner_observes_bounded_output_and_quoted_argv(tmp_path):
 def test_effective_checker_policy_is_reported(tmp_path):
     from tests.helpers import custom_domain_model
 
-    _, report = ReductionEngine(config=EngineConfig(max_tests=0)).run(
+    _, report = ReductionEngine(config=EngineConfig(max_candidate_check_calls=0)).run(
         OnnxModel.from_proto(custom_domain_model()),
         Always(),
         tmp_path,
     )
-    assert report.checker_mode == "strict"
-    assert report.effective_checker_modes == ["structural"]
+    assert report.requested_validation_mode == "strict"
+    assert report.effective_validation_modes == ["structural"]
     assert report.custom_domains == ["com.example"]
 
 
@@ -364,7 +370,7 @@ def test_cli_regex_preserves_target_instead_of_another_bug(tmp_path):
     report = json.loads(
         next((tmp_path / "reduced.onnx.work").glob("run-*/report.json")).read_text()
     )
-    assert report["oracle"]["signature_mismatches"] > 0
+    assert report["failure_checks"]["target_identity_mismatches"] > 0
 
 
 def test_cli_external_weights_end_to_end(tmp_path):
@@ -392,7 +398,7 @@ def test_cli_external_weights_end_to_end(tmp_path):
                 shlex.join([sys.executable, str(script)]),
                 "-o",
                 str(output),
-                "--max-tests",
+                "--max-candidate-check-calls",
                 "0",
             ]
         )
@@ -409,7 +415,9 @@ def test_cache_can_be_disabled_and_mandatory_checks_always_run(tmp_path):
         def run(self, path):
             self.calls += 1
             return (
-                OracleResult.NOT_INTERESTING if self.calls in (2, 3) else OracleResult.INTERESTING
+                FailureCheckResult.NOT_INTERESTING
+                if self.calls in (2, 3)
+                else FailureCheckResult.INTERESTING
             )
 
     class Duplicates:
@@ -419,24 +427,27 @@ def test_cache_can_be_disabled_and_mandatory_checks_always_run(tmp_path):
             for _ in range(2):
                 yield Candidate((DeleteNodes((0,)),))
 
-    oracle = Reject()
+    failure_check_runner = Reject()
     _, report = ReductionEngine(
         passes=[Duplicates()], config=EngineConfig(cache_enabled=False)
     ).run(
         OnnxModel.from_proto(chain_model()),
-        oracle,
+        failure_check_runner,
         tmp_path,
     )
-    assert report.oracle_calls == 4
+    assert report.failure_check_calls == 4
     assert report.cache_hits == 0
 
 
 def test_truncated_missing_signature_remains_inconclusive(tmp_path):
-    from onnx_reduce.oracle.evaluator import TargetMatcher
+    from onnx_reduce.failure_check.evaluator import TargetMatcher
 
     matcher = TargetMatcher(signature_regex=r"assertion (\w+)")
     matcher.match(
-        OracleObservation(OracleResult.INTERESTING, 0, stdout="assertion A"), initial=True
+        FailureCheckObservation(FailureCheckResult.INTERESTING, 0, stdout="assertion A"),
+        initial=True,
     )
-    result = matcher.match(OracleObservation(OracleResult.INTERESTING, 0, output_truncated=True))
-    assert result.outcome is OracleResult.INCONCLUSIVE
+    result = matcher.match(
+        FailureCheckObservation(FailureCheckResult.INTERESTING, 0, output_truncated=True)
+    )
+    assert result.outcome is FailureCheckResult.INCONCLUSIVE

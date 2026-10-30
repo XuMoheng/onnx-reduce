@@ -13,8 +13,8 @@ from onnx import TensorProto, helper
 from onnx_reduce.cli import main
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs
 from onnx_reduce.engine import EngineConfig, ReductionEngine
+from onnx_reduce.failure_check.contract import FailureCheckConfig, FailureCheckResult
 from onnx_reduce.model import OnnxModel
-from onnx_reduce.oracle.contract import OracleResult, OracleSpec
 from onnx_reduce.storage import atomic_write
 from tests.helpers import chain_model, external_data_model, tensor_value
 
@@ -132,9 +132,9 @@ def test_proto_tensor_mutations_cannot_invalidate_an_owned_snapshot(tmp_path):
 class RejectCandidates:
     def run(self, path):
         return (
-            OracleResult.NOT_INTERESTING
+            FailureCheckResult.NOT_INTERESTING
             if "candidates" in Path(path).parts
-            else OracleResult.INTERESTING
+            else FailureCheckResult.INTERESTING
         )
 
 
@@ -150,15 +150,15 @@ class Duplicates:
 def test_cache_still_works_at_exact_call_limit(tmp_path, cache_enabled):
     _, report = ReductionEngine(
         passes=[Duplicates()],
-        config=EngineConfig(max_tests=1, cache_enabled=cache_enabled),
+        config=EngineConfig(max_candidate_check_calls=1, cache_enabled=cache_enabled),
     ).run(OnnxModel.from_proto(chain_model()), RejectCandidates(), tmp_path)
-    assert report.oracle_calls == 3  # Initial, one candidate, mandatory final.
+    assert report.failure_check_calls == 3  # Initial, one candidate, mandatory final.
     assert report.cache_hits == int(cache_enabled)
     assert report.stop_reason == ("fixed_point" if cache_enabled else "budget_exhausted")
     assert report.minimality["status"] == ("pass_fixed_point" if cache_enabled else "unproven")
 
 
-def test_expired_time_budget_after_preparation_does_not_start_oracle(tmp_path, monkeypatch):
+def test_expired_time_budget_after_preparation_does_not_start_failure_check(tmp_path, monkeypatch):
     # A fake clock makes the deadline deterministic without slow sleeps.
     clock = [0.0]
     monkeypatch.setattr("onnx_reduce.engine.time.monotonic", lambda: clock[0])
@@ -175,7 +175,7 @@ def test_expired_time_budget_after_preparation_does_not_start_oracle(tmp_path, m
         passes=[Duplicates()],
         config=EngineConfig(time_budget_seconds=1),
     ).run(OnnxModel.from_proto(chain_model()), RejectCandidates(), tmp_path)
-    assert report.oracle_calls == 2
+    assert report.failure_check_calls == 2
     assert report.stop_reason == "budget_exhausted"
 
 
@@ -194,19 +194,19 @@ def test_non_decreasing_candidates_are_not_counted_as_validated(tmp_path):
     counts = report.to_dict()["candidates"]
     assert counts["not_cheaper"] == 1
     assert counts["valid_rate"] is None
-    assert report.oracle_calls == 2
+    assert report.failure_check_calls == 2
 
 
 @pytest.mark.parametrize(
     "config",
     [
-        {"max_tests": -1},
-        {"max_tests": 1.5},
-        {"max_tests": True},
+        {"max_candidate_check_calls": -1},
+        {"max_candidate_check_calls": 1.5},
+        {"max_candidate_check_calls": True},
         {"time_budget_seconds": 0},
         {"time_budget_seconds": float("nan")},
         {"time_budget_seconds": float("inf")},
-        {"checker_mode": "typo"},
+        {"validation_mode": "typo"},
         {"target_mode": "typo"},
     ],
 )
@@ -230,9 +230,9 @@ def test_library_engine_configuration_is_validated(config):
         {"inconclusive_exit_codes": {256}},
     ],
 )
-def test_library_oracle_configuration_is_validated(config):
+def test_library_failure_check_configuration_is_validated(config):
     with pytest.raises(ValueError):
-        OracleSpec(**({"command": (sys.executable,)} | config))
+        FailureCheckConfig(**({"command": (sys.executable,)} | config))
 
 
 @pytest.mark.parametrize("alias", ["input", "output", "symlink", "hardlink"])

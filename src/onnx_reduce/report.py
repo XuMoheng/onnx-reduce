@@ -12,7 +12,7 @@ from onnx_reduce.types import ModelCost
 class PassStats:
     generated: int = 0
     invalid: int = 0
-    oracle_calls: int = 0
+    failure_check_calls: int = 0
     accepted: int = 0
     not_cheaper: int = 0
 
@@ -22,7 +22,7 @@ class ReductionReport:
     stop_reason: str
     original: ModelCost
     final: ModelCost
-    oracle_calls: int = 0
+    failure_check_calls: int = 0
     interesting: int = 0
     not_interesting: int = 0
     inconclusive: int = 0
@@ -33,12 +33,12 @@ class ReductionReport:
     duration_seconds: float = 0.0
     final_hash: str = ""
     cache_hits: int = 0
-    signature_mismatches: int = 0
+    target_identity_mismatches: int = 0
     work_directory: str = ""
-    effective_checker_modes: list[str] = field(default_factory=list)
+    effective_validation_modes: list[str] = field(default_factory=list)
     custom_domains: list[str] = field(default_factory=list)
     minimality: dict[str, Any] = field(default_factory=dict)
-    checker_mode: str = "strict"
+    requested_validation_mode: str = "strict"
     pass_stats: dict[str, PassStats] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -62,20 +62,20 @@ class ReductionReport:
         if self.original.byte_size:
             byte_rate = round(1 - self.final.byte_size / self.original.byte_size, 6)
         return {
-            "version": 2,
+            "version": 3,
             "work_directory": self.work_directory,
             "minimality": self.minimality,
-            "effective_checker_modes": self.effective_checker_modes,
+            "effective_validation_modes": self.effective_validation_modes,
             "custom_domains": self.custom_domains,
             "stop_reason": self.stop_reason,
             "original": cost_dict(self.original),
             "final": cost_dict(self.final),
             "node_reduction_rate": node_rate,
             "byte_reduction_rate": byte_rate,
-            "oracle": {
-                "calls": self.oracle_calls,
+            "failure_checks": {
+                "calls": self.failure_check_calls,
                 "cache_hits": self.cache_hits,
-                "signature_mismatches": self.signature_mismatches,
+                "target_identity_mismatches": self.target_identity_mismatches,
                 "interesting": self.interesting,
                 "not_interesting": self.not_interesting,
                 "inconclusive": self.inconclusive,
@@ -88,7 +88,7 @@ class ReductionReport:
                 "valid_rate": valid_rate,
             },
             "passes": {name: stats.__dict__.copy() for name, stats in self.pass_stats.items()},
-            "checker_mode": self.checker_mode,
+            "requested_validation_mode": self.requested_validation_mode,
             "final_hash": self.final_hash,
             "duration_seconds": round(self.duration_seconds, 6),
         }
