@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from onnx_reduce.edits import Candidate
 
@@ -52,6 +53,17 @@ class ModelAdapter(Protocol):
     def save(self, path: str | Path) -> None: ...
 
     def materialize(self, path: str | Path) -> ModelArtifact: ...
+
+
+@runtime_checkable
+class NodeSearchModel(Protocol):
+    """Optional main-graph identity view; IDs survive edits within one lineage."""
+
+    @property
+    def node_ids(self) -> tuple[int, ...]: ...
+
+    @property
+    def id_to_index(self) -> Mapping[int, int]: ...
 
 
 class EditApplicationError(RuntimeError):

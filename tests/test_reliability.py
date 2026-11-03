@@ -346,7 +346,8 @@ def test_effective_checker_policy_is_reported(tmp_path):
     assert report.custom_domains == ["com.example"]
 
 
-def test_cli_regex_preserves_target_instead_of_another_bug(tmp_path):
+@pytest.mark.parametrize("scheduler", ["legacy", "stateful"])
+def test_cli_regex_preserves_target_instead_of_another_bug(tmp_path, scheduler):
     source = tmp_path / "source.onnx"
     output = tmp_path / "reduced.onnx"
     onnx.save(chain_model(4, 1), source)
@@ -362,6 +363,8 @@ def test_cli_regex_preserves_target_instead_of_another_bug(tmp_path):
                 str(source),
                 "--test",
                 shlex.join([sys.executable, str(script)]),
+                "--scheduler",
+                scheduler,
                 "--signature-regex",
                 r"assertion (\w+)",
                 "-o",

@@ -42,7 +42,10 @@ def test_byte_counter_includes_repeated_atomic_and_utf8_append_writes(tmp_path):
 
 
 @pytest.mark.parametrize("budget", [None, 0, 4])
-def test_instrumentation_preserves_ordered_decisions_and_final_artifact(tmp_path, budget):
+@pytest.mark.parametrize("scheduler", ["legacy", "stateful"])
+def test_instrumentation_preserves_ordered_decisions_and_final_artifact(
+    tmp_path, budget, scheduler
+):
     reports = []
     traces = []
     for enabled in (False, True):
@@ -51,12 +54,17 @@ def test_instrumentation_preserves_ordered_decisions_and_final_artifact(tmp_path
             config=EngineConfig(
                 collect_performance=enabled,
                 max_candidate_check_calls=budget,
+                scheduler=scheduler,
             )
         ).run(model, ReluFailureCheck(), tmp_path / str(enabled))
         reports.append(report.to_dict())
         trace = Path(report.work_directory) / "candidates.jsonl"
         traces.append(trace.read_bytes() if trace.exists() else b"")
     assert traces[0] == traces[1]
+    schedules = [Path(report["work_directory"]) / "scheduler.jsonl" for report in reports]
+    schedule_traces = [path.read_bytes() if path.exists() else b"" for path in schedules]
+    assert schedule_traces[0] == schedule_traces[1]
+    assert reports[0]["scheduler"]["coverage"] == reports[1]["scheduler"]["coverage"]
     for key in (
         "final_hash",
         "final",

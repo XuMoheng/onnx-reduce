@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from onnx_reduce.edits import Candidate, DeleteNodes
+from onnx_reduce.types import NodeSearchModel
 
 
 def _granularities(node_count: int) -> tuple[int, ...]:
@@ -23,6 +24,17 @@ def _granularities(node_count: int) -> tuple[int, ...]:
 
 class DeleteNodesPass:
     name = "delete_nodes"
+
+    def node_regions(
+        self, model: NodeSearchModel, size: int, *, start: int = 0
+    ) -> Iterator[tuple[int, ...]]:
+        """Yield current partitions, rotated to the block containing the resume anchor."""
+
+        ids = model.node_ids
+        count = (len(ids) + size - 1) // size
+        for offset in range(count):
+            begin = ((start + offset) % count) * size
+            yield ids[begin : begin + size]
 
     def generate(self, model: Any) -> Iterator[Candidate]:
         count = model.node_count

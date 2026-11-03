@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from functools import cached_property
 from pathlib import Path
+from types import MappingProxyType
 
 import onnx
 from google.protobuf.message import DecodeError
@@ -53,10 +54,21 @@ class OnnxModel:
     # Initialization, Model Conversion, and Copying
     # ==========================================
 
-    def __init__(self, model: ir.Model):
+    def __init__(self, model: ir.Model, *, _node_ids: tuple[int, ...] | None = None):
         """Take ownership of the IR model; callers must stop mutating it and its tensors."""
 
         self._model = model  # Owned IR; edits are applied only to fresh clones
+        ids = range(model.graph.num_nodes()) if _node_ids is None else _node_ids
+        self._node_ids = dict(zip(model.graph, ids, strict=True))
+        self._refresh_node_indices()
+
+    def _refresh_node_indices(self) -> None:
+        # Keep only live objects. Identity metadata never enters the ONNX payload.
+        self._node_ids = {node: self._node_ids[node] for node in self._model.graph}
+        self._ordered_node_ids = tuple(self._node_ids.values())
+        self._id_to_index = MappingProxyType(
+            {node_id: index for index, node_id in enumerate(self._ordered_node_ids)}
+        )
 
     @classmethod
     def load(cls, path: str | os.PathLike[str]) -> OnnxModel:
@@ -103,7 +115,7 @@ class OnnxModel:
     def copy(self) -> OnnxModel:
         """Clone the IR for candidate edits while preserving the original model."""
 
-        return OnnxModel(self._model.clone())
+        return OnnxModel(self._model.clone(), _node_ids=self.node_ids)
 
     @measured("export")
     def to_proto(self) -> onnx.ModelProto:
@@ -129,6 +141,18 @@ class OnnxModel:
         """Return the main-graph node count, excluding nodes inside attribute subgraphs."""
 
         return self._model.graph.num_nodes()
+
+    @property
+    def node_ids(self) -> tuple[int, ...]:
+        """Return stable lineage IDs in the current main-graph order."""
+
+        return self._ordered_node_ids
+
+    @property
+    def id_to_index(self):
+        """Expose an immutable index mapping for this model version."""
+
+        return self._id_to_index
 
     @property
     def output_names(self) -> tuple[str, ...]:
@@ -371,6 +395,7 @@ class OnnxModel:
         # 5. Remove nodes and restore topological order; leave input/weight cleanup separate.
         graph.remove(selected)
         graph.sort()
+        self._refresh_node_indices()
 
     def _drop_outputs(self, names: Iterable[str]) -> None:
         """Drop named graph outputs, keeping at least one and preserving producer nodes."""

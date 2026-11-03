@@ -160,7 +160,10 @@ def test_cache_still_works_at_exact_call_limit(tmp_path, cache_enabled):
     assert report.minimality["status"] == ("pass_fixed_point" if cache_enabled else "unproven")
 
 
-def test_expired_time_budget_after_preparation_does_not_start_failure_check(tmp_path, monkeypatch):
+@pytest.mark.parametrize("scheduler", ["legacy", "stateful"])
+def test_expired_time_budget_after_preparation_does_not_start_failure_check(
+    tmp_path, monkeypatch, scheduler
+):
     # A fake clock makes the deadline deterministic without slow sleeps.
     clock = [0.0]
     monkeypatch.setattr("onnx_reduce.engine.time.monotonic", lambda: clock[0])
@@ -175,7 +178,7 @@ def test_expired_time_budget_after_preparation_does_not_start_failure_check(tmp_
     monkeypatch.setattr(OnnxModel, "materialize", slow_materialize)
     _, report = ReductionEngine(
         passes=[Duplicates()],
-        config=EngineConfig(time_budget_seconds=1),
+        config=EngineConfig(time_budget_seconds=1, scheduler=scheduler),
     ).run(OnnxModel.from_proto(chain_model()), RejectCandidates(), tmp_path)
     assert report.failure_check_calls == 2
     assert report.stop_reason == "budget_exhausted"

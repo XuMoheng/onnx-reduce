@@ -26,12 +26,18 @@ from onnx_reduce.performance import (
     current_performance,
     measured,
     sample,
-    timed_candidates,
 )
 from onnx_reduce.preparation import current_preparation, edit_key, preparation_caches
 from onnx_reduce.report import PassStats, ReductionReport
+from onnx_reduce.scheduler import (
+    AttemptResult,
+    CandidateFeedback,
+    LegacyScheduler,
+    ScheduledAttempt,
+    StatefulScheduler,
+)
 from onnx_reduce.storage import write_json, write_text
-from onnx_reduce.types import EditApplicationError, ModelAdapter, ValidationResult
+from onnx_reduce.types import EditApplicationError, ModelAdapter, ModelCost, ValidationResult
 
 ProgressCallback = Callable[[str], None]
 
@@ -65,8 +71,11 @@ class EngineConfig:
     collect_performance: bool = False
     target_mode: str = "baseline"
     signature_regex: str | None = None
+    scheduler: str = "legacy"
 
     def __post_init__(self) -> None:
+        if self.scheduler not in {"legacy", "stateful"}:
+            raise ValueError(f"unknown scheduler: {self.scheduler}")
         if self.validation_mode not in {"strict", "structural", "permissive"}:
             raise ValueError(f"unknown validation mode: {self.validation_mode}")
         if self.target_mode not in {"baseline", "script"}:
@@ -162,6 +171,8 @@ class ReductionEngine:
         validation = model.validate(self.config.validation_mode)
         if not validation.valid:
             raise ReductionError(f"input model is invalid: {validation.reason}")
+        scheduler_type = LegacyScheduler if self.config.scheduler == "legacy" else StatefulScheduler
+        scheduler = scheduler_type(self.passes, model)
         report = ReductionReport(
             stop_reason="searching",
             performance=current_performance(),
@@ -188,61 +199,60 @@ class ReductionEngine:
                 "baseline_identity": evaluator.matcher.baseline_identity,
             },
         )
+        report.scheduler = scheduler.to_dict()
         current_model = model
         self._checkpoint(current_model, report, run_dir, started)
         self.progress(f"initial model is interesting ({report.original.node_count} nodes)")
         candidate_sequence_number = 0
-        sweep_inconclusive_candidate_count = 0
         while True:
-            accepted_model = None
-            budget_exhausted = False
-            # Counts only the final incumbent's completed sweep. A prior sweep's
-            # inconclusive neighbors say nothing about this incumbent.
-            sweep_inconclusive_candidate_count = 0
+            attempt = scheduler.next_attempt(current_model)
+            if attempt is None:
+                report.stop_reason = "fixed_point"
+                break
+            if self.config.max_candidate_check_calls == 0 or not self._time_budget_allows(started):
+                report.stop_reason = "budget_exhausted"
+                break
             base_digest = current_model.canonical_hash()
-            for reduction_pass in self.passes:
-                for candidate in timed_candidates(reduction_pass, current_model):
-                    if self.config.max_candidate_check_calls == 0 or not self._time_budget_allows(
-                        started
-                    ):
-                        budget_exhausted = True
-                        break
-                    if candidate.base_digest not in (None, base_digest):
-                        raise ReductionError("pass produced a candidate for a different base")
-                    candidate = replace(
-                        candidate,
-                        base_digest=base_digest,
-                        pass_name=reduction_pass.name,
-                        sequence_number=candidate_sequence_number,
-                    )
-                    candidate_sequence_number += 1
-                    inconclusive_count_before = report.inconclusive
-                    try:
-                        accepted_model = self._try_candidate(
-                            current_model,
-                            candidate,
-                            reduction_pass,
-                            evaluator,
-                            run_dir,
-                            report,
-                            started,
-                        )
-                    except EvaluationBudgetExceeded:
-                        budget_exhausted = True
-                        break
-                    sweep_inconclusive_candidate_count += (
-                        report.inconclusive - inconclusive_count_before
-                    )
-                    if accepted_model is not None:
-                        break
-                if accepted_model is not None or budget_exhausted:
-                    break
-            if accepted_model is not None:
-                current_model = accepted_model
+            candidate = attempt.candidate
+            if attempt.base_digest != base_digest or candidate.base_digest not in (
+                None,
+                base_digest,
+            ):
+                raise ReductionError("pass produced a candidate for a different base")
+            candidate = replace(
+                candidate,
+                base_digest=base_digest,
+                pass_name=attempt.reduction_pass.name,
+                sequence_number=candidate_sequence_number,
+            )
+            candidate_sequence_number += 1
+            try:
+                outcome = self._try_candidate(
+                    current_model,
+                    candidate,
+                    attempt.reduction_pass,
+                    evaluator,
+                    run_dir,
+                    report,
+                    started,
+                )
+            except EvaluationBudgetExceeded:
+                self._record_schedule(run_dir, attempt, candidate, None)
+                report.stop_reason = "budget_exhausted"
+                break
+            self._record_schedule(run_dir, attempt, candidate, outcome.feedback)
+            scheduler.observe(attempt, outcome.feedback, outcome.accepted_model)
+            if outcome.accepted_model is not None:
+                current_model = outcome.accepted_model
+                report.scheduler = scheduler.to_dict()
                 self._checkpoint(current_model, report, run_dir, started)
-                continue
-            report.stop_reason = "budget_exhausted" if budget_exhausted else "fixed_point"
-            break
+
+        coverage = scheduler.coverage()
+        if report.stop_reason == "fixed_point" and (
+            not coverage.completed or coverage.base_digest != current_model.canonical_hash()
+        ):
+            raise ReductionError("scheduler did not cover the current model")
+        report.scheduler = scheduler.to_dict()
 
         # Recheck precisely the artifact delivered to the caller. Mandatory
         # evaluations never reuse the verdict cache.
@@ -261,12 +271,12 @@ class ReductionEngine:
         report.minimality = {
             "status": (
                 "pass_fixed_point"
-                if report.stop_reason == "fixed_point" and not sweep_inconclusive_candidate_count
+                if report.stop_reason == "fixed_point" and not coverage.inconclusive_candidate_count
                 else "unproven"
             ),
-            "scope": "valid, strictly cheaper candidates generated by configured passes",
+            "scope": coverage.scope,
             "passes": [item.name for item in self.passes],
-            "sweep_inconclusive_candidate_count": sweep_inconclusive_candidate_count,
+            "sweep_inconclusive_candidate_count": coverage.inconclusive_candidate_count,
             "global_minimum": False,
         }
         self._checkpoint(current_model, report, run_dir, started)
@@ -301,7 +311,29 @@ class ReductionEngine:
         run_dir: Path,
         report: ReductionReport,
         started: float,
-    ) -> ModelAdapter | None:
+    ) -> AttemptResult:
+        clock = time.perf_counter if current_performance() is not None else None
+        attempt_started = clock() if clock else None
+        evaluation_seconds = 0.0
+        materialization_seconds = 0.0
+        base_cost = base_model.cost()
+
+        def finish(status, cost=None, accepted_model=None, **details):
+            preparation_seconds = (
+                max(0.0, clock() - attempt_started - evaluation_seconds) if clock else None
+            )
+            return AttemptResult(
+                CandidateFeedback(
+                    status,
+                    base_cost,
+                    cost,
+                    preparation_seconds=preparation_seconds,
+                    evaluation_seconds=evaluation_seconds if clock else None,
+                    **details,
+                ),
+                accepted_model,
+            )
+
         stats = report.pass_stats[reduction_pass.name]
         stats.generated += 1
         report.candidates_generated += 1
@@ -343,15 +375,19 @@ class ReductionEngine:
                 self._record_evaluation(result, report)
                 details["cache_hit"] = True
             self._record_candidate(run_dir, candidate, status, **details, edit_cache_hit=True)
-            return None
+            return finish(
+                status,
+                ModelCost(**details["cost"]) if "cost" in details else None,
+                cache_source="edit",
+                target_identity_mismatch=details.get("target_identity_mismatch", False),
+            )
         try:
             candidate_model = base_model.apply_candidate(candidate)
         except EditApplicationError as exc:
             report.candidates_invalid += 1
             stats.invalid += 1
             self._record_candidate(run_dir, candidate, "edit_failed", reason=str(exc))
-            return None
-        base_cost = base_model.cost()
+            return finish("edit_failed")
         candidate_cost = candidate_model.cost()
         sample("candidate_nodes", candidate_cost.node_count)
         sample("candidate_bytes", candidate_cost.byte_size)
@@ -359,7 +395,7 @@ class ReductionEngine:
             report.candidates_not_cheaper += 1
             stats.not_cheaper += 1
             self._record_candidate(run_dir, candidate, "not_cheaper", cost=asdict(candidate_cost))
-            return None
+            return finish("not_cheaper", candidate_cost)
         validation = candidate_model.validate(self.config.validation_mode)
         self._record_validation(validation, report)
         if not validation.valid:
@@ -372,7 +408,7 @@ class ReductionEngine:
                 validation=asdict(validation),
                 cost=asdict(candidate_cost),
             )
-            return None
+            return finish("invalid", candidate_cost)
         digest = candidate_model.canonical_hash()
         candidate_path = run_dir / "candidates" / f"{candidate.sequence_number:08d}" / "model.onnx"
         if not self._time_budget_allows(started):
@@ -380,13 +416,18 @@ class ReductionEngine:
             raise EvaluationBudgetExceeded("search time budget exhausted")
 
         def prepare():
+            nonlocal materialization_seconds
+            materialization_started = clock() if clock else None
             candidate_model.materialize(candidate_path)
+            if clock:
+                materialization_seconds += clock() - materialization_started
             if not self._time_budget_allows(started):
                 raise EvaluationBudgetExceeded("search time budget exhausted")
 
         # Cached decisions consume no calls, even when the quota is exactly
         # spent. The evaluator checks its cache before enforcing this limit.
         try:
+            evaluation_started = clock() if clock else None
             result = evaluator.evaluate(
                 candidate_path,
                 digest,
@@ -397,6 +438,10 @@ class ReductionEngine:
                 ),
                 prepare=prepare,
             )
+            if clock:
+                evaluation_seconds = max(
+                    0.0, clock() - evaluation_started - materialization_seconds
+                )
         except EvaluationBudgetExceeded:
             self._record_candidate(
                 run_dir,
@@ -419,7 +464,13 @@ class ReductionEngine:
         if not result.cache_hit:
             stats.failure_check_calls += 1
         if result.outcome is not FailureCheckResult.INTERESTING:
-            return None
+            return finish(
+                result.outcome.value,
+                candidate_cost,
+                cache_source="content" if result.cache_hit else None,
+                failure_check_calls=int(not result.cache_hit),
+                target_identity_mismatch=result.target_identity_mismatch,
+            )
         # All passes, including cleanup, are gated by failure checks.
         report.candidates_accepted += 1
         stats.accepted += 1
@@ -440,7 +491,48 @@ class ReductionEngine:
             + "\n",
             append=True,
         )
-        return candidate_model
+        return finish(
+            "accepted",
+            candidate_cost,
+            candidate_model,
+            cache_source="content" if result.cache_hit else None,
+            failure_check_calls=int(not result.cache_hit),
+        )
+
+    @staticmethod
+    def _record_schedule(
+        run_dir: Path,
+        attempt: ScheduledAttempt,
+        candidate: Candidate,
+        feedback: CandidateFeedback | None,
+    ) -> None:
+        # Keep scheduling evidence separate so replayable candidate JSON and
+        # instrumentation-equivalence traces retain their existing format.
+        write_text(
+            run_dir / "scheduler.jsonl",
+            json.dumps(
+                {
+                    "sequence_number": candidate.sequence_number,
+                    "base_digest": attempt.base_digest,
+                    "model_version": attempt.model_version,
+                    "pass_name": attempt.reduction_pass.name,
+                    "source": attempt.source,
+                    "direction": attempt.direction,
+                    "scale": attempt.scale,
+                    "region_anchor": attempt.region_ids[0] if attempt.region_ids else None,
+                    "region_size": len(attempt.region_ids),
+                    "status": feedback.status if feedback else "budget_exhausted",
+                    "cache_source": feedback.cache_source if feedback else None,
+                    "failure_check_calls": feedback.failure_check_calls if feedback else 0,
+                    "target_identity_mismatch": (
+                        feedback.target_identity_mismatch if feedback else False
+                    ),
+                },
+                sort_keys=True,
+            )
+            + "\n",
+            append=True,
+        )
 
     @staticmethod
     def _record_candidate(
