@@ -20,8 +20,16 @@ from onnx_reduce.failure_check.evaluator import (
 )
 from onnx_reduce.failure_check.runner import FailureCheckRunnable
 from onnx_reduce.passes.base import ReductionPass
+from onnx_reduce.performance import (
+    collect_performance,
+    count,
+    current_performance,
+    measured,
+    sample,
+    timed_candidates,
+)
 from onnx_reduce.report import PassStats, ReductionReport
-from onnx_reduce.storage import write_json
+from onnx_reduce.storage import write_json, write_text
 from onnx_reduce.types import EditApplicationError, ModelAdapter, ValidationResult
 
 ProgressCallback = Callable[[str], None]
@@ -53,6 +61,7 @@ class EngineConfig:
     max_candidate_check_calls: int | None = None
     time_budget_seconds: float | None = None
     cache_enabled: bool = True
+    collect_performance: bool = False
     target_mode: str = "baseline"
     signature_regex: str | None = None
 
@@ -101,6 +110,23 @@ class ReductionEngine:
         *,
         output_path: str | Path | None = None,
     ) -> tuple[ModelAdapter, ReductionReport]:
+        with collect_performance(self.config.collect_performance) as performance:
+            reduced, report = self._run(
+                model, failure_check_runner, workdir, output_path=output_path
+            )
+        if performance is not None:
+            # Freeze metrics before serializing their final snapshot.
+            write_json(Path(report.work_directory) / "report.json", report.to_dict())
+        return reduced, report
+
+    def _run(
+        self,
+        model: ModelAdapter,
+        failure_check_runner: FailureCheckRunnable,
+        workdir: str | Path,
+        *,
+        output_path: str | Path | None = None,
+    ) -> tuple[ModelAdapter, ReductionReport]:
         started = time.monotonic()
         work_root = Path(workdir).resolve()
         work_root.mkdir(parents=True, exist_ok=True)
@@ -134,6 +160,7 @@ class ReductionEngine:
             raise ReductionError(f"input model is invalid: {validation.reason}")
         report = ReductionReport(
             stop_reason="searching",
+            performance=current_performance(),
             original=model.cost(),
             final=model.cost(),
             requested_validation_mode=self.config.validation_mode,
@@ -170,7 +197,7 @@ class ReductionEngine:
             sweep_inconclusive_candidate_count = 0
             base_digest = current_model.canonical_hash()
             for reduction_pass in self.passes:
-                for candidate in reduction_pass.generate(current_model):
+                for candidate in timed_candidates(reduction_pass, current_model):
                     if self.config.max_candidate_check_calls == 0 or not self._time_budget_allows(
                         started
                     ):
@@ -274,6 +301,15 @@ class ReductionEngine:
         stats = report.pass_stats[reduction_pass.name]
         stats.generated += 1
         report.candidates_generated += 1
+        if current_performance() is not None:
+            sample("candidate_edit_count", len(candidate.edits))
+            sample(
+                "candidate_selected_items",
+                sum(
+                    len(edit.indices) if hasattr(edit, "indices") else len(edit.names)
+                    for edit in candidate.edits
+                ),
+            )
         try:
             candidate_model = base_model.apply_candidate(candidate)
         except EditApplicationError as exc:
@@ -283,6 +319,8 @@ class ReductionEngine:
             return None
         base_cost = base_model.cost()
         candidate_cost = candidate_model.cost()
+        sample("candidate_nodes", candidate_cost.node_count)
+        sample("candidate_bytes", candidate_cost.byte_size)
         if candidate_cost >= base_cost:
             report.candidates_not_cheaper += 1
             stats.not_cheaper += 1
@@ -336,31 +374,34 @@ class ReductionEngine:
             f"accepted {reduction_pass.name}: nodes {base_cost.node_count}->{candidate_cost.node_count}, "
             f"bytes {base_cost.byte_size}->{candidate_cost.byte_size}"
         )
-        with (run_dir / "accepted.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(
-                json.dumps(
-                    {
-                        "candidate": candidate.to_dict(),
-                        "digest": artifact.digest,
-                        "cost": asdict(candidate_cost),
-                    },
-                    sort_keys=True,
-                )
-                + "\n"
+        write_text(
+            run_dir / "accepted.jsonl",
+            json.dumps(
+                {
+                    "candidate": candidate.to_dict(),
+                    "digest": artifact.digest,
+                    "cost": asdict(candidate_cost),
+                },
+                sort_keys=True,
             )
+            + "\n",
+            append=True,
+        )
         return candidate_model
 
     @staticmethod
     def _record_candidate(run_dir: Path, candidate: Candidate, status: str, **details) -> None:
         """Keep rejection evidence even when a candidate never reaches the failure check runner."""
-        with (run_dir / "candidates.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(
-                json.dumps(
-                    {"candidate": candidate.to_dict(), "status": status, **details},
-                    sort_keys=True,
-                )
-                + "\n"
+        count(f"candidate_status.{status}")
+        write_text(
+            run_dir / "candidates.jsonl",
+            json.dumps(
+                {"candidate": candidate.to_dict(), "status": status, **details},
+                sort_keys=True,
             )
+            + "\n",
+            append=True,
+        )
 
     @staticmethod
     def _record_evaluation(result: Evaluation, report: ReductionReport) -> None:
@@ -387,6 +428,7 @@ class ReductionEngine:
         report.custom_domains = sorted(set(report.custom_domains) | set(validation.custom_domains))
 
     @staticmethod
+    @measured("checkpoint")
     def _checkpoint(
         model: ModelAdapter,
         report: ReductionReport,

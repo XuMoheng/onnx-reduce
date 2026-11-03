@@ -32,8 +32,8 @@ jobs:
 
       - name: Lint and formatting
         run: |
-          uv run --locked ruff check src tests examples
-          uv run --locked ruff format --check src tests examples
+          uv run --locked ruff check src tests examples benchmarks
+          uv run --locked ruff format --check src tests examples benchmarks
 
       - name: Run tests
         run: uv run --locked pytest -q

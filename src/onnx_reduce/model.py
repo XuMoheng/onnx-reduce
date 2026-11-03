@@ -14,6 +14,7 @@ from google.protobuf.message import DecodeError
 from onnxscript import ir
 
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs, DropOutputs
+from onnx_reduce.performance import count, measure, measured
 from onnx_reduce.storage import atomic_write
 from onnx_reduce.types import (
     EditApplicationError,
@@ -97,11 +98,13 @@ class OnnxModel:
             raise TypeError("proto did not convert to an onnxscript IR Model")
         return cls(converted)
 
+    @measured("clone")
     def copy(self) -> OnnxModel:
         """Clone the IR for candidate edits while preserving the original model."""
 
         return OnnxModel(self._model.clone())
 
+    @measured("export")
     def to_proto(self) -> onnx.ModelProto:
         """Export a ModelProto that can be modified independently."""
 
@@ -274,6 +277,7 @@ class OnnxModel:
     # Candidate Editing: Public Entry Point and Internal Implementations
     # ==========================================
 
+    @measured("clone_and_edit")
     def apply_candidate(self, candidate: Candidate) -> OnnxModel:
         """Verify the base and apply edits to a clone; the engine decides acceptance."""
 
@@ -401,24 +405,28 @@ class OnnxModel:
         missing = [value for value in values if value.name]
         if not missing:
             return {}
-        try:
-            inferred_proto = onnx.shape_inference.infer_shapes(self.to_proto())
-            inferred_model = ir.from_proto(inferred_proto)
-            if not isinstance(inferred_model, ir.Model):
+        with measure("shape_inference"):
+            try:
+                inferred_proto = onnx.shape_inference.infer_shapes(self.to_proto())
+                inferred_model = ir.from_proto(inferred_proto)
+                if not isinstance(inferred_model, ir.Model):
+                    return {}
+                # Promotions are main-graph edits. Nested scopes can reuse local
+                # names, so never flatten their value names into this lookup.
+                graph = inferred_model.graph
+                available = {value.name: value for value in graph.inputs}
+                for node in graph:
+                    available.update({value.name: value for value in node.outputs if value.name})
+                return {
+                    value.name: available[value.name]
+                    for value in missing
+                    if value.name in available
+                }
+            except Exception:
+                count("shape_inference_failures")
+                # An untyped promotion will be rejected by the configured checker.
+                # This is preferable to failing the whole reduction run.
                 return {}
-            # Promotions are main-graph edits. Nested scopes can reuse local
-            # names, so never flatten their value names into this lookup.
-            graph = inferred_model.graph
-            available = {value.name: value for value in graph.inputs}
-            for node in graph:
-                available.update({value.name: value for value in node.outputs if value.name})
-            return {
-                value.name: available[value.name] for value in missing if value.name in available
-            }
-        except Exception:
-            # An untyped promotion will be rejected by the configured checker.
-            # This is preferable to failing the whole reduction run.
-            return {}
 
     # ==========================================
     # Cost Calculation and Model Validation
@@ -436,6 +444,7 @@ class OnnxModel:
             initializer_count=len(graph.initializers),
         )
 
+    @measured("validation")
     def validate(self, mode: str = "strict") -> ValidationResult:
         """Check the model and report validity, the failure reason, and the effective mode."""
 
@@ -484,12 +493,14 @@ class OnnxModel:
     # ==========================================
 
     @cached_property
+    @measured("serialization")
     def _payload(self) -> bytes:
         """Cache deterministic bytes on first access for cost, hashing, and file output."""
 
         return self.to_proto().SerializeToString(deterministic=True)
 
     @cached_property
+    @measured("hash")
     def _digest(self) -> str:
         """Cache the SHA-256 of serialized bytes as the exact content identity."""
 

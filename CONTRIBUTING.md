@@ -20,8 +20,8 @@ uv run --locked onnx-reduce --help
 
 ```bash
 uv run --locked pytest -q
-uv run --locked ruff check src tests examples
-uv run --locked ruff format --check src tests examples
+uv run --locked ruff check src tests examples benchmarks
+uv run --locked ruff format --check src tests examples benchmarks
 ```
 
 测试只使用仓库内的模型和判定替身，不需要安装真实推理后端。

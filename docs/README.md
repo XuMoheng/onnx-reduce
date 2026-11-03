@@ -19,6 +19,8 @@ onnx-reduce 在保留用户指定故障的前提下，缩减 ONNX 模型。以�
 ## 开发计划
 
 - [性能优化计划](performance-todo.md)
+- [性能基线：采集与基准命令](performance-baseline.md)
+- [性能基线实测：2026-11-02](performance-results.md)
 
 ## 命令与路径约定
 

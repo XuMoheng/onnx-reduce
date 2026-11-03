@@ -52,6 +52,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--work-dir", type=Path, help="retain run logs/checkpoints here (default: OUTPUT.work)"
     )
+    parser.add_argument(
+        "--performance", action="store_true", help="collect stage timings and resource counters"
+    )
     parser.add_argument("--no-cache", action="store_true", help="disable per-run verdict cache")
     parser.add_argument(
         "--target-mode",
@@ -101,6 +104,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             max_candidate_check_calls=args.max_candidate_check_calls,
             time_budget_seconds=args.time_budget_seconds,
             cache_enabled=not args.no_cache,
+            collect_performance=args.performance,
             target_mode=args.target_mode,
             signature_regex=args.signature_regex,
         )

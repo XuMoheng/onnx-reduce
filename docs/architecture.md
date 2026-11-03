@@ -25,6 +25,7 @@ src/onnx_reduce/
 │   ├── contract.py      # 判定配置、退出码到三态结果的转换
 │   ├── runner.py        # 判定进程执行、超时清理、日志与结束方式收集
 │   └── evaluator.py     # 基线身份与签名匹配、单次运行缓存、判定证据
+├── performance.py       # 可选的运行内阶段计时、规模和资源统计
 ├── report.py            # 统计项与 JSON schema version 3
 └── storage.py           # 同目录临时文件与原子替换写入
 ```

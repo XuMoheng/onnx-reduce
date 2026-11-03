@@ -69,6 +69,7 @@ build-backend = "uv_build"
 source-include = [
     "tests/**",
     "examples/**",
+    "benchmarks/**",
     "docs/**",
     "CHANGELOG.md",
     "CONTRIBUTING.md",

@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from onnx_reduce.performance import PerformanceStats
 from onnx_reduce.types import ModelCost
 
 
@@ -41,6 +42,8 @@ class ReductionReport:
     requested_validation_mode: str = "strict"
     pass_stats: dict[str, PassStats] = field(default_factory=dict)
 
+    performance: PerformanceStats | None = field(default=None, repr=False)
+
     def to_dict(self) -> dict[str, Any]:
         def cost_dict(cost: ModelCost) -> dict[str, int]:
             return {
@@ -63,6 +66,7 @@ class ReductionReport:
             byte_rate = round(1 - self.final.byte_size / self.original.byte_size, 6)
         return {
             "version": 3,
+            **({"performance": self.performance.to_dict()} if self.performance else {}),
             "work_directory": self.work_directory,
             "minimality": self.minimality,
             "effective_validation_modes": self.effective_validation_modes,

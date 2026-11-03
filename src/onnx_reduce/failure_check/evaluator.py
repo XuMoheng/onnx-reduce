@@ -9,6 +9,8 @@ from pathlib import Path
 
 from onnx_reduce.failure_check.contract import FailureCheckResult
 from onnx_reduce.failure_check.runner import FailureCheckObservation, FailureCheckRunnable
+from onnx_reduce.performance import count, measure
+from onnx_reduce.storage import write_text
 
 
 @dataclass(frozen=True)
@@ -93,22 +95,26 @@ class Evaluator:
             cached = self.cache[digest]
             result = Evaluation(cached.outcome, True, cached.target_identity_mismatch)
             self.cache_hits += 1
+            count("content_cache_hits")
             self._record(path, digest, result, None, metadata)
             return result
+        if not mandatory:
+            count("content_cache_misses" if self.cache_enabled else "content_cache_disabled")
         if not mandatory and not allow_execution:
             raise EvaluationBudgetExceeded("candidate failure check call budget exhausted")
         self.calls += 1
         observe = getattr(self.failure_check_runner, "observe", None)
-        observation = (
-            observe(path)
-            if observe is not None
-            else FailureCheckObservation(self.failure_check_runner.run(path))
-        )
+        with measure("external_check"):
+            observation = (
+                observe(path)
+                if observe is not None
+                else FailureCheckObservation(self.failure_check_runner.run(path))
+            )
         result = self.matcher.match(observation, initial=initial)
         logs = self.workdir / "checks" / f"{self.calls:08d}"
         logs.mkdir(parents=True)
-        logs.joinpath("stdout.log").write_text(observation.stdout, encoding="utf-8")
-        logs.joinpath("stderr.log").write_text(observation.stderr, encoding="utf-8")
+        write_text(logs / "stdout.log", observation.stdout)
+        write_text(logs / "stderr.log", observation.stderr)
         self._record(path, digest, result, observation, metadata)
         if self.cache_enabled and result.outcome is not FailureCheckResult.INCONCLUSIVE:
             self.cache[digest] = result
@@ -133,5 +139,8 @@ class Evaluator:
                 "output_truncated": observation.output_truncated,
                 "logs": str(self.workdir / "checks" / f"{self.calls:08d}"),
             }
-        with (self.workdir / "evaluations.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(json.dumps(record, sort_keys=True) + "\n")
+        write_text(
+            self.workdir / "evaluations.jsonl",
+            json.dumps(record, sort_keys=True) + "\n",
+            append=True,
+        )
