@@ -66,5 +66,34 @@ class NodeSearchModel(Protocol):
     def id_to_index(self) -> Mapping[int, int]: ...
 
 
+@dataclass(frozen=True)
+class RegionValue:
+    producer: int | None
+    consumers: tuple[int, ...]
+    graph_output: bool
+    type_complete: bool
+
+
+@dataclass(frozen=True)
+class RegionGraph:
+    """Main-graph links, including outer captures, using stable node IDs."""
+
+    node_ids: tuple[int, ...]
+    modules: tuple[tuple[int, tuple[str, ...]], ...]
+    values: tuple[RegionValue, ...]
+
+
+@runtime_checkable
+class RegionSearchModel(NodeSearchModel, Protocol):
+    def region_graph(self) -> RegionGraph: ...
+
+
+@runtime_checkable
+class ArtifactValidationModel(Protocol):
+    """Optional read-back validation of the delivered artifact."""
+
+    def validate_artifact(self, artifact: ModelArtifact, mode: str) -> ValidationResult: ...
+
+
 class EditApplicationError(RuntimeError):
     """An edit could not be applied to the current model."""

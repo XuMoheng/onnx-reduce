@@ -42,6 +42,7 @@ class ReductionReport:
     requested_validation_mode: str = "strict"
     pass_stats: dict[str, PassStats] = field(default_factory=dict)
     scheduler: dict[str, Any] = field(default_factory=dict)
+    artifact_recheck: dict[str, Any] = field(default_factory=dict)
 
     performance: PerformanceStats | None = field(default=None, repr=False)
 
@@ -66,11 +67,12 @@ class ReductionReport:
         if self.original.byte_size:
             byte_rate = round(1 - self.final.byte_size / self.original.byte_size, 6)
         return {
-            "version": 4,
+            "version": 5,
             **({"performance": self.performance.to_dict()} if self.performance else {}),
             "work_directory": self.work_directory,
             "minimality": self.minimality,
             "scheduler": self.scheduler,
+            "artifact_recheck": self.artifact_recheck,
             "effective_validation_modes": self.effective_validation_modes,
             "custom_domains": self.custom_domains,
             "stop_reason": self.stop_reason,

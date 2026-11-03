@@ -160,7 +160,7 @@ def test_cache_still_works_at_exact_call_limit(tmp_path, cache_enabled):
     assert report.minimality["status"] == ("pass_fixed_point" if cache_enabled else "unproven")
 
 
-@pytest.mark.parametrize("scheduler", ["legacy", "stateful"])
+@pytest.mark.parametrize("scheduler", ["legacy", "stateful", "staged"])
 def test_expired_time_budget_after_preparation_does_not_start_failure_check(
     tmp_path, monkeypatch, scheduler
 ):

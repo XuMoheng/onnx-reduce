@@ -276,7 +276,8 @@ def test_invalid_validation_is_reused_without_repeating_clone_or_checker(tmp_pat
     assert report.candidates_invalid == 2
     assert report.failure_check_calls == 2
     assert report.performance.stages["clone"]["calls"] == 1
-    assert report.performance.stages["validation"]["calls"] == 2  # initial + unique invalid
+    # Initial model, unique invalid candidate, and independently loaded final artifact.
+    assert report.performance.stages["validation"]["calls"] == 3
     assert report.performance.counters["edit_cache_hits"] == 1
 
 

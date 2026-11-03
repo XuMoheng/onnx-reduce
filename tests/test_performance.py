@@ -42,7 +42,7 @@ def test_byte_counter_includes_repeated_atomic_and_utf8_append_writes(tmp_path):
 
 
 @pytest.mark.parametrize("budget", [None, 0, 4])
-@pytest.mark.parametrize("scheduler", ["legacy", "stateful"])
+@pytest.mark.parametrize("scheduler", ["legacy", "stateful", "staged"])
 def test_instrumentation_preserves_ordered_decisions_and_final_artifact(
     tmp_path, budget, scheduler
 ):
