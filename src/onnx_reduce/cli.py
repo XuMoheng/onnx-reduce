@@ -70,6 +70,40 @@ def build_parser() -> argparse.ArgumentParser:
         help="finalize a verified previous output; restore its target and verify check configuration",
     )
     parser.add_argument(
+        "--model-edit-mode",
+        choices=("ir", "auto"),
+        default="ir",
+        help="candidate editing (auto enables conservative protobuf edits)",
+    )
+    parser.add_argument(
+        "--search-policy",
+        choices=("restart", "cursor"),
+        default="restart",
+        help="staged heuristic continuation policy",
+    )
+    parser.add_argument(
+        "--history-order",
+        choices=("off", "defer"),
+        default="off",
+        help="staged cursor: defer old rejections without skipping them",
+    )
+    parser.add_argument(
+        "--direction-order",
+        choices=("fixed", "adaptive"),
+        default="fixed",
+        help="staged cursor: region delete/keep ordering",
+    )
+    parser.add_argument(
+        "--no-validation-cache",
+        action="store_true",
+        help="disable checker/domain metadata caches for comparisons",
+    )
+    parser.add_argument(
+        "--no-checkpoint-reuse",
+        action="store_true",
+        help="rewrite checkpoints, for storage comparisons",
+    )
+    parser.add_argument(
         "--performance", action="store_true", help="collect stage timings and resource counters"
     )
     parser.add_argument(
@@ -127,6 +161,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             target_mode=args.target_mode,
             signature_regex=args.signature_regex,
             scheduler=args.scheduler,
+            model_edit_mode=args.model_edit_mode,
+            search_policy=args.search_policy,
+            history_order=args.history_order,
+            direction_order=args.direction_order,
+            checkpoint_reuse=not args.no_checkpoint_reuse,
+            validation_cache_enabled=not args.no_validation_cache,
             goal=args.goal,
             finalize_from=str(args.finalize_from.resolve()) if args.finalize_from else None,
         )

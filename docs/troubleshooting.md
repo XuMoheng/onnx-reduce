@@ -17,7 +17,7 @@
 正常收尾时，运行目录总会有 `report.json`；`--report` 额外导出一份相同报告。
 初检失败、加载失败或中断时可能没有最终报告。
 
-当前 JSON schema 的版本字段为 `version: 5`，新增实际产物的 `artifact_recheck`，
+当前 JSON schema 的版本字段为 `version: 6`，保留实际产物的 `artifact_recheck`，增加优化配置 `optimizations`，
 staged 还会扩展 scheduler 中的阶段和收尾信息。主要字段如下：
 
 | 字段 | 读法 |
@@ -37,6 +37,8 @@ staged 还会扩展 scheduler 中的阶段和收尾信息。主要字段如下�
 | `scheduler.strategy` / `model_version` | 本次策略，以及接受编辑后递增的模型版本 |
 | `scheduler.coverage` | 被扫描的摘要、版本、候选范围、是否完成及不确定候选数 |
 | `scheduler.sources` | heuristic / coverage，或 coarse / regions / fine / cleanup / coverage 的尝试、实际调用、缓存命中和接受数 |
+| `optimizations` | 模型编辑模式、续扫/历史/方向配置、校验缓存与 checkpoint 复用开关 |
+| `scheduler.history` | 历史延后/重新尝试次数及有界历史占用；不代表缓存判定 |
 | `scheduler.finalization` | staged 独立收尾是否启动、尝试、接受后重启与同版本去重次数 |
 | `scheduler.stage_accepted_cost_delta` | staged 各阶段接受编辑的完整成本变化；某些分量可能为负 |
 | `artifact_recheck` | 实际输出路径、摘要、是否读回校验、强制复检结果及缓存标志 |

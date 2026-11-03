@@ -137,7 +137,13 @@ uv run --locked onnx-reduce cases/original.onnx \
 | `--inconclusive-code CODE` | `125`；可重复，显式指定后替换默认集合；范围 1–255 |
 | `--no-crash-interesting` | 默认信号终止视为复现；使用此选项后视为未复现 |
 | `--timeout-interesting` | 默认超时无法判定；使用此选项后视为复现 |
-| `--no-cache` | 默认启用单次运行内的编辑、shape 摘要与内容判定缓存；使用此选项全部关闭 |
+| `--model-edit-mode ir\|auto` | `ir`；auto 对支持的平坦图使用 protobuf 快速删除，其余回退 IR |
+| `--search-policy restart\|cursor` | `restart`；cursor 仅用于 staged，接受后延续细搜索游标 |
+| `--direction-order fixed\|adaptive` | `fixed`；adaptive 仅用于 staged/cursor，调整区域删除/保留顺序 |
+| `--history-order off\|defer` | `off`；defer 仅用于 staged/cursor，旧拒绝只延后，不跳过 |
+| `--no-cache` | 关闭运行内的编辑、shape、内容判定、校验与域缓存；快照、调度去重及显式历史排序仍存在 |
+| `--no-validation-cache` | 仅关闭校验/域缓存，供性能对照使用 |
+| `--no-checkpoint-reuse` | 关闭同内容 checkpoint 去重，供存储对照使用 |
 | `--work-dir DIR` | `OUTPUT.work`；日志和 checkpoint 的根目录，每次创建独立 `run-*` |
 | `-v, --verbose` | 默认 INFO；开启 DEBUG 日志 |
 
@@ -254,3 +260,20 @@ uv run --locked onnx-reduce results/fast.onnx \
 未标注模型无需额外准备。边界缺类型会影响排序，不会永久跳过该区域。
 当前标注格式、范围保证和内部额度见[第四批设计](staged-search-design.md)，
 质量与成本对照见[第四批实测](performance-batch4-results.md)。
+
+### 第五、六批实验优化
+
+`--model-edit-mode auto` 可与三种 scheduler 配合。支持范围外的模型自动回退 IR，
+包括子图、空可选输入、未支持类型和提升边界的元数据；实际输出仍读回校验和独立复检。
+`--scheduler staged --search-policy cursor` 进一步启用节点/资源续扫；普通自定义 pass 保持原接口。
+
+```bash
+uv run --locked onnx-reduce input.onnx --test '/absolute/path/check-backend' \
+  -o reduced.onnx --scheduler staged --goal complete \
+  --model-edit-mode auto --search-policy cursor --performance
+```
+
+`--direction-order adaptive`、`--history-order defer` 是进一步的排序实验，默认关闭。
+它们可能改变紧预算下的结果质量；fast 永远不证明最小性，complete 仍需在总预算内完成独立扫描。
+独立 `--finalize-from` 可改变这些搜索选项，但判定命令与故障身份须保持一致。
+各项性能证据与已知退化见[第五、六批结果](performance-batch56-results.md)。

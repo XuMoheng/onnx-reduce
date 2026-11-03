@@ -54,7 +54,7 @@ uv run --locked python benchmarks/reduction.py --case backend \
 
 ### 准备缓存基准
 
-`preparation` 不包含在 `all` 的五类场景中。它生成省略中间 shape 的链图，对每个节点
+`preparation` 不包含在 `all` 中；`all` 当前包含原五类和 `gated`、`one-stubborn-init` 两类场景。它生成省略中间 shape 的链图，对每个节点
 依次生成单次删除、重复索引删除、相同单次删除三种候选。判定条件是必须保留全部节点，
 因此所有候选均被拒绝，可以分别观察 shape 共享、相同内容和相同编辑的命中。
 以下两条命令使用相同候选序列，分别开启和关闭三类缓存：
@@ -183,3 +183,15 @@ uv run --locked python benchmarks/reduction.py \
 不代表真实导出器元信息。比较完整字典序成本，并分别读取 `scheduler.sources`、
 `scheduler.finalization`、`scheduler.coverage` 和 `artifact_recheck`，区分搜索工作、
 收尾工作及最终输出保证。
+
+### 第五、六批消融与复核
+
+`--case gated` 每三个原始节点有一个必须保留，暴露细分与重启放大；
+`--case one-stubborn-init` 要求保留中间编号的 initializer，检验批量失败后细分。
+`--model-edit-mode ir|auto` 独立选择模型准备；`--search-policy restart|cursor`
+仅用于 staged。排序实验、校验缓存和 checkpoint 开关也可分别传入基准脚本。
+
+`prepare_batch56_baseline.py` 冻结原 perf 源码并移入同一份基准定义；
+`batch56.py` 串行执行准备、搜索、完整收敛与采集开关消融；
+`audit_batch56.py` 从实际输出、成本、ONNX checker、首尾日志和当前源码重新核验记录。
+正式命令、714 次矩阵和边界说明见[第五、六批结果](performance-batch56-results.md)。

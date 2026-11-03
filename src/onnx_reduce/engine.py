@@ -82,8 +82,28 @@ class EngineConfig:
     scheduler: str = "legacy"
     goal: str | None = None
     finalize_from: str | None = None
+    model_edit_mode: str = "ir"
+    search_policy: str = "restart"
+    history_order: str = "off"
+    direction_order: str = "fixed"
+    checkpoint_reuse: bool = True
+    validation_cache_enabled: bool = True
 
     def __post_init__(self) -> None:
+        for name, options in (
+            ("model_edit_mode", {"ir", "auto"}),
+            ("search_policy", {"restart", "cursor"}),
+            ("history_order", {"off", "defer"}),
+            ("direction_order", {"fixed", "adaptive"}),
+        ):
+            if getattr(self, name) not in options:
+                raise ValueError(f"unknown {name}: {getattr(self, name)}")
+        if self.search_policy != "restart" and self.scheduler != "staged":
+            raise ValueError("search_policy=cursor requires scheduler=staged")
+        if (self.history_order != "off" or self.direction_order != "fixed") and (
+            self.scheduler != "staged" or self.search_policy != "cursor"
+        ):
+            raise ValueError("history/direction ordering requires staged search_policy=cursor")
         if self.scheduler not in {"legacy", "stateful", "staged"}:
             raise ValueError(f"unknown scheduler: {self.scheduler}")
         if self.goal not in {None, "fast", "complete"}:
@@ -138,7 +158,12 @@ class ReductionEngine:
     ) -> tuple[ModelAdapter, ReductionReport]:
         with (
             collect_performance(self.config.collect_performance) as performance,
-            preparation_caches(self.config.cache_enabled, self.config.validation_mode),
+            preparation_caches(
+                self.config.cache_enabled,
+                self.config.validation_mode,
+                self.config.model_edit_mode,
+                self.config.validation_cache_enabled,
+            ),
         ):
             reduced, report = self._run(
                 model, failure_check_runner, workdir, output_path=output_path
@@ -193,6 +218,9 @@ class ReductionEngine:
                 model,
                 goal=self.config.goal or "complete",
                 finalize_only=self.config.finalize_from is not None,
+                search_policy=self.config.search_policy,
+                history_order=self.config.history_order,
+                direction_order=self.config.direction_order,
             )
         else:
             scheduler_type = (
@@ -238,7 +266,19 @@ class ReductionEngine:
         )
         report.scheduler = scheduler.to_dict()
         current_model = model
-        self._checkpoint(current_model, report, run_dir, started)
+        checkpoint_artifacts = {} if self.config.checkpoint_reuse else None
+        report.optimizations = {
+            name: getattr(self.config, name)
+            for name in (
+                "model_edit_mode",
+                "search_policy",
+                "history_order",
+                "direction_order",
+                "checkpoint_reuse",
+                "validation_cache_enabled",
+            )
+        }
+        self._checkpoint(current_model, report, run_dir, started, checkpoint_artifacts)
         self.progress(f"initial model is interesting ({report.original.node_count} nodes)")
         candidate_sequence_number = 0
         while True:
@@ -282,7 +322,7 @@ class ReductionEngine:
             if outcome.accepted_model is not None:
                 current_model = outcome.accepted_model
                 report.scheduler = scheduler.to_dict()
-                self._checkpoint(current_model, report, run_dir, started)
+                self._checkpoint(current_model, report, run_dir, started, checkpoint_artifacts)
 
         coverage = scheduler.coverage()
         if report.stop_reason == "fixed_point" and (
@@ -331,7 +371,7 @@ class ReductionEngine:
             "sweep_inconclusive_candidate_count": coverage.inconclusive_candidate_count,
             "global_minimum": False,
         }
-        self._checkpoint(current_model, report, run_dir, started)
+        self._checkpoint(current_model, report, run_dir, started, checkpoint_artifacts)
         write_json(run_dir / "report.json", report.to_dict())
         replay = {
             "model": str(final_artifact.model_path),
@@ -657,9 +697,15 @@ class ReductionEngine:
         report: ReductionReport,
         run_dir: Path,
         started: float,
+        known_artifacts: dict | None = None,
     ) -> None:
         # Model is self-contained and atomically replaced before the manifest.
-        artifact = model.materialize(run_dir / "checkpoint" / f"{model.canonical_hash()}.onnx")
+        from onnx_reduce.storage import checkpoint_artifact
+
+        artifact = checkpoint_artifact(
+            model, run_dir / "checkpoint" / f"{model.canonical_hash()}.onnx", known_artifacts
+        )
+
         report.final = model.cost()
         report.final_hash = artifact.digest
         report.duration_seconds = time.monotonic() - started
