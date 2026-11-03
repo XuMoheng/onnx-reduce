@@ -81,6 +81,7 @@ def test_run_files_use_consistent_configuration_and_report_fields(tmp_path):
         "minimality",
         "scheduler",
         "artifact_recheck",
+        "optimizations",
         "effective_validation_modes",
         "custom_domains",
         "stop_reason",
@@ -95,7 +96,7 @@ def test_run_files_use_consistent_configuration_and_report_fields(tmp_path):
         "final_hash",
         "duration_seconds",
     }
-    assert payload["version"] == 5
+    assert payload["version"] == 6
     assert payload["requested_validation_mode"] == "strict"
     assert payload["effective_validation_modes"] == ["strict"]
     assert payload["failure_checks"] == {

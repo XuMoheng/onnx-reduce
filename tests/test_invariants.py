@@ -9,6 +9,7 @@ from pathlib import Path
 import onnx
 import pytest
 from onnx import TensorProto, helper
+from onnxscript import ir
 
 from onnx_reduce.cli import main
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs
@@ -92,14 +93,14 @@ def test_retained_subgraphs_keep_shared_captures():
 def test_artifact_snapshot_is_shared_by_cost_hash_and_materialization(tmp_path, monkeypatch):
     model = OnnxModel.from_proto(chain_model())
     serialize_calls = 0
-    original = model.to_proto
+    original = ir.to_proto
 
-    def to_proto():
+    def to_proto(value):
         nonlocal serialize_calls
         serialize_calls += 1
-        return original()
+        return original(value)
 
-    monkeypatch.setattr(model, "to_proto", to_proto)
+    monkeypatch.setattr(ir, "to_proto", to_proto)
     cost = model.cost()
     assert model.validate().valid
     assert model.validate("structural").valid
