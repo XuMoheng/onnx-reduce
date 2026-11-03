@@ -128,6 +128,7 @@ uv run --locked onnx-reduce cases/original.onnx \
 | `--timeout SECONDS` | `60`；单次判定超时，必须为有限正数 |
 | `--max-candidate-check-calls N` | 不设上限；非负整数，`0` 跳过候选搜索 |
 | `--time-budget-seconds N` | 不设上限；软墙钟预算，必须为有限正数 |
+| `--scheduler legacy\|stateful` | `legacy`；原顺序重启，或实验性的有状态分区与阶段轮转 |
 | `--validation-mode strict\|structural\|permissive` | `strict`；[模型校验策略](architecture.md#模型校验策略) |
 | `--target-mode baseline\|script` | `baseline`；匹配原模型结束方式或信任脚本 |
 | `--signature-regex REGEX` | 不提取签名；指定后要求基线签名匹配 |
@@ -140,6 +141,22 @@ uv run --locked onnx-reduce cases/original.onnx \
 
 完整帮助：`uv run --locked onnx-reduce --help`。旧参数 `--max-tests`、`--checker`
 已移除，分别改用 `--max-candidate-check-calls`、`--validation-mode`。
+
+### 选择搜索调度
+
+默认 `legacy` 按 `drop_outputs → remove_unused → delete_nodes` 搜索，接受编辑后从首个 pass
+重启。`--scheduler stateful` 会延续有效阶段、分区尺度和位置，节点搜索同时尝试删除区域
+和仅保留区域；阶段最多连续尝试 8 个候选后轮转。两种策略使用相同的接受条件和缓存。
+
+stateful 当前为实验选项，不保证每个模型更快，也可能在相同预算下留下更大的模型。
+对照时保持输入、判定器、缓存和预算一致，只切换该参数；结果见
+[第三批实测](performance-batch3-results.md)。
+
+stateful 的启发式搜索结束后，还会在当前模型上扫描全部配置 pass 及标准分区的保留候选。
+扫描中接受编辑就重新开始新版本的搜索与覆盖。预算停止或最终扫描有无法判定候选时，
+最小性为 `unproven`；报告的 `minimality.scope` 和 `scheduler.coverage` 描述实际保证范围。
+这里只搜索主图节点集合，保留区域不会自动保留其依赖闭包，边界提升规则见
+[架构说明](architecture.md#搜索调度与节点身份)。
 
 ### 崩溃与挂起场景
 

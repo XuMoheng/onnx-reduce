@@ -72,6 +72,40 @@ uv run --locked python benchmarks/reduction.py \
 内容摘要与最终结果，不能要求包含命中字段的原始日志字节完全一致。
 采集开关的原有严格轨迹对照仍分别执行。
 
+### 第三批调度对照
+
+`--scheduler legacy|stateful` 选择单一策略；`--compare-schedulers` 在同一份源码、清理和
+缓存实现上比较两者，并交替执行顺序。`--compare-instrumentation` 可同时使用，固定检查预算
+逐策略验证有序候选和调度日志、最终成本、计数、停止原因与最小性一致；重复轮次也做相同检查。
+不同策略之间只比较结果质量和资源成本，不要求轨迹相同。
+
+```bash
+uv run --locked python benchmarks/reduction.py \
+  --case all --size 32 --repeat 3 --budget both \
+  --candidate-budget 100 --time-budget 1 \
+  --compare-schedulers --compare-instrumentation
+uv run --locked python benchmarks/reduction.py \
+  --case chain --size 8 --condition non-monotonic \
+  --repeat 3 --budget both --candidate-budget 100 --time-budget 1 \
+  --compare-schedulers --compare-instrumentation
+```
+
+`chain`、`missing-shape` 另支持 `--condition`：
+
+| 条件 | 目标故障的合成定义 |
+| --- | --- |
+| `relu`（默认） | 保留 Relu；`--trigger-position front|middle|back` 选择链中位置 |
+| `cross-region` | 同时保留索引 `size//4` 和 `3*size//4` 的原始触发节点 |
+| `threshold` | 节点数至少为 `--threshold`，未指定时为 `max(1, size//4)` |
+| `non-monotonic` | 节点数属于 `--interesting-sizes` 的逗号分隔集合；默认 `size, size//2+1, max(1,size//4)` |
+| `old-rejection` | 保留中间触发节点，并满足“首节点存在，或末节点不存在” |
+| `dead-trigger` | 保留额外的不通向图输出的 `dead_trigger` 节点 |
+
+每项保留环境、完整参数、源码 SHA-256、运行目录及最终完整成本。
+`comparisons` 逐次按 `(nodes, bytes, outputs, inputs, initializers)` 字典序记录 improved、equal、
+regressed，不能只看耗时平均值。stateful 的最终覆盖成本单列在 `scheduler.sources.coverage`。
+实测结果及退化记录见[第三批报告](performance-batch3-results.md)。
+
 ## 对单次缩减采集
 
 在已有 CLI 命令中增加 `--performance`，例如：
@@ -125,4 +159,5 @@ CLI 额外指定报告和后端自行写的文件，也不是磁盘物理写入�
 3. 同时报出固定检查预算和固定时间预算下的最终完整成本元组。
 4. 单独记录真实后端验证状态；未提供模型与判定器时保留为待验证项。
 
-本批仅建立测量基础；批量清理、准备缓存和有状态调度器在后续独立改动中实施。
+第一批建立测量基础；后续批量清理、准备缓存和有状态调度的独立结果分别见
+[第二批实测](performance-batch2-results.md)与[第三批实测](performance-batch3-results.md)。

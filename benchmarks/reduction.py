@@ -37,7 +37,9 @@ def value(name, size=1):
     return helper.make_tensor_value_info(name, TensorProto.FLOAT, [size])
 
 
-def make_model(case: str, size: int) -> onnx.ModelProto:
+def make_model(
+    case: str, size: int, *, trigger_position: str = "middle", condition: str = "relu"
+) -> onnx.ModelProto:
     nodes = []
     outputs = [value("y")]
     infos = []
@@ -49,15 +51,24 @@ def make_model(case: str, size: int) -> onnx.ModelProto:
             for i in range(size)
         ]
     elif case in {"chain", "missing-shape", "preparation"}:
+        trigger = {"front": 0, "middle": size // 2, "back": size - 1}[trigger_position]
         previous = "x"
         for i in range(size):
             name = "y" if i == size - 1 else f"v{i}"
             nodes.append(
-                helper.make_node("Relu" if i == size // 2 else "Identity", [previous], [name])
+                helper.make_node(
+                    "Relu" if i == trigger and condition != "dead-trigger" else "Identity",
+                    [previous],
+                    [name],
+                    **({"name": f"n{i}"} if condition != "relu" else {}),
+                )
             )
             if name != "y" and case == "chain":
                 infos.append(value(name))
             previous = name
+        if condition == "dead-trigger":
+            nodes.append(helper.make_node("Relu", ["x"], ["dead_value"], name="dead_trigger"))
+            infos.append(value("dead_value"))
     else:
         nodes.append(helper.make_node("Relu", ["x"], ["trigger"]))
         infos.append(value("trigger"))
@@ -106,6 +117,33 @@ class NodeCountCheck:
         )
 
 
+class SyntheticCheck:
+    """Named adversarial conditions; no numerical inference or real backend."""
+
+    def __init__(self, args):
+        self.args = args
+
+    def run(self, path):
+        nodes = onnx.load(path).graph.node
+        names = {node.name for node in nodes}
+        size = self.args.size
+        condition = self.args.condition
+        if condition == "cross-region":
+            interesting = {f"n{size // 4}", f"n{3 * size // 4}"} <= names
+        elif condition == "threshold":
+            interesting = len(nodes) >= (self.args.threshold or max(1, size // 4))
+        elif condition == "non-monotonic":
+            allowed = self.args.interesting_sizes or (size, size // 2 + 1, max(1, size // 4))
+            interesting = len(nodes) in allowed
+        elif condition == "old-rejection":
+            interesting = f"n{size // 2}" in names and (
+                "n0" in names or f"n{size - 1}" not in names
+            )
+        else:
+            interesting = "dead_trigger" in names
+        return FailureCheckResult.INTERESTING if interesting else FailureCheckResult.NOT_INTERESTING
+
+
 class RepeatedDeletionPass:
     name = "repeated_deletion"
 
@@ -131,16 +169,25 @@ def worker(args):
             )
         )
     else:
-        proto = make_model(args.case, args.size)
+        proto = make_model(
+            args.case, args.size, trigger_position=args.trigger_position, condition=args.condition
+        )
         onnx.checker.check_model(proto, full_check=True)
         model = OnnxModel.from_proto(proto)
-        runner = NodeCountCheck(args.size) if args.case == "preparation" else ReluCheck()
+        runner = (
+            NodeCountCheck(args.size)
+            if args.case == "preparation"
+            else SyntheticCheck(args)
+            if args.condition != "relu"
+            else ReluCheck()
+        )
     config = EngineConfig(
         cache_enabled=not args.no_cache,
         collect_performance=not args.no_performance,
         max_candidate_check_calls=args.candidate_budget if args.budget == "calls" else None,
         time_budget_seconds=args.time_budget if args.budget == "time" else None,
         signature_regex=args.signature_regex,
+        scheduler=args.scheduler,
     )
     started = time.perf_counter()
     passes = [RepeatedDeletionPass()] if args.case == "preparation" else None
@@ -155,16 +202,140 @@ def worker(args):
     # reasons, to compare both successful and unsuccessful candidate attempts.
     trace_path = Path(report.work_directory) / "candidates.jsonl"
     trace = trace_path.read_bytes() if trace_path.exists() else b""
+    schedule_path = Path(report.work_directory) / "scheduler.jsonl"
     return {
         "case": args.case,
         "size": args.size,
         "budget": args.budget,
         "instrumented": not args.no_performance,
+        "scheduler": args.scheduler,
+        "condition": args.condition,
+        "trigger_position": args.trigger_position,
         "wall_seconds": elapsed,
         "peak_rss_bytes": PerformanceStats.peak_rss(),
         "decision_trace_sha256": hashlib.sha256(trace).hexdigest(),
+        "scheduler_trace_sha256": hashlib.sha256(
+            schedule_path.read_bytes() if schedule_path.exists() else b""
+        ).hexdigest(),
         "report": report.to_dict(),
     }
+
+
+def run_worker(args, case, budget, repeat, enabled, scheduler, batch):
+    directory = batch / f"{case}-{budget}-{repeat}-{scheduler}-{'on' if enabled else 'off'}"
+    command = [
+        sys.executable,
+        str(Path(__file__).resolve()),
+        "--worker",
+        "--case",
+        case,
+        "--size",
+        str(args.size),
+        "--budget",
+        budget,
+        "--candidate-budget",
+        str(args.candidate_budget),
+        "--time-budget",
+        str(args.time_budget),
+        "--output",
+        str(directory),
+        "--scheduler",
+        scheduler,
+        "--condition",
+        args.condition,
+        "--trigger-position",
+        args.trigger_position,
+    ]
+    if not enabled:
+        command.append("--no-performance")
+    if args.no_cache:
+        command.append("--no-cache")
+    if args.threshold is not None:
+        command += ["--threshold", str(args.threshold)]
+    if args.interesting_sizes:
+        command += ["--interesting-sizes", ",".join(map(str, args.interesting_sizes))]
+    if args.model:
+        command += [
+            "--model",
+            str(args.model.resolve()),
+            "--test",
+            args.test,
+            "--timeout",
+            str(args.timeout),
+        ]
+    if args.signature_regex:
+        command += ["--signature-regex", args.signature_regex]
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode:
+        raise RuntimeError(f"benchmark worker failed ({directory}):\n{result.stderr}")
+    record = {**json.loads(result.stdout), "repeat": repeat}
+    (directory / "measurement.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+    print(
+        f"{directory.name}: {record['wall_seconds']:.3f}s, "
+        f"final={record['report']['final']}, checks={record['report']['failure_checks']['calls']}",
+        flush=True,
+    )
+    return record
+
+
+def assert_same_decisions(first, second):
+    for key in ("decision_trace_sha256", "scheduler_trace_sha256"):
+        if first[key] != second[key]:
+            raise RuntimeError(
+                f"fixed-call-budget decisions changed: {first['case']}, {first['scheduler']}, {key}"
+            )
+    for key in (
+        "final",
+        "final_hash",
+        "candidates",
+        "passes",
+        "failure_checks",
+        "stop_reason",
+        "minimality",
+    ):
+        if first["report"][key] != second["report"][key]:
+            raise RuntimeError(
+                f"fixed-call-budget result changed: {first['case']}, {first['scheduler']}, {key}"
+            )
+
+
+def scheduler_comparisons(group):
+    comparisons = []
+    for legacy in (r for r in group if r["scheduler"] == "legacy"):
+        stateful = next(
+            (
+                r
+                for r in group
+                if r["scheduler"] == "stateful"
+                and r["repeat"] == legacy["repeat"]
+                and r["instrumented"] == legacy["instrumented"]
+            ),
+            None,
+        )
+        if stateful is None:
+            continue
+        fields = ("node_count", "byte_size", "output_count", "input_count", "initializer_count")
+        before, after = (
+            tuple(r["report"]["final"][name] for name in fields) for r in (legacy, stateful)
+        )
+        comparisons.append(
+            {
+                "case": legacy["case"],
+                "budget": legacy["budget"],
+                "repeat": legacy["repeat"],
+                "instrumented": legacy["instrumented"],
+                "quality": "improved"
+                if after < before
+                else "regressed"
+                if after > before
+                else "equal",
+                "legacy_cost": before,
+                "stateful_cost": after,
+                "legacy_run": legacy["report"]["work_directory"],
+                "stateful_run": stateful["report"]["work_directory"],
+            }
+        )
+    return comparisons
 
 
 def main():
@@ -178,6 +349,25 @@ def main():
     parser.add_argument("--candidate-budget", type=int, default=600)
     parser.add_argument("--time-budget", type=float, default=5.0)
     parser.add_argument("--compare-instrumentation", action="store_true")
+    parser.add_argument("--scheduler", choices=("legacy", "stateful"), default="legacy")
+    parser.add_argument("--compare-schedulers", action="store_true")
+    parser.add_argument(
+        "--condition",
+        choices=(
+            "relu",
+            "cross-region",
+            "threshold",
+            "non-monotonic",
+            "old-rejection",
+            "dead-trigger",
+        ),
+        default="relu",
+    )
+    parser.add_argument("--trigger-position", choices=("front", "middle", "back"), default="middle")
+    parser.add_argument("--threshold", type=int)
+    parser.add_argument(
+        "--interesting-sizes", type=lambda text: tuple(int(n) for n in text.split(","))
+    )
     parser.add_argument(
         "--no-cache", action="store_true", help="disable preparation/verdict caches"
     )
@@ -201,6 +391,28 @@ def main():
         parser.error(
             "--case backend requires both --model and --test; synthetic cases accept neither"
         )
+    if args.condition != "relu" and args.case not in {"chain", "missing-shape"}:
+        parser.error("non-relu conditions require --case chain or missing-shape")
+    if args.condition in {"cross-region", "old-rejection"} and args.size < 3:
+        parser.error("cross-region and old-rejection require --size >= 3")
+    if args.trigger_position != "middle" and args.case not in {
+        "chain",
+        "missing-shape",
+        "preparation",
+    }:
+        parser.error("trigger-position applies to chain, missing-shape and preparation")
+    if args.threshold is not None and (
+        args.condition != "threshold" or not 1 <= args.threshold <= args.size
+    ):
+        parser.error("--threshold requires threshold condition and a value in [1, size]")
+    if args.interesting_sizes is not None and (
+        args.condition != "non-monotonic"
+        or args.size not in args.interesting_sizes
+        or min(args.interesting_sizes) < 0
+    ):
+        parser.error(
+            "--interesting-sizes requires non-monotonic condition, nonnegative sizes and the original size"
+        )
     if args.worker:
         print(json.dumps(worker(args)))
         return
@@ -208,6 +420,7 @@ def main():
     budgets = ("calls", "time") if args.budget == "both" else (args.budget,)
     records = []
     summaries = []
+    comparisons = []
     args.output.mkdir(parents=True, exist_ok=True)
     batch = args.output / time.strftime("%Y%m%d-%H%M%S")
     batch.mkdir()  # Never mix artifacts with an earlier batch.
@@ -215,91 +428,50 @@ def main():
         for budget in budgets:
             group = []
             for repeat in range(args.repeat):
-                pair = []
                 # Alternate execution order to reduce systematic warm-cache bias.
-                modes = [True, False] if args.compare_instrumentation else [True]
+                strategies = ["legacy", "stateful"] if args.compare_schedulers else [args.scheduler]
                 if repeat % 2:
-                    modes.reverse()
-                for enabled in modes:
-                    directory = batch / f"{case}-{budget}-{repeat}-{'on' if enabled else 'off'}"
-                    command = [
-                        sys.executable,
-                        str(Path(__file__).resolve()),
-                        "--worker",
-                        "--case",
-                        case,
-                        "--size",
-                        str(args.size),
-                        "--budget",
-                        budget,
-                        "--candidate-budget",
-                        str(args.candidate_budget),
-                        "--time-budget",
-                        str(args.time_budget),
-                        "--output",
-                        str(directory),
-                    ]
-                    if not enabled:
-                        command.append("--no-performance")
-                    if args.no_cache:
-                        command.append("--no-cache")
-                    if args.model:
-                        command += [
-                            "--model",
-                            str(args.model.resolve()),
-                            "--test",
-                            args.test,
-                            "--timeout",
-                            str(args.timeout),
-                        ]
-                    if args.signature_regex:
-                        command += ["--signature-regex", args.signature_regex]
-                    result = subprocess.run(command, capture_output=True, text=True)
-                    if result.returncode:
-                        raise RuntimeError(
-                            f"benchmark worker failed ({directory}):\n{result.stderr}"
-                        )
-                    record = json.loads(result.stdout)
-                    (directory / "measurement.json").write_text(
-                        json.dumps(record, indent=2, sort_keys=True) + "\n"
+                    strategies.reverse()
+                for strategy in strategies:
+                    modes = [True, False] if args.compare_instrumentation else [True]
+                    if repeat % 2:
+                        modes.reverse()
+                    pair = []
+                    for enabled in modes:
+                        record = run_worker(args, case, budget, repeat, enabled, strategy, batch)
+                        if budget == "calls":
+                            prior = next((r for r in group if r["scheduler"] == strategy), None)
+                            if prior is not None:
+                                assert_same_decisions(prior, record)
+                        records.append(record)
+                        group.append(record)
+                        pair.append(record)
+                    if budget == "calls" and len(pair) == 2:
+                        assert_same_decisions(pair[0], pair[1])
+            for strategy in sorted({r["scheduler"] for r in group}):
+                on = [
+                    r["wall_seconds"]
+                    for r in group
+                    if r["scheduler"] == strategy and r["instrumented"]
+                ]
+                off = [
+                    r["wall_seconds"]
+                    for r in group
+                    if r["scheduler"] == strategy and not r["instrumented"]
+                ]
+                summary = {
+                    "case": case,
+                    "budget": budget,
+                    "scheduler": strategy,
+                    "instrumented_median_seconds": statistics.median(on),
+                }
+                if off:
+                    summary.update(
+                        uninstrumented_median_seconds=statistics.median(off),
+                        overhead_ratio=statistics.median(on) / statistics.median(off) - 1,
                     )
-                    records.append(record)
-                    group.append(record)
-                    pair.append(record)
-                    print(
-                        f"{directory.name}: {record['wall_seconds']:.3f}s, "
-                        f"final={record['report']['final']}, checks={record['report']['failure_checks']['calls']}",
-                        flush=True,
-                    )
-                if budget == "calls" and len(pair) == 2:
-                    if pair[0]["decision_trace_sha256"] != pair[1]["decision_trace_sha256"]:
-                        raise RuntimeError(
-                            f"instrumentation changed candidate decisions: {case}, repetition {repeat}"
-                        )
-                    for key in (
-                        "final",
-                        "final_hash",
-                        "candidates",
-                        "failure_checks",
-                        "stop_reason",
-                    ):
-                        if pair[0]["report"][key] != pair[1]["report"][key]:
-                            raise RuntimeError(
-                                f"instrumentation changed {key}: {case}, repetition {repeat}"
-                            )
-            on = [r["wall_seconds"] for r in group if r["instrumented"]]
-            off = [r["wall_seconds"] for r in group if not r["instrumented"]]
-            summary = {
-                "case": case,
-                "budget": budget,
-                "instrumented_median_seconds": statistics.median(on),
-            }
-            if off:
-                summary.update(
-                    uninstrumented_median_seconds=statistics.median(off),
-                    overhead_ratio=statistics.median(on) / statistics.median(off) - 1,
-                )
-            summaries.append(summary)
+                summaries.append(summary)
+            comparisons.extend(scheduler_comparisons(group))
     payload = {
         "environment": {
             "python": sys.version,
@@ -317,6 +489,7 @@ def main():
         },
         "configuration": {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
         "summaries": summaries,
+        "comparisons": comparisons,
         "runs": records,
     }
     result_path = batch / "baseline.json"

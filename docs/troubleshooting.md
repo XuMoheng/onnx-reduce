@@ -17,7 +17,7 @@
 正常收尾时，运行目录总会有 `report.json`；`--report` 额外导出一份相同报告。
 初检失败、加载失败或中断时可能没有最终报告。
 
-当前 JSON schema 的版本字段为 `version: 3`。主要字段如下：
+当前 JSON schema 的版本字段为 `version: 4`，在版本 3 上增加 `scheduler`。主要字段如下：
 
 | 字段 | 读法 |
 |---|---|
@@ -33,12 +33,22 @@
 | `candidates` | `generated`、`invalid`、`accepted`、`not_cheaper` 等候选统计 |
 | `candidates.valid_rate` | `(generated - not_cheaper - invalid) / (generated - not_cheaper)`，分母为 0 时为 `null`；不是后端复现率 |
 | `passes` | 每个 pass 的候选、无效、实际调用、接受、成本未下降统计 |
+| `scheduler.strategy` / `model_version` | 本次策略，以及接受编辑后递增的模型版本 |
+| `scheduler.coverage` | 被扫描的摘要、版本、候选范围、是否完成及不确定候选数 |
+| `scheduler.sources` | heuristic / coverage 各阶段累计完成尝试、实际调用、缓存命中和接受数 |
+| `scheduler.buckets` | 按 pass / 方向 / 二次幂尺度桶汇总的拒绝类型、接受率、缓存来源和接受成本变化 |
+| `scheduler.phase_revisits` / `scale_reuses` / `deduplicated` | 跨版本阶段重访、接受后尺度续用、启发式节点编辑去重次数 |
 | `requested_validation_mode` / `effective_validation_modes` / `custom_domains` | 请求的校验策略和运行中观察到的模式与自定义 domain |
 | `final_hash` | 最终适配器序列化内容的 SHA-256 |
 | `work_directory` / `duration_seconds` | 本次独立运行目录和记录时的已用时间 |
 
 `fixed_point` 不一定意味着 `pass_fixed_point`：如果最终轮次有无法判定的候选，最小性仍为
-`unproven`。即使 `pass_fixed_point` 也只针对当前 pass 的候选，不保证全局最小。
+`unproven`。即使 `pass_fixed_point` 也只针对 `minimality.scope` 描述的候选范围，不保证全局最小。
+`scheduler.coverage` 只证明所记录摘要对应的模型，不能把旧版本的完成标志用于新模型。
+`scheduler.sources`、`buckets` 汇总整个运行，包含此前失效扫描；预算中止的在途尝试不计为
+完成尝试，见 `scheduler.jsonl`。计时仅在 `--performance` 开启时采集，否则为 `null`。
+其中 preparation 是候选执行中判定路径之外的耗时；evaluation 包含目标匹配和判定证据记录，
+不含模型落盘。精确外部执行耗时仍看 `performance.stages.external_check`。
 
 ## 找到日志与判定证据
 
@@ -52,6 +62,7 @@
 | `initial/model.onnx` | 导入并重新序列化的原模型，供初检使用 |
 | `target.json` | 初检成功后记录目标模式、签名表达式与基线身份 |
 | `candidates.jsonl` | 候选编辑、决策及相关成本/校验原因；处理候选时生成 |
+| `scheduler.jsonl` | 按候选序号关联的版本、阶段、方向、尺度、区域锚点与反馈；不改变候选重放格式 |
 | `evaluations.jsonl` | 实际判定与缓存命中的结果、模型路径和摘要；有判定事件时生成 |
 | `accepted.jsonl` | 被接受的候选编辑、摘要和成本；有接受事件时生成 |
 | `checks/00000001/stdout.log` / `stderr.log` | 第一次实际调用的日志；后续实际调用按序编号，缓存命中不新建日志目录 |

@@ -1,0 +1,1136 @@
+{
+  "batches": [
+    {
+      "baseline": "output/performance/batch3-matrix/five-32/20261103-152833/baseline.json",
+      "job": "five-32",
+      "quality": {
+        "equal": 60,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 120
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/five-128/20261103-152945/baseline.json",
+      "job": "five-128",
+      "quality": {
+        "equal": 30,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 60
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/five-512/20261103-153023/baseline.json",
+      "job": "five-512",
+      "quality": {
+        "equal": 30,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 60
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/position-front/20261103-153105/baseline.json",
+      "job": "position-front",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/position-back/20261103-153113/baseline.json",
+      "job": "position-back",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/cross-region-32/20261103-153121/baseline.json",
+      "job": "cross-region-32",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/cross-region-128/20261103-153130/baseline.json",
+      "job": "cross-region-128",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/threshold-32/20261103-153139/baseline.json",
+      "job": "threshold-32",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/threshold-128/20261103-153147/baseline.json",
+      "job": "threshold-128",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/non-monotonic-32/20261103-153158/baseline.json",
+      "job": "non-monotonic-32",
+      "quality": {
+        "equal": 0,
+        "improved": 6,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/non-monotonic-128/20261103-153206/baseline.json",
+      "job": "non-monotonic-128",
+      "quality": {
+        "equal": 0,
+        "improved": 6,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/old-rejection-32/20261103-153220/baseline.json",
+      "job": "old-rejection-32",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/old-rejection-128/20261103-153228/baseline.json",
+      "job": "old-rejection-128",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/dead-trigger-32/20261103-153237/baseline.json",
+      "job": "dead-trigger-32",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/dead-trigger-128/20261103-153245/baseline.json",
+      "job": "dead-trigger-128",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/cover-accept/20261103-153253/baseline.json",
+      "job": "cover-accept",
+      "quality": {
+        "equal": 6,
+        "improved": 0,
+        "regressed": 0
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/tight-calls/20261103-153302/baseline.json",
+      "job": "tight-calls",
+      "quality": {
+        "equal": 3,
+        "improved": 0,
+        "regressed": 3
+      },
+      "runs": 12
+    },
+    {
+      "baseline": "output/performance/batch3-matrix/larger-budget/20261103-153310/baseline.json",
+      "job": "larger-budget",
+      "quality": {
+        "equal": 0,
+        "improved": 6,
+        "regressed": 0
+      },
+      "runs": 12
+    }
+  ],
+  "cli_smoke": {
+    "actual_output_independent_recheck": "interesting; cache bypassed",
+    "final_cost": {
+      "byte_size": 94,
+      "initializer_count": 0,
+      "input_count": 2,
+      "node_count": 1,
+      "output_count": 1
+    },
+    "final_hash": "ce67c5548d7bd368fd46fd199237e65572e6ee81ff2bbc3144d3b6eff8e19a7b",
+    "report": "output/performance/batch3-cli/report.json",
+    "signature": "DEMO_RELU",
+    "strict_validation": "passed"
+  },
+  "cost_order": [
+    "node_count",
+    "byte_size",
+    "output_count",
+    "input_count",
+    "initializer_count"
+  ],
+  "date": "2026-11-03",
+  "environment": {
+    "cpu_count": 14,
+    "onnx": "1.23.2",
+    "onnxscript": "0.7.2",
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+    "python": "3.11.17 (main, Oct 21 2026, 17:46:53) [Clang 23.1.3 ]",
+    "python_executable": "/home/weifenfc/ms02u/hw/onnx-reduce/1012/.venv/bin/python"
+  },
+  "legacy_equivalence": {
+    "after": "output/performance/batch3-equivalence-final/comparison.json",
+    "baseline_commit": "e8203a3",
+    "before": "output/performance/batch3-equivalence-before/comparison.json",
+    "cache_modes": [
+      false,
+      true
+    ],
+    "candidate_budgets": [
+      null,
+      0,
+      4
+    ],
+    "cases": [
+      "initializers",
+      "chain",
+      "branches",
+      "outputs",
+      "missing-shape"
+    ],
+    "comparison_sha256": "143f72d2f2434c271275415b47b2dbb52574a1c2ea8a8f6e0967083d2ef9afe7",
+    "performance_modes": [
+      false,
+      true
+    ],
+    "runs_per_version": 60,
+    "size": 32
+  },
+  "primary_runs": 420,
+  "quality_comparison_pairs": 210,
+  "quality_counts": {
+    "equal": 189,
+    "improved": 18,
+    "regressed": 3
+  },
+  "quantum_probe": {
+    "results": "output/performance/batch3-quantum/results.json",
+    "runs": 27,
+    "script": "output/performance/batch3-quantum/probe.py",
+    "source_sha256": "8ff5ef7bf57aa25761eb04e2e635f77ecd2a10515edea6c5e4bc9694ff655c43",
+    "summaries": [
+      {
+        "calls": [
+          6,
+          6,
+          6
+        ],
+        "candidates": [
+          5,
+          5,
+          5
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "9ea1aa3e75d322c910759f1739ea19e83ea78f01f115b39e7f9d2569f5ad4ce4",
+            "run": "output/performance/batch3-quantum/tight-calls-1-0/work/run-yv2_ga40",
+            "scheduler_trace_sha256": "5acd7e65b36807286ad56180a66c722d7046d3898b913ba9b4a985dc253c9875"
+          },
+          {
+            "decision_trace_sha256": "9ea1aa3e75d322c910759f1739ea19e83ea78f01f115b39e7f9d2569f5ad4ce4",
+            "run": "output/performance/batch3-quantum/tight-calls-1-1/work/run-cc7ep088",
+            "scheduler_trace_sha256": "5acd7e65b36807286ad56180a66c722d7046d3898b913ba9b4a985dc253c9875"
+          },
+          {
+            "decision_trace_sha256": "9ea1aa3e75d322c910759f1739ea19e83ea78f01f115b39e7f9d2569f5ad4ce4",
+            "run": "output/performance/batch3-quantum/tight-calls-1-2/work/run-w8ll_jb9",
+            "scheduler_trace_sha256": "5acd7e65b36807286ad56180a66c722d7046d3898b913ba9b4a985dc253c9875"
+          }
+        ],
+        "final": {
+          "byte_size": 685,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 16,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 1,
+        "runs": 3,
+        "scenario": "tight-calls",
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.014566764002665877
+      },
+      {
+        "calls": [
+          6,
+          6,
+          6
+        ],
+        "candidates": [
+          6,
+          6,
+          6
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "5e9895f5397044f834efcc5f34d8e0e09391ab3ae41edba96e5d83982206f7d4",
+            "run": "output/performance/batch3-quantum/tight-calls-4-0/work/run-6bgc7ns1",
+            "scheduler_trace_sha256": "36a755245ce1d3ecfe14375b92c04941fdc7d94530e96a411aae962e0845b2fe"
+          },
+          {
+            "decision_trace_sha256": "5e9895f5397044f834efcc5f34d8e0e09391ab3ae41edba96e5d83982206f7d4",
+            "run": "output/performance/batch3-quantum/tight-calls-4-1/work/run-p34usv9t",
+            "scheduler_trace_sha256": "36a755245ce1d3ecfe14375b92c04941fdc7d94530e96a411aae962e0845b2fe"
+          },
+          {
+            "decision_trace_sha256": "5e9895f5397044f834efcc5f34d8e0e09391ab3ae41edba96e5d83982206f7d4",
+            "run": "output/performance/batch3-quantum/tight-calls-4-2/work/run-kz48c5yn",
+            "scheduler_trace_sha256": "36a755245ce1d3ecfe14375b92c04941fdc7d94530e96a411aae962e0845b2fe"
+          }
+        ],
+        "final": {
+          "byte_size": 412,
+          "initializer_count": 0,
+          "input_count": 3,
+          "node_count": 8,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 4,
+        "runs": 3,
+        "scenario": "tight-calls",
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.015570660994853824
+      },
+      {
+        "calls": [
+          6,
+          6,
+          6
+        ],
+        "candidates": [
+          6,
+          6,
+          6
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "35d7399d2854797dbf19cf12057b4b1415a7202e52889613e4c545a2af74211f",
+            "run": "output/performance/batch3-quantum/tight-calls-8-0/work/run-24qj7s9u",
+            "scheduler_trace_sha256": "1d0d7237d15da8bbfd89195965103ff162978caad345109fdfe24f48d417d601"
+          },
+          {
+            "decision_trace_sha256": "35d7399d2854797dbf19cf12057b4b1415a7202e52889613e4c545a2af74211f",
+            "run": "output/performance/batch3-quantum/tight-calls-8-1/work/run-2ub8cbdt",
+            "scheduler_trace_sha256": "1d0d7237d15da8bbfd89195965103ff162978caad345109fdfe24f48d417d601"
+          },
+          {
+            "decision_trace_sha256": "35d7399d2854797dbf19cf12057b4b1415a7202e52889613e4c545a2af74211f",
+            "run": "output/performance/batch3-quantum/tight-calls-8-2/work/run-cwk_bhq3",
+            "scheduler_trace_sha256": "1d0d7237d15da8bbfd89195965103ff162978caad345109fdfe24f48d417d601"
+          }
+        ],
+        "final": {
+          "byte_size": 412,
+          "initializer_count": 0,
+          "input_count": 3,
+          "node_count": 8,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 8,
+        "runs": 3,
+        "scenario": "tight-calls",
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.015005433990154415
+      },
+      {
+        "calls": [
+          102,
+          102,
+          102
+        ],
+        "candidates": [
+          101,
+          101,
+          101
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "9ca8b661e674ac5061c3e1bbf09427460b26f12c346362eee635246d497fd7a0",
+            "run": "output/performance/batch3-quantum/threshold-1-0/work/run-t0mn3xbi",
+            "scheduler_trace_sha256": "8549ea8a0c36c0ba4cb3bc7942622ea4a0fb5bf9cf7d26f448e338d194665db4"
+          },
+          {
+            "decision_trace_sha256": "9ca8b661e674ac5061c3e1bbf09427460b26f12c346362eee635246d497fd7a0",
+            "run": "output/performance/batch3-quantum/threshold-1-1/work/run-k2i3_bt5",
+            "scheduler_trace_sha256": "8549ea8a0c36c0ba4cb3bc7942622ea4a0fb5bf9cf7d26f448e338d194665db4"
+          },
+          {
+            "decision_trace_sha256": "9ca8b661e674ac5061c3e1bbf09427460b26f12c346362eee635246d497fd7a0",
+            "run": "output/performance/batch3-quantum/threshold-1-2/work/run-rq6xo1ol",
+            "scheduler_trace_sha256": "8549ea8a0c36c0ba4cb3bc7942622ea4a0fb5bf9cf7d26f448e338d194665db4"
+          }
+        ],
+        "final": {
+          "byte_size": 1614,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 32,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 1,
+        "runs": 3,
+        "scenario": "threshold",
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.222361447988078
+      },
+      {
+        "calls": [
+          102,
+          102,
+          102
+        ],
+        "candidates": [
+          101,
+          101,
+          101
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "7b4ad571e92628dc6568933900816f0cdada9295a8d3d6c252b1f352d914e098",
+            "run": "output/performance/batch3-quantum/threshold-4-0/work/run-klobv__0",
+            "scheduler_trace_sha256": "855e7c744ee95e0f2013a63d17ffc405dd17d235533e00d0d8a3a20f699b4e0f"
+          },
+          {
+            "decision_trace_sha256": "7b4ad571e92628dc6568933900816f0cdada9295a8d3d6c252b1f352d914e098",
+            "run": "output/performance/batch3-quantum/threshold-4-1/work/run-sn1ggaps",
+            "scheduler_trace_sha256": "855e7c744ee95e0f2013a63d17ffc405dd17d235533e00d0d8a3a20f699b4e0f"
+          },
+          {
+            "decision_trace_sha256": "7b4ad571e92628dc6568933900816f0cdada9295a8d3d6c252b1f352d914e098",
+            "run": "output/performance/batch3-quantum/threshold-4-2/work/run-_y7f52hw",
+            "scheduler_trace_sha256": "855e7c744ee95e0f2013a63d17ffc405dd17d235533e00d0d8a3a20f699b4e0f"
+          }
+        ],
+        "final": {
+          "byte_size": 1614,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 32,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 4,
+        "runs": 3,
+        "scenario": "threshold",
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.22104467503959313
+      },
+      {
+        "calls": [
+          102,
+          102,
+          102
+        ],
+        "candidates": [
+          101,
+          101,
+          101
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "522f62a28bfa6909d5ae4057e00bf95e81677cfbc6dce54e0f05eadf109c217d",
+            "run": "output/performance/batch3-quantum/threshold-8-0/work/run-k1rq5my0",
+            "scheduler_trace_sha256": "d18450a5511a6e140a4fa48d608652858df42cea1eb6bd304424ec1ee1012390"
+          },
+          {
+            "decision_trace_sha256": "522f62a28bfa6909d5ae4057e00bf95e81677cfbc6dce54e0f05eadf109c217d",
+            "run": "output/performance/batch3-quantum/threshold-8-1/work/run-8z926hqv",
+            "scheduler_trace_sha256": "d18450a5511a6e140a4fa48d608652858df42cea1eb6bd304424ec1ee1012390"
+          },
+          {
+            "decision_trace_sha256": "522f62a28bfa6909d5ae4057e00bf95e81677cfbc6dce54e0f05eadf109c217d",
+            "run": "output/performance/batch3-quantum/threshold-8-2/work/run-1pq2nc08",
+            "scheduler_trace_sha256": "d18450a5511a6e140a4fa48d608652858df42cea1eb6bd304424ec1ee1012390"
+          }
+        ],
+        "final": {
+          "byte_size": 1614,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 32,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 8,
+        "runs": 3,
+        "scenario": "threshold",
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.222709686961025
+      },
+      {
+        "calls": [
+          65,
+          65,
+          65
+        ],
+        "candidates": [
+          79,
+          79,
+          79
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "8a566847a4e49747158dfbe9d9133a45cc984562919b09bc57e3cbcd6341b989",
+            "run": "output/performance/batch3-quantum/cover-accept-1-0/work/run-x6x5_qxa",
+            "scheduler_trace_sha256": "22c3e91f0c20dd01d4b0d0727790749105d19a1cccb616ada1c959b7cf5a4cbb"
+          },
+          {
+            "decision_trace_sha256": "8a566847a4e49747158dfbe9d9133a45cc984562919b09bc57e3cbcd6341b989",
+            "run": "output/performance/batch3-quantum/cover-accept-1-1/work/run-gw5mjsqo",
+            "scheduler_trace_sha256": "22c3e91f0c20dd01d4b0d0727790749105d19a1cccb616ada1c959b7cf5a4cbb"
+          },
+          {
+            "decision_trace_sha256": "8a566847a4e49747158dfbe9d9133a45cc984562919b09bc57e3cbcd6341b989",
+            "run": "output/performance/batch3-quantum/cover-accept-1-2/work/run-nuc9xk9l",
+            "scheduler_trace_sha256": "22c3e91f0c20dd01d4b0d0727790749105d19a1cccb616ada1c959b7cf5a4cbb"
+          }
+        ],
+        "final": {
+          "byte_size": 307,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 6,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "pass_fixed_point",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 1,
+        "runs": 3,
+        "scenario": "cover-accept",
+        "stop_reason": "fixed_point",
+        "wall_seconds_median": 0.09444731497205794
+      },
+      {
+        "calls": [
+          68,
+          68,
+          68
+        ],
+        "candidates": [
+          82,
+          82,
+          82
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "48af50e25c67b745995c18863e6357f057b06c45fa33e2922b28f6c747464f57",
+            "run": "output/performance/batch3-quantum/cover-accept-4-0/work/run-osndd21j",
+            "scheduler_trace_sha256": "cc466652635abeb4facdc2dd21c3244f813b2f327abde2688b1f1e7cfe045db7"
+          },
+          {
+            "decision_trace_sha256": "48af50e25c67b745995c18863e6357f057b06c45fa33e2922b28f6c747464f57",
+            "run": "output/performance/batch3-quantum/cover-accept-4-1/work/run-wmz5rijr",
+            "scheduler_trace_sha256": "cc466652635abeb4facdc2dd21c3244f813b2f327abde2688b1f1e7cfe045db7"
+          },
+          {
+            "decision_trace_sha256": "48af50e25c67b745995c18863e6357f057b06c45fa33e2922b28f6c747464f57",
+            "run": "output/performance/batch3-quantum/cover-accept-4-2/work/run-l5z2r2bh",
+            "scheduler_trace_sha256": "cc466652635abeb4facdc2dd21c3244f813b2f327abde2688b1f1e7cfe045db7"
+          }
+        ],
+        "final": {
+          "byte_size": 307,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 6,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "pass_fixed_point",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 4,
+        "runs": 3,
+        "scenario": "cover-accept",
+        "stop_reason": "fixed_point",
+        "wall_seconds_median": 0.09911698300857097
+      },
+      {
+        "calls": [
+          75,
+          75,
+          75
+        ],
+        "candidates": [
+          88,
+          88,
+          88
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "c99922bebb7ddcd8ea7b757e63d84f860b8757dd1983ab4f5f31514123be60fb",
+            "run": "output/performance/batch3-quantum/cover-accept-8-0/work/run-sbc7opn5",
+            "scheduler_trace_sha256": "a3bf42422ff795bc1d1c9f433ce078733f82e17b508eb7f68488d7a9bd8f546a"
+          },
+          {
+            "decision_trace_sha256": "c99922bebb7ddcd8ea7b757e63d84f860b8757dd1983ab4f5f31514123be60fb",
+            "run": "output/performance/batch3-quantum/cover-accept-8-1/work/run-s7teoh_f",
+            "scheduler_trace_sha256": "a3bf42422ff795bc1d1c9f433ce078733f82e17b508eb7f68488d7a9bd8f546a"
+          },
+          {
+            "decision_trace_sha256": "c99922bebb7ddcd8ea7b757e63d84f860b8757dd1983ab4f5f31514123be60fb",
+            "run": "output/performance/batch3-quantum/cover-accept-8-2/work/run-nxn8drno",
+            "scheduler_trace_sha256": "a3bf42422ff795bc1d1c9f433ce078733f82e17b508eb7f68488d7a9bd8f546a"
+          }
+        ],
+        "final": {
+          "byte_size": 307,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 6,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "pass_fixed_point",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "phase_quantum": 8,
+        "runs": 3,
+        "scenario": "cover-accept",
+        "stop_reason": "fixed_point",
+        "wall_seconds_median": 0.13292217097477987
+      }
+    ]
+  },
+  "regressions": [
+    {
+      "budget": "calls",
+      "configuration": {
+        "budget": "both",
+        "candidate_budget": 4,
+        "case": "chain",
+        "compare_instrumentation": false,
+        "compare_schedulers": true,
+        "condition": "relu",
+        "interesting_sizes": null,
+        "model": null,
+        "no_cache": false,
+        "repeat": 3,
+        "scheduler": "legacy",
+        "signature_regex": null,
+        "size": 32,
+        "test": null,
+        "threshold": null,
+        "time_budget": 1.0,
+        "timeout": 60.0,
+        "trigger_position": "middle"
+      },
+      "legacy": {
+        "calls": [
+          6,
+          6,
+          6
+        ],
+        "candidates": [
+          5,
+          5,
+          5
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "fbccd9b0f43b5e764d2d74bf8361950497a885b158505e4bf7925c1f950f945e",
+            "run": "output/performance/batch3-matrix/tight-calls/20261103-153302/chain-calls-0-legacy-on/work/run-illjc_v4",
+            "scheduler_trace_sha256": "01e1d19da632ee353b78fffa2b95c3548135890be08a345c8065fcd058de8c98"
+          },
+          {
+            "decision_trace_sha256": "fbccd9b0f43b5e764d2d74bf8361950497a885b158505e4bf7925c1f950f945e",
+            "run": "output/performance/batch3-matrix/tight-calls/20261103-153302/chain-calls-1-legacy-on/work/run-x8tjku6b",
+            "scheduler_trace_sha256": "01e1d19da632ee353b78fffa2b95c3548135890be08a345c8065fcd058de8c98"
+          },
+          {
+            "decision_trace_sha256": "fbccd9b0f43b5e764d2d74bf8361950497a885b158505e4bf7925c1f950f945e",
+            "run": "output/performance/batch3-matrix/tight-calls/20261103-153302/chain-calls-2-legacy-on/work/run-cwtesygr",
+            "scheduler_trace_sha256": "01e1d19da632ee353b78fffa2b95c3548135890be08a345c8065fcd058de8c98"
+          }
+        ],
+        "final": {
+          "byte_size": 395,
+          "initializer_count": 0,
+          "input_count": 2,
+          "node_count": 8,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "runs": 3,
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.015047160966787487
+      },
+      "scenario": "tight-calls",
+      "stateful": {
+        "calls": [
+          6,
+          6,
+          6
+        ],
+        "candidates": [
+          6,
+          6,
+          6
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "35d7399d2854797dbf19cf12057b4b1415a7202e52889613e4c545a2af74211f",
+            "run": "output/performance/batch3-matrix/tight-calls/20261103-153302/chain-calls-0-stateful-on/work/run-4hvje_wp",
+            "scheduler_trace_sha256": "1d0d7237d15da8bbfd89195965103ff162978caad345109fdfe24f48d417d601"
+          },
+          {
+            "decision_trace_sha256": "35d7399d2854797dbf19cf12057b4b1415a7202e52889613e4c545a2af74211f",
+            "run": "output/performance/batch3-matrix/tight-calls/20261103-153302/chain-calls-1-stateful-on/work/run-a4k2na1f",
+            "scheduler_trace_sha256": "1d0d7237d15da8bbfd89195965103ff162978caad345109fdfe24f48d417d601"
+          },
+          {
+            "decision_trace_sha256": "35d7399d2854797dbf19cf12057b4b1415a7202e52889613e4c545a2af74211f",
+            "run": "output/performance/batch3-matrix/tight-calls/20261103-153302/chain-calls-2-stateful-on/work/run-lji2cbmq",
+            "scheduler_trace_sha256": "1d0d7237d15da8bbfd89195965103ff162978caad345109fdfe24f48d417d601"
+          }
+        ],
+        "final": {
+          "byte_size": 412,
+          "initializer_count": 0,
+          "input_count": 3,
+          "node_count": 8,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "runs": 3,
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.015436829009559005
+      }
+    },
+    {
+      "budget": "calls",
+      "configuration": {
+        "budget": "both",
+        "candidate_budget": 100,
+        "case": "chain",
+        "compare_instrumentation": false,
+        "compare_schedulers": true,
+        "condition": "threshold",
+        "interesting_sizes": null,
+        "model": null,
+        "no_cache": false,
+        "repeat": 3,
+        "scheduler": "legacy",
+        "signature_regex": null,
+        "size": 128,
+        "test": null,
+        "threshold": null,
+        "time_budget": 1.0,
+        "timeout": 60.0,
+        "trigger_position": "middle"
+      },
+      "legacy": {
+        "calls": [
+          68,
+          68,
+          68
+        ],
+        "candidates": [
+          66,
+          66,
+          66
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "f896ee35d4e388e7063084901695cb4c45a0d7583db2af3ee3441f8a85620a2b",
+            "run": "output/performance/batch3-matrix/threshold-128/20261103-153147/chain-calls-0-legacy-on/work/run-8j6fu8gf",
+            "scheduler_trace_sha256": "3605d39915b928550020c42f5ba2542f353b8112a4918f666b3e75a73a3afc55"
+          },
+          {
+            "decision_trace_sha256": "f896ee35d4e388e7063084901695cb4c45a0d7583db2af3ee3441f8a85620a2b",
+            "run": "output/performance/batch3-matrix/threshold-128/20261103-153147/chain-calls-1-legacy-on/work/run-hcsq5jq5",
+            "scheduler_trace_sha256": "3605d39915b928550020c42f5ba2542f353b8112a4918f666b3e75a73a3afc55"
+          },
+          {
+            "decision_trace_sha256": "f896ee35d4e388e7063084901695cb4c45a0d7583db2af3ee3441f8a85620a2b",
+            "run": "output/performance/batch3-matrix/threshold-128/20261103-153147/chain-calls-2-legacy-on/work/run-gc5yi74y",
+            "scheduler_trace_sha256": "3605d39915b928550020c42f5ba2542f353b8112a4918f666b3e75a73a3afc55"
+          }
+        ],
+        "final": {
+          "byte_size": 1614,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 32,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes",
+          "status": "pass_fixed_point",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "runs": 3,
+        "stop_reason": "fixed_point",
+        "wall_seconds_median": 0.16423110099276528
+      },
+      "scenario": "threshold-128",
+      "stateful": {
+        "calls": [
+          102,
+          102,
+          102
+        ],
+        "candidates": [
+          101,
+          101,
+          101
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "522f62a28bfa6909d5ae4057e00bf95e81677cfbc6dce54e0f05eadf109c217d",
+            "run": "output/performance/batch3-matrix/threshold-128/20261103-153147/chain-calls-0-stateful-on/work/run-_jsrskrv",
+            "scheduler_trace_sha256": "d18450a5511a6e140a4fa48d608652858df42cea1eb6bd304424ec1ee1012390"
+          },
+          {
+            "decision_trace_sha256": "522f62a28bfa6909d5ae4057e00bf95e81677cfbc6dce54e0f05eadf109c217d",
+            "run": "output/performance/batch3-matrix/threshold-128/20261103-153147/chain-calls-1-stateful-on/work/run-ge9y1_nr",
+            "scheduler_trace_sha256": "d18450a5511a6e140a4fa48d608652858df42cea1eb6bd304424ec1ee1012390"
+          },
+          {
+            "decision_trace_sha256": "522f62a28bfa6909d5ae4057e00bf95e81677cfbc6dce54e0f05eadf109c217d",
+            "run": "output/performance/batch3-matrix/threshold-128/20261103-153147/chain-calls-2-stateful-on/work/run-oqsmjd39",
+            "scheduler_trace_sha256": "d18450a5511a6e140a4fa48d608652858df42cea1eb6bd304424ec1ee1012390"
+          }
+        ],
+        "final": {
+          "byte_size": 1614,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 32,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "unproven",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "runs": 3,
+        "stop_reason": "budget_exhausted",
+        "wall_seconds_median": 0.21916209202026948
+      }
+    },
+    {
+      "budget": "calls",
+      "configuration": {
+        "budget": "both",
+        "candidate_budget": 100,
+        "case": "chain",
+        "compare_instrumentation": false,
+        "compare_schedulers": true,
+        "condition": "non-monotonic",
+        "interesting_sizes": [
+          16,
+          12,
+          6
+        ],
+        "model": null,
+        "no_cache": false,
+        "repeat": 3,
+        "scheduler": "legacy",
+        "signature_regex": null,
+        "size": 16,
+        "test": null,
+        "threshold": null,
+        "time_budget": 1.0,
+        "timeout": 60.0,
+        "trigger_position": "middle"
+      },
+      "legacy": {
+        "calls": [
+          16,
+          16,
+          16
+        ],
+        "candidates": [
+          14,
+          14,
+          14
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "4c235e690912e1ecce6aa9b235cdf31d7d2999c9e8b1647bad18e32b03bb7b7a",
+            "run": "output/performance/batch3-matrix/cover-accept/20261103-153253/chain-calls-0-legacy-on/work/run-4f5krtxl",
+            "scheduler_trace_sha256": "8dc2829fc6cc8d6255697fb4f56fb60cd3a2ff482edf9393b43b261aa16eb8cf"
+          },
+          {
+            "decision_trace_sha256": "4c235e690912e1ecce6aa9b235cdf31d7d2999c9e8b1647bad18e32b03bb7b7a",
+            "run": "output/performance/batch3-matrix/cover-accept/20261103-153253/chain-calls-1-legacy-on/work/run-122xdkp6",
+            "scheduler_trace_sha256": "8dc2829fc6cc8d6255697fb4f56fb60cd3a2ff482edf9393b43b261aa16eb8cf"
+          },
+          {
+            "decision_trace_sha256": "4c235e690912e1ecce6aa9b235cdf31d7d2999c9e8b1647bad18e32b03bb7b7a",
+            "run": "output/performance/batch3-matrix/cover-accept/20261103-153253/chain-calls-2-legacy-on/work/run-rtu_nwz_",
+            "scheduler_trace_sha256": "8dc2829fc6cc8d6255697fb4f56fb60cd3a2ff482edf9393b43b261aa16eb8cf"
+          }
+        ],
+        "final": {
+          "byte_size": 307,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 6,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes",
+          "status": "pass_fixed_point",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "runs": 3,
+        "stop_reason": "fixed_point",
+        "wall_seconds_median": 0.02667411498259753
+      },
+      "scenario": "cover-accept",
+      "stateful": {
+        "calls": [
+          75,
+          75,
+          75
+        ],
+        "candidates": [
+          88,
+          88,
+          88
+        ],
+        "evidence": [
+          {
+            "decision_trace_sha256": "c99922bebb7ddcd8ea7b757e63d84f860b8757dd1983ab4f5f31514123be60fb",
+            "run": "output/performance/batch3-matrix/cover-accept/20261103-153253/chain-calls-0-stateful-on/work/run-ft2loo8q",
+            "scheduler_trace_sha256": "a3bf42422ff795bc1d1c9f433ce078733f82e17b508eb7f68488d7a9bd8f546a"
+          },
+          {
+            "decision_trace_sha256": "c99922bebb7ddcd8ea7b757e63d84f860b8757dd1983ab4f5f31514123be60fb",
+            "run": "output/performance/batch3-matrix/cover-accept/20261103-153253/chain-calls-1-stateful-on/work/run-5fwxxxpo",
+            "scheduler_trace_sha256": "a3bf42422ff795bc1d1c9f433ce078733f82e17b508eb7f68488d7a9bd8f546a"
+          },
+          {
+            "decision_trace_sha256": "c99922bebb7ddcd8ea7b757e63d84f860b8757dd1983ab4f5f31514123be60fb",
+            "run": "output/performance/batch3-matrix/cover-accept/20261103-153253/chain-calls-2-stateful-on/work/run-4kzt6l7t",
+            "scheduler_trace_sha256": "a3bf42422ff795bc1d1c9f433ce078733f82e17b508eb7f68488d7a9bd8f546a"
+          }
+        ],
+        "final": {
+          "byte_size": 307,
+          "initializer_count": 0,
+          "input_count": 1,
+          "node_count": 6,
+          "output_count": 1
+        },
+        "minimality": {
+          "global_minimum": false,
+          "passes": [
+            "drop_outputs",
+            "remove_unused",
+            "delete_nodes"
+          ],
+          "scope": "valid, strictly cheaper candidates generated by configured passes and standard partition keep-region candidates",
+          "status": "pass_fixed_point",
+          "sweep_inconclusive_candidate_count": 0
+        },
+        "runs": 3,
+        "stop_reason": "fixed_point",
+        "wall_seconds_median": 0.1316747439559549
+      }
+    }
+  ],
+  "scope": "synthetic conditions; no real backend fault measured",
+  "source_sha256": {
+    "benchmarks/reduction.py": "db3fc8e5addfbdae86f0d6d101b172051399c35149cf7ba3adae453a644e4918",
+    "src/onnx_reduce/__init__.py": "ffd0a0359e2cc5f4a53524f116555eca6d4586d109f26e0d64c411bd860c2265",
+    "src/onnx_reduce/__main__.py": "d2a24a77971de1a7e9bd162da0de4180ebdd6187e8ae2750a761b80df2a9deb1",
+    "src/onnx_reduce/cli.py": "5b1ee7481e552077938e752b6e8706137356ad44702af915a8aa81c3d9b6a185",
+    "src/onnx_reduce/edits.py": "bba98930cbf728f249023a5f5f0fb8c1adaafebc8efcf53db290218153afb33f",
+    "src/onnx_reduce/engine.py": "687275bd2420be463ceddc83aa39b71fd4de6ac91718487f8b0b50ddde634446",
+    "src/onnx_reduce/failure_check/__init__.py": "1776601f6a880b42989be2aecfa1864bbe1611dbd1d46035bcf6854e8dbf2316",
+    "src/onnx_reduce/failure_check/contract.py": "9388a16c81e5e2cb7712fc63164a3954b1a206c02d6fd1e045f5d1f03a3cf3de",
+    "src/onnx_reduce/failure_check/evaluator.py": "c9b03a50e9de9e27c26f0f8cc2c7c7bba1a098f49104d43debf2fc0f0bd08f19",
+    "src/onnx_reduce/failure_check/runner.py": "2b74e51fc4cac94f1037842902c005154516037e38992ea79b9c69cff693e86c",
+    "src/onnx_reduce/model.py": "ca2fe4d32cbb0c02404de5e3a15188a3af624d10941f0168ca4e95da0fe39573",
+    "src/onnx_reduce/passes/__init__.py": "4b3dfce1a3666afecfc1eb8ee69da41e299716da893f5ce9f2caad1b102cc13c",
+    "src/onnx_reduce/passes/base.py": "84c379d33f663ff2ba62e4a23e91d949b66cbfd3120fcf090644c1fb8507f332",
+    "src/onnx_reduce/passes/delete_nodes.py": "89cda3e13f0c3b5808de84e08831e0b74df6e2b7532c17dbd4296ce04559c965",
+    "src/onnx_reduce/passes/drop_outputs.py": "93bb615a60951dd3f2b1e6662a8036b3cf318f8cfb99fc97d18249614386d2d2",
+    "src/onnx_reduce/passes/groups.py": "5ece2b776d869e37ef319561628c8b827c9f8f915cef8c8b5ae1abfb21ac6294",
+    "src/onnx_reduce/passes/remove_unused.py": "b730ae6922bc610e8f2842ec218d3734851500ffc26cf42c5ca23571d1479132",
+    "src/onnx_reduce/performance.py": "55f3c2df67338002641b51639473b4457a17dbff2ee1759a7b136ebdea5a7999",
+    "src/onnx_reduce/preparation.py": "cac3cbd57cc4d77e0175e6cd9cf61787c1f29731700094b19be4c2555aff361a",
+    "src/onnx_reduce/report.py": "efff91507d83fc1c6d0c8d1a9f113e9f9fab4e868fc94b0a19b0c6e085041f3e",
+    "src/onnx_reduce/scheduler.py": "6132fe34abf002848e7dc2d7b388ae3d06af545205ffb702c75bff8db28b4553",
+    "src/onnx_reduce/storage.py": "1759f4725b14defef4402b7841b0ad141805a602ece58aa564c323df7277d981",
+    "src/onnx_reduce/types.py": "0ca10a2e5a763987161544e0bfd30338d0dda8a8531c64e1143ac33188be40be"
+  },
+  "validation": {
+    "document_relative_links": 50,
+    "git_diff_check": "passed",
+    "pytest_passed": 210,
+    "ruff_check": "passed",
+    "ruff_format_check": "passed"
+  }
+}

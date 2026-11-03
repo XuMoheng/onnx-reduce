@@ -53,6 +53,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--work-dir", type=Path, help="retain run logs/checkpoints here (default: OUTPUT.work)"
     )
     parser.add_argument(
+        "--scheduler",
+        choices=("legacy", "stateful"),
+        default="legacy",
+        help="candidate scheduling strategy (stateful is experimental)",
+    )
+    parser.add_argument(
         "--performance", action="store_true", help="collect stage timings and resource counters"
     )
     parser.add_argument(
@@ -109,6 +115,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             collect_performance=args.performance,
             target_mode=args.target_mode,
             signature_regex=args.signature_regex,
+            scheduler=args.scheduler,
         )
         if args.report:
             for model_path in (args.model, args.output):

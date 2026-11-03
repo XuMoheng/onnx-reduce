@@ -12,16 +12,18 @@ onnx-reduce 在保留用户指定故障的前提下，缩减 ONNX 模型。以�
 | 理解候选如何生成、校验和接受，定位相关源码 | [架构说明](architecture.md) |
 | 排查无法启动、判定异常、最终复检失败或中断 | [排障指南](troubleshooting.md) |
 | 搭建开发环境、运行验证、提交贡献 | [贡献指南](../CONTRIBUTING.md) |
-| 查看当前版本与接口变化 | [变更记录](../CHANGELOG.md) |
+| 查看当前版本与依赖 | [项目元数据](../pyproject.toml) |
 
 首次接入建议按「README → 使用指南 → 排障指南」阅读；修改实现前再阅读架构说明。
 
 ## 开发计划
 
 - [性能优化计划](performance-todo.md)
+- [第三批设计：有状态搜索调度器](stateful-search-design.md)
 - [性能基线：采集与基准命令](performance-baseline.md)
 - [性能基线实测：2026-11-02](performance-results.md)
 - [第二批性能实测：2026-11-03](performance-batch2-results.md)
+- [第三批性能实测：2026-11-03](performance-batch3-results.md)
 
 ## 命令与路径约定
 
