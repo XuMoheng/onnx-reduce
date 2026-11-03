@@ -30,7 +30,15 @@ from onnx_reduce.failure_check.runner import FailureCheckRunner
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.performance import PerformanceStats
 
-CASES = ("initializers", "chain", "branches", "outputs", "missing-shape")
+CASES = (
+    "initializers",
+    "chain",
+    "branches",
+    "outputs",
+    "missing-shape",
+    "gated",
+    "one-stubborn-init",
+)
 
 
 def value(name, size=1):
@@ -44,13 +52,13 @@ def make_model(
     outputs = [value("y")]
     infos = []
     weights = []
-    if case == "initializers":
+    if case in {"initializers", "one-stubborn-init"}:
         nodes = [helper.make_node("Relu", ["x"], ["y"])]
         weights = [
             helper.make_tensor(f"unused_{i:04d}", TensorProto.FLOAT, [1], [1.0])
             for i in range(size)
         ]
-    elif case in {"chain", "missing-shape", "preparation"}:
+    elif case in {"chain", "missing-shape", "preparation", "gated"}:
         trigger = {"front": 0, "middle": size // 2, "back": size - 1}[trigger_position]
         previous = "x"
         for i in range(size):
@@ -60,10 +68,16 @@ def make_model(
                     "Relu" if i == trigger and condition != "dead-trigger" else "Identity",
                     [previous],
                     [name],
-                    **({"name": f"n{i}"} if condition != "relu" else {}),
+                    **(
+                        {"name": f"mustkeep_{i}" if i % 3 == 0 else f"n{i}"}
+                        if case == "gated"
+                        else {"name": f"n{i}"}
+                        if condition != "relu"
+                        else {}
+                    ),
                 )
             )
-            if name != "y" and case == "chain":
+            if (name != "y" and case == "chain") or case == "gated":
                 infos.append(value(name))
             previous = name
         if condition == "dead-trigger":
@@ -94,13 +108,19 @@ def make_model(
 class ReluCheck:
     """Deterministic synthetic condition; deliberately excludes process startup cost."""
 
+    def __init__(self, case="chain", size=0):
+        self.case = case
+        self.stubborn = f"unused_{size // 2:04d}"
+        self.anchors = {f"mustkeep_{i}" for i in range(0, size, 3)}
+
     def run(self, path):
         model = onnx.load(path)
-        return (
-            FailureCheckResult.INTERESTING
-            if any(node.op_type == "Relu" for node in model.graph.node)
-            else FailureCheckResult.NOT_INTERESTING
-        )
+        interesting = any(node.op_type == "Relu" for node in model.graph.node)
+        if self.case == "gated":
+            interesting &= self.anchors <= {node.name for node in model.graph.node}
+        elif self.case == "one-stubborn-init":
+            interesting &= self.stubborn in {v.name for v in model.graph.initializer}
+        return FailureCheckResult.INTERESTING if interesting else FailureCheckResult.NOT_INTERESTING
 
 
 class NodeCountCheck:
@@ -184,10 +204,16 @@ def worker(args):
             if args.case == "preparation"
             else SyntheticCheck(args)
             if args.condition != "relu"
-            else ReluCheck()
+            else ReluCheck(args.case, args.size)
         )
     config = EngineConfig(
         cache_enabled=not args.no_cache,
+        model_edit_mode=args.model_edit_mode,
+        search_policy=args.search_policy,
+        history_order=args.history_order,
+        direction_order=args.direction_order,
+        checkpoint_reuse=not args.no_checkpoint_reuse,
+        validation_cache_enabled=not args.no_validation_cache,
         collect_performance=not args.no_performance,
         max_candidate_check_calls=args.candidate_budget if args.budget == "calls" else None,
         time_budget_seconds=args.time_budget if args.budget == "time" else None,
@@ -256,6 +282,12 @@ def run_worker(args, case, budget, repeat, enabled, scheduler, batch):
         args.trigger_position,
     ]
     command += ["--module-width", str(args.module_width)]
+    for option in ("model-edit-mode", "search-policy", "history-order", "direction-order"):
+        command += ["--" + option, getattr(args, option.replace("-", "_"))]
+    if args.no_checkpoint_reuse:
+        command.append("--no-checkpoint-reuse")
+    if args.no_validation_cache:
+        command.append("--no-validation-cache")
     if not enabled:
         command.append("--no-performance")
     if args.no_cache:
@@ -399,6 +431,12 @@ def main():
     parser.add_argument("--test", help="real backend interestingness command")
     parser.add_argument("--signature-regex")
     parser.add_argument("--timeout", type=float, default=60.0)
+    parser.add_argument("--model-edit-mode", choices=("ir", "auto"), default="ir")
+    parser.add_argument("--search-policy", choices=("restart", "cursor"), default="restart")
+    parser.add_argument("--history-order", choices=("off", "defer"), default="off")
+    parser.add_argument("--direction-order", choices=("fixed", "adaptive"), default="fixed")
+    parser.add_argument("--no-checkpoint-reuse", action="store_true")
+    parser.add_argument("--no-validation-cache", action="store_true")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--no-performance", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
