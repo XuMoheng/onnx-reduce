@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from onnx_reduce.edits import Candidate, DeleteNodes
+from onnx_reduce.passes.base import RemovalGroup
 from onnx_reduce.passes.groups import is_coarse
 from onnx_reduce.types import NodeSearchModel
 
@@ -25,6 +26,10 @@ def _granularities(node_count: int) -> tuple[int, ...]:
 
 class DeleteNodesPass:
     name = "delete_nodes"
+    requires_node_ids = True
+
+    def removal_groups(self, model):
+        yield RemovalGroup("nodes", model.node_ids, DeleteNodes, nodes=True)
 
     def node_regions(
         self, model: NodeSearchModel, size: int, *, start: int = 0

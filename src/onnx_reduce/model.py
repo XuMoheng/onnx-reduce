@@ -6,7 +6,7 @@ import hashlib
 import json
 import os
 from collections.abc import Iterable
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from functools import cached_property
 from pathlib import Path
 from types import MappingProxyType
@@ -17,7 +17,8 @@ from onnxscript import ir
 
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs, DropOutputs
 from onnx_reduce.performance import count, measured
-from onnx_reduce.preparation import current_preparation, metadata_key
+from onnx_reduce.preparation import current_preparation, metadata_key, preparation_caches
+from onnx_reduce.snapshot import SnapshotModel
 from onnx_reduce.storage import atomic_write
 from onnx_reduce.types import (
     EditApplicationError,
@@ -45,7 +46,7 @@ class TensorLinks:
     is_initializer: bool
 
 
-class OnnxModel:
+class OnnxModel(SnapshotModel):
     """An immutable public view of an owned ONNX IR model.
 
     Edits mutate only a fresh clone, before its serialized snapshot is read.
@@ -60,10 +61,42 @@ class OnnxModel:
     def __init__(self, model: ir.Model, *, _node_ids: tuple[int, ...] | None = None):
         """Take ownership of the IR model; callers must stop mutating it and its tensors."""
 
-        self._model = model  # Owned IR; edits are applied only to fresh clones
+        self._ir_model = model  # Owned IR; edits are applied only to fresh clones
+        self._proto_snapshot = None
         ids = range(model.graph.num_nodes()) if _node_ids is None else _node_ids
         self._node_ids = dict(zip(model.graph, ids, strict=True))
         self._refresh_node_indices()
+
+    @property
+    def _model(self):
+        if self._ir_model is None:
+            self._ir_model = self._import_snapshot()
+            self._node_ids = dict(zip(self._ir_model.graph, self.node_ids, strict=True))
+        return self._ir_model
+
+    @measured("lazy_import")
+    def _import_snapshot(self):
+        count("lazy_ir_imports")
+        return ir.from_proto(self._snapshot)
+
+    @classmethod
+    def _from_snapshot(cls, proto, ids):
+        obj = cls.__new__(cls)
+        obj._ir_model = None
+        obj._proto_snapshot = proto
+        obj._ordered_node_ids = ids
+        obj._id_to_index = MappingProxyType({item: i for i, item in enumerate(ids)})
+        return obj
+
+    @cached_property
+    @measured("export")
+    def _snapshot(self):
+        if self._proto_snapshot is not None:
+            return self._proto_snapshot
+        converted = ir.to_proto(self._model)
+        if not isinstance(converted, onnx.ModelProto):
+            raise TypeError("onnxscript IR did not convert to a ModelProto")
+        return converted
 
     def _refresh_node_indices(self) -> None:
         # Keep only live objects. Identity metadata never enters the ONNX payload.
@@ -120,14 +153,11 @@ class OnnxModel:
 
         return OnnxModel(self._model.clone(), _node_ids=self.node_ids)
 
-    @measured("export")
     def to_proto(self) -> onnx.ModelProto:
-        """Export a ModelProto that can be modified independently."""
-
-        converted = ir.to_proto(self._model)
-        if not isinstance(converted, onnx.ModelProto):
-            raise TypeError("onnxscript IR did not convert to a ModelProto")
-        return converted
+        """Export an independently mutable copy of the normalized snapshot."""
+        proto = onnx.ModelProto()
+        proto.CopyFrom(self._snapshot)
+        return proto
 
     # ==========================================
     # Read-only Properties
@@ -137,13 +167,17 @@ class OnnxModel:
     def graph_name(self) -> str:
         """Return the main-graph name, or an empty string if unnamed."""
 
-        return self._model.graph.name or ""
+        return self._snapshot.graph.name if self._ir_model is None else self._model.graph.name or ""
 
     @property
     def node_count(self) -> int:
         """Return the main-graph node count, excluding nodes inside attribute subgraphs."""
 
-        return self._model.graph.num_nodes()
+        return (
+            len(self._snapshot.graph.node)
+            if self._ir_model is None
+            else self._model.graph.num_nodes()
+        )
 
     @property
     def node_ids(self) -> tuple[int, ...]:
@@ -161,18 +195,24 @@ class OnnxModel:
     def output_names(self) -> tuple[str, ...]:
         """Return main-graph output names in their current order."""
 
+        if self._ir_model is None:
+            return tuple(v.name for v in self._snapshot.graph.output)
         return tuple(value.name or "" for value in self._model.graph.outputs)
 
     @property
     def input_names(self) -> tuple[str, ...]:
         """Return main-graph input names in their current order."""
 
+        if self._ir_model is None:
+            return tuple(v.name for v in self._snapshot.graph.input)
         return tuple(value.name or "" for value in self._model.graph.inputs)
 
     @property
     def op_types(self) -> tuple[str, ...]:
         """Return operator types in main-graph node order."""
 
+        if self._ir_model is None:
+            return tuple(n.op_type for n in self._snapshot.graph.node)
         return tuple(node.op_type for node in self._model.graph)
 
     # ==========================================
@@ -182,6 +222,8 @@ class OnnxModel:
     def tensor_index(self) -> dict[str, TensorLinks]:
         """Summarize main-graph value links and roles for inspection and tests."""
 
+        if self._ir_model is None:
+            return self._proto_links()
         graph = self._model.graph
         links: dict[str, TensorLinks] = {}
 
@@ -224,6 +266,8 @@ class OnnxModel:
 
     @cached_property
     def _region_graph(self) -> RegionGraph:
+        if self._ir_model is None:
+            return self._proto_region_graph()
         graph = self._model.graph
         links = {}
         consumers = {}
@@ -272,6 +316,8 @@ class OnnxModel:
     def dead_node_indices(self) -> tuple[int, ...]:
         """Return main-graph node indices outside the backward closure of all outputs."""
 
+        if self._ir_model is None:
+            return self._proto_dead()
         # Use a stack to trace producers backward from every graph output.
         needed_values = list(self._model.graph.outputs)
         # Track object identities to distinguish same-named values in different scopes.
@@ -294,6 +340,8 @@ class OnnxModel:
     def unused_input_names(self) -> tuple[str, ...]:
         """Find graph inputs with no consumers that are not themselves graph outputs."""
 
+        if self._ir_model is None:
+            return self._proto_unused("input")
         return tuple(
             value.name
             for value in self._model.graph.inputs
@@ -303,6 +351,8 @@ class OnnxModel:
     def unused_initializer_names(self) -> tuple[str, ...]:
         """Find initializers with no consumers that are not themselves graph outputs."""
 
+        if self._ir_model is None:
+            return self._proto_unused("initializer")
         return tuple(
             name
             for name, value in self._model.graph.initializers.items()
@@ -312,13 +362,29 @@ class OnnxModel:
     def custom_domains(self) -> tuple[str, ...]:
         """Collect non-builtin operator domains from the main graph and subgraphs."""
 
-        domains = {
-            node.domain
-            for graph in self._model.graphs()
-            for node in graph
-            if node.domain and node.domain not in BUILTIN_DOMAINS
-        }
-        return tuple(sorted(domains))
+        caches = current_preparation()
+        key = metadata_key("domains", self.canonical_hash()) if caches else None
+        cached = caches.domains.get(key) if caches else None
+        if cached is not None:
+            return tuple(json.loads(cached))
+        count("domain_scans")
+        if self._ir_model is None:
+            domains = {
+                n.domain
+                for n in self._snapshot.graph.node
+                if n.domain and n.domain not in BUILTIN_DOMAINS
+            }
+        else:
+            domains = {
+                n.domain
+                for g in self._model.graphs()
+                for n in g
+                if n.domain and n.domain not in BUILTIN_DOMAINS
+            }
+        result = tuple(sorted(domains))
+        if caches:
+            caches.domains.put(key, json.dumps(result).encode())
+        return result
 
     # ==========================================
     # Dependency Traversal: Internal Helpers for Queries and Node Deletion
@@ -358,6 +424,16 @@ class OnnxModel:
 
         if candidate.base_digest is not None and candidate.base_digest != self.canonical_hash():
             raise EditApplicationError("candidate base digest does not match the model")
+        caches = current_preparation()
+        if (
+            caches is not None
+            and caches.model_edit_mode == "auto"
+            and len(candidate.edits) == 1
+            and isinstance(candidate.edits[0], DeleteNodes)
+        ):
+            fast = self._try_fast_delete_nodes(candidate.edits[0].indices)
+            if fast is not None:
+                return fast
         result = self.copy()
         # Each edit addresses the result of the preceding edit.
         for edit_index, edit in enumerate(candidate.edits):
@@ -375,6 +451,9 @@ class OnnxModel:
                 raise EditApplicationError(f"unsupported edit: {type(edit).__name__}")
             # An intermediate edit may have acquired a serialized snapshot for
             # inference. Subsequent edits must never see that stale snapshot.
+            result.__dict__.pop("_snapshot", None)
+            result.__dict__.pop("_fast_capability", None)
+            result.__dict__.pop("_proto_infos", None)
             result.__dict__.pop("_payload", None)
             result.__dict__.pop("_digest", None)
             result.__dict__.pop("_region_graph", None)
@@ -445,8 +524,23 @@ class OnnxModel:
             graph.inputs.append(replacement)
         # 5. Remove nodes and restore topological order; leave input/weight cleanup separate.
         graph.remove(selected)
-        graph.sort()
+        caches = current_preparation()
+        if caches is not None and caches.model_edit_mode == "auto" and self._graph_ordered(graph):
+            count("sort_skips")
+        else:
+            graph.sort()
         self._refresh_node_indices()
+
+    @classmethod
+    def _graph_ordered(cls, graph):
+        available = set(graph.inputs) | set(graph.initializers.values())
+        for node in graph:
+            if any(True for _ in cls._nested_graphs(node)):
+                return False
+            if any(value not in available for value in node.inputs if value is not None):
+                return False
+            available.update(node.outputs)
+        return True
 
     def _drop_outputs(self, names: Iterable[str]) -> None:
         """Drop named graph outputs, keeping at least one and preserving producer nodes."""
@@ -537,6 +631,15 @@ class OnnxModel:
     def cost(self) -> ModelCost:
         """Build a lexicographic cost: nodes, bytes, outputs, inputs, and initializers."""
 
+        if self._ir_model is None:
+            graph = self._snapshot.graph
+            return ModelCost(
+                len(graph.node),
+                len(self._payload),
+                len(graph.output),
+                len(graph.input),
+                len(graph.initializer),
+            )
         graph = self._model.graph
         return ModelCost(
             node_count=graph.num_nodes(),
@@ -547,31 +650,26 @@ class OnnxModel:
         )
 
     @measured("validation")
-    def validate(self, mode: str = "strict") -> ValidationResult:
+    def validate(self, mode: str = "strict", *, use_cache: bool = True) -> ValidationResult:
         """Check the model and report validity, the failure reason, and the effective mode."""
 
         if mode not in {"strict", "structural", "permissive"}:
             raise ValueError(f"unknown validation mode: {mode}")
-        graph = self._model.graph
+        graph = self._snapshot.graph
         domains = self.custom_domains()
-        if len(graph.outputs) == 0:
+        if not graph.output:
             return ValidationResult(False, "graph has no outputs", mode, domains)
-        output_names = [value.name for value in graph.outputs]
+        output_names = [v.name for v in graph.output]
         if any(not name for name in output_names):
             return ValidationResult(False, "graph output has an empty name", mode, domains)
         if len(set(output_names)) != len(output_names):
             return ValidationResult(False, "graph output names are not unique", mode, domains)
-        for value in graph.outputs:
-            if (
-                value.producer() is None
-                and not value.is_graph_input()
-                and not value.is_initializer()
-            ):
+        defined = {v.name for v in graph.input} | {v.name for v in graph.initializer}
+        defined.update(name for n in graph.node for name in n.output)
+        for name in output_names:
+            if name not in defined:
                 return ValidationResult(
-                    False,
-                    f"graph output {value.name!r} has no producer",
-                    mode,
-                    domains,
+                    False, f"graph output {name!r} has no producer", mode, domains
                 )
 
         # Downgrade strict to structural when custom domains are present.
@@ -579,6 +677,18 @@ class OnnxModel:
         effective_mode = "structural" if mode == "strict" and domains else mode
         if effective_mode == "permissive":
             return ValidationResult(True, None, effective_mode, domains)
+        caches = current_preparation() if use_cache else None
+        key = (
+            metadata_key("validation", self.canonical_hash(), mode, effective_mode)
+            if caches
+            else None
+        )
+        cached = caches.validations.get(key) if caches else None
+        if cached is not None:
+            data = json.loads(cached)
+            data["custom_domains"] = tuple(data["custom_domains"])
+            return ValidationResult(**data)
+        count("checker_calls")
         try:
             onnx.checker.check_model(
                 self._payload,
@@ -586,8 +696,12 @@ class OnnxModel:
                 check_custom_domain=effective_mode == "strict",
             )
         except Exception as exc:  # Checker failures describe an invalid candidate.
-            return ValidationResult(False, f"onnx checker: {exc}", effective_mode, domains)
-        return ValidationResult(True, None, effective_mode, domains)
+            result = ValidationResult(False, f"onnx checker: {exc}", effective_mode, domains)
+        else:
+            result = ValidationResult(True, None, effective_mode, domains)
+        if caches:
+            caches.validations.put(key, json.dumps(asdict(result)).encode())
+        return result
 
     # ==========================================
     # Serialized Snapshots, Content Identity, and File Output
@@ -598,7 +712,7 @@ class OnnxModel:
     def _payload(self) -> bytes:
         """Cache deterministic bytes on first access for cost, hashing, and file output."""
 
-        return self.to_proto().SerializeToString(deterministic=True)
+        return self._snapshot.SerializeToString(deterministic=True)
 
     @cached_property
     @measured("hash")
@@ -631,4 +745,5 @@ class OnnxModel:
         if actual_digest != artifact.digest or actual_digest != self.canonical_hash():
             return ValidationResult(False, "output artifact digest mismatch", mode)
         loaded = OnnxModel.load(artifact.model_path)
-        return loaded.validate(mode)
+        with preparation_caches(False, mode):
+            return loaded.validate(mode)

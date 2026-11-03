@@ -6,11 +6,24 @@ from collections.abc import Iterator
 from typing import Any
 
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs
+from onnx_reduce.passes.base import RemovalGroup
 from onnx_reduce.passes.groups import deletion_groups, is_coarse
 
 
 class RemoveUnusedPass:
     name = "remove_unused"
+    requires_node_ids = True
+
+    def removal_groups(self, model):
+        yield RemovalGroup("inputs", model.unused_input_names(), DropInputs)
+        yield RemovalGroup("initializers", model.unused_initializer_names(), DropInitializers)
+        yield RemovalGroup(
+            "dead",
+            tuple(model.node_ids[i] for i in model.dead_node_indices()),
+            DeleteNodes,
+            nodes=True,
+        )
+
     # Dead nodes can still be the sole carrier of a compiler bug.  Unlike an
     # optimizer, the reducer must never remove them without running the failure check,
     # so this cleanup is gated by failure checks.

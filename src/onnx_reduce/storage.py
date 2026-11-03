@@ -2,12 +2,36 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import tempfile
 from pathlib import Path
 
 from onnx_reduce.performance import count, measured
+
+
+@measured("checkpoint_verification")
+def checkpoint_artifact(model, destination, known):
+    """Reuse only our private, verified checkpoint, never a writable test file."""
+    digest = model.canonical_hash()
+    artifact = known.get(digest) if known is not None else None
+    if artifact is not None and not artifact.resources:
+        try:
+            with artifact.model_path.open("rb") as stream:
+                actual = hashlib.file_digest(stream, "sha256").hexdigest()
+            if actual == digest:
+                count("checkpoint_reuses")
+                return artifact
+        except OSError:
+            pass
+        count("checkpoint_reuse_fallbacks")
+    artifact = model.materialize(destination)
+    if known is not None:
+        # Only the incumbent needs retention; no unbounded artifact history.
+        known.clear()
+        known[digest] = artifact
+    return artifact
 
 
 @measured("write")

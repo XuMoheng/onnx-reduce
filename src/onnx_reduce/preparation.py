@@ -37,6 +37,11 @@ class MetadataCache:
     def __len__(self):
         return len(self._entries)
 
+    def discard(self, key):
+        previous = self._entries.pop(key, None)
+        if previous is not None:
+            self.byte_size -= len(key.encode()) + len(previous)
+
     def get(self, key: str) -> bytes | None:
         if not self.enabled:
             count(f"{self.name}_cache_disabled")
@@ -73,12 +78,22 @@ class MetadataCache:
 class PreparationCaches:
     enabled: bool
     validation_mode: str
+    model_edit_mode: str = "ir"
+    validation_cache_enabled: bool = True
     edits: MetadataCache = field(init=False)
     shapes: MetadataCache = field(init=False)
+    validations: MetadataCache = field(init=False)
+    domains: MetadataCache = field(init=False)
 
     def __post_init__(self):
         self.edits = MetadataCache("edit", enabled=self.enabled)
         self.shapes = MetadataCache("shape", enabled=self.enabled)
+        self.validations = MetadataCache(
+            "validation", enabled=self.enabled and self.validation_cache_enabled
+        )
+        self.domains = MetadataCache(
+            "domain", enabled=self.enabled and self.validation_cache_enabled
+        )
 
 
 _ACTIVE: ContextVar[PreparationCaches | None] = ContextVar("preparation_caches", default=None)
@@ -95,8 +110,10 @@ def edit_key(candidate, validation_mode):
 
 
 @contextmanager
-def preparation_caches(enabled=True, validation_mode="strict"):
-    caches = PreparationCaches(enabled, validation_mode)
+def preparation_caches(
+    enabled=True, validation_mode="strict", model_edit_mode="ir", validation_cache_enabled=True
+):
+    caches = PreparationCaches(enabled, validation_mode, model_edit_mode, validation_cache_enabled)
     token = _ACTIVE.set(caches)
     try:
         yield caches

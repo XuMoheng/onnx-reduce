@@ -3,10 +3,29 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
 
 from onnx_reduce.edits import Candidate
 from onnx_reduce.types import NodeSearchModel
+
+
+@dataclass(frozen=True)
+class RemovalGroup:
+    """Current removable identities, explicitly offered to the staged cursor."""
+
+    key: str
+    items: tuple
+    edit_type: type
+    nodes: bool = False
+    keep_one: bool = False
+
+
+@runtime_checkable
+class CursorPass(Protocol):
+    requires_node_ids: bool
+
+    def removal_groups(self, model: Any) -> Iterator[RemovalGroup]: ...
 
 
 @runtime_checkable

@@ -6,11 +6,18 @@ from collections.abc import Iterator
 from typing import Any
 
 from onnx_reduce.edits import Candidate, DropOutputs
+from onnx_reduce.passes.base import RemovalGroup
 from onnx_reduce.passes.groups import deletion_groups, is_coarse
 
 
 class DropOutputsPass:
     name = "drop_outputs"
+    requires_node_ids = False
+
+    def removal_groups(self, model):
+        yield RemovalGroup(
+            "outputs", tuple(reversed(model.output_names)), DropOutputs, keep_one=True
+        )
 
     def generate(self, model: Any) -> Iterator[Candidate]:
         # Preserve the old reverse-output preference within each batch.

@@ -43,6 +43,8 @@ class ScheduledAttempt:
     region_ids: tuple[int, ...] = ()
     stage: str | None = None
     region_source: str | None = None
+    cursor_key: tuple | None = None
+    cursor_state: tuple | None = None
 
 
 @dataclass(frozen=True)
