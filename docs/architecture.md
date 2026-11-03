@@ -13,6 +13,11 @@ src/onnx_reduce/
 ├── cli.py               # 参数解析、配置与判定器创建、输入加载、CLI 退出码
 ├── engine.py            # 初检、候选搜索、预算、接受决策、checkpoint 与最终复检
 ├── scheduler.py         # legacy / stateful 调度、结构化反馈与当前版本覆盖记账
+├── staged.py            # 实验性的 coarse / regions / fine 阶段与清理机会
+├── finalizer.py         # 覆盖候选枚举、独立收尾与版本失效
+├── regions.py           # 模块、无分叉链与拓扑区域，边界排序
+├── search_types.py      # 调度记录、反馈和覆盖摘要
+├── resume.py            # 跨运行恢复目标身份与核对配置
 ├── types.py             # ModelAdapter 协议、字典序成本、校验结果与落盘产物
 ├── edits.py             # 候选及有序编辑：删除节点、输出、输入或权重
 ├── model.py             # 基于 onnxscript.ir 的模型编辑、校验、序列化与摘要
@@ -28,7 +33,7 @@ src/onnx_reduce/
 │   └── evaluator.py     # 基线身份与签名匹配、单次运行缓存、判定证据
 ├── performance.py       # 可选的运行内阶段计时、规模和资源统计
 ├── preparation.py       # 有容量边界的运行内编辑与 shape 摘要缓存
-├── report.py            # 统计项与 JSON schema version 4
+├── report.py            # 统计项与 JSON schema version 5
 └── storage.py           # 同目录临时文件与原子替换写入
 ```
 
@@ -44,8 +49,10 @@ src/onnx_reduce/
    只有匹配目标故障的 `interesting` 候选会被接受。
 6. engine 返回结构化结果给 scheduler；接受后更新当前模型与 checkpoint。
    legacy 从首个 pass 重启，stateful 延续阶段并使全部旧覆盖失效。
+   staged 依次执行粗、区域、细搜索，complete 目标再进入独立收尾。
    当前模型的声明范围完成扫描且没有接受时达到固定点；预算阻止继续时标记预算耗尽。
-7. 将当前模型写到实际输出路径，绕过缓存执行强制最终复检，再写最终报告与复现配置。
+7. 将当前模型写到实际输出路径，读取字节核对摘要、重新加载校验，再绕过缓存执行强制最终复检，
+   写最终报告与复现配置。
    若复检不再为 `interesting`，停止原因改为 `unstable_check`。
 
 这意味着清理无用内容也必须通过故障判定。即使节点不影响图输出，它也可能是编译器
@@ -92,6 +99,13 @@ src/onnx_reduce/
 该扫描不受启发式去重影响。覆盖接受后返回搜索；`--no-cache` 时也必须实际执行覆盖候选。
 完整设计与验收边界见[第三批设计](stateful-search-design.md)。
 
+`staged` 增加 coarse、regions、fine 阶段及有额度限制的资源清理。complete 目标随后进入
+独立 Finalizer，收尾接受后留在收尾阶段并重新扫描；fast 目标结束搜索后直接复检产物，
+始终不声明最小性。区域使用明确模块标注、无分叉链与拓扑回退，旧失败只影响尝试历史。
+可选的 RegionSearchModel 提供当前稳定 ID 下的图链接，包含控制流捕获；缺少该能力时
+仍可用节点身份执行拓扑分区。跨运行的 `--finalize-from` 恢复源目标并重新初检，
+不恢复旧游标或缓存。规则、范围和接口见[第四批设计](staged-search-design.md)。
+
 ## 接受条件与最小性
 
 成本按以下元组做字典序比较：
@@ -109,8 +123,9 @@ src/onnx_reduce/
 `minimality.status=pass_fixed_point` 只在达到固定点且最终模型的完整搜索轮次中
 没有无法判定的候选、最终复检通过时出现。此前轮次的无法判定不单独阻止这一结论。
 legacy 的作用域为当前配置 pass 所生成的合法、成本更低候选；stateful 在启用节点搜索时
-还覆盖当前标准尺度分区的保留候选。自适应中出现的其他尺度不属于最终声明范围，
-两种策略都**不保证全局最小**。报告记录覆盖的摘要、版本和完成标志。
+还覆盖当前标准尺度分区的保留候选。自适应中出现的其他尺度不属于最终声明范围。
+staged complete 还覆盖最终模块、链和拓扑区域的删除与保留候选；staged fast 始终不证明最小性。
+所有策略都**不保证全局最小**。报告记录覆盖的摘要、版本和完成标志。
 预算停止、最终轮次无法判定或最终复检失败时，状态为 `unproven`。
 
 ## 模型校验策略

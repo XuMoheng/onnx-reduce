@@ -29,6 +29,7 @@ from onnx_reduce.performance import (
 )
 from onnx_reduce.preparation import current_preparation, edit_key, preparation_caches
 from onnx_reduce.report import PassStats, ReductionReport
+from onnx_reduce.resume import restore_target
 from onnx_reduce.scheduler import (
     AttemptResult,
     CandidateFeedback,
@@ -36,8 +37,15 @@ from onnx_reduce.scheduler import (
     ScheduledAttempt,
     StatefulScheduler,
 )
+from onnx_reduce.staged import StagedScheduler
 from onnx_reduce.storage import write_json, write_text
-from onnx_reduce.types import EditApplicationError, ModelAdapter, ModelCost, ValidationResult
+from onnx_reduce.types import (
+    ArtifactValidationModel,
+    EditApplicationError,
+    ModelAdapter,
+    ModelCost,
+    ValidationResult,
+)
 
 ProgressCallback = Callable[[str], None]
 
@@ -72,10 +80,18 @@ class EngineConfig:
     target_mode: str = "baseline"
     signature_regex: str | None = None
     scheduler: str = "legacy"
+    goal: str | None = None
+    finalize_from: str | None = None
 
     def __post_init__(self) -> None:
-        if self.scheduler not in {"legacy", "stateful"}:
+        if self.scheduler not in {"legacy", "stateful", "staged"}:
             raise ValueError(f"unknown scheduler: {self.scheduler}")
+        if self.goal not in {None, "fast", "complete"}:
+            raise ValueError(f"unknown goal: {self.goal}")
+        if (self.goal is not None or self.finalize_from is not None) and self.scheduler != "staged":
+            raise ValueError("goal and finalize_from require scheduler=staged")
+        if self.finalize_from is not None and self.goal == "fast":
+            raise ValueError("finalize_from requires goal=complete")
         if self.validation_mode not in {"strict", "structural", "permissive"}:
             raise ValueError(f"unknown validation mode: {self.validation_mode}")
         if self.target_mode not in {"baseline", "script"}:
@@ -171,8 +187,26 @@ class ReductionEngine:
         validation = model.validate(self.config.validation_mode)
         if not validation.valid:
             raise ReductionError(f"input model is invalid: {validation.reason}")
-        scheduler_type = LegacyScheduler if self.config.scheduler == "legacy" else StatefulScheduler
-        scheduler = scheduler_type(self.passes, model)
+        if self.config.scheduler == "staged":
+            scheduler = StagedScheduler(
+                self.passes,
+                model,
+                goal=self.config.goal or "complete",
+                finalize_only=self.config.finalize_from is not None,
+            )
+        else:
+            scheduler_type = (
+                LegacyScheduler if self.config.scheduler == "legacy" else StatefulScheduler
+            )
+            scheduler = scheduler_type(self.passes, model)
+        if self.config.finalize_from is not None:
+            scheduler.target_origin = restore_target(
+                self.config.finalize_from,
+                model_digest=model.canonical_hash(),
+                config=self.config,
+                failure_check_config=failure_check_config_data,
+                matcher=evaluator.matcher,
+            )
         report = ReductionReport(
             stop_reason="searching",
             performance=current_performance(),
@@ -186,7 +220,10 @@ class ReductionEngine:
         self.progress("failure check contract: exit code 0 means the target failure is present")
         initial_artifact = model.materialize(run_dir / "initial" / "model.onnx")
         result = evaluator.evaluate(
-            initial_artifact.model_path, initial_artifact.digest, initial=True, mandatory=True
+            initial_artifact.model_path,
+            initial_artifact.digest,
+            initial=self.config.finalize_from is None,
+            mandatory=True,
         )
         self._record_evaluation(result, report)
         if result.outcome is not FailureCheckResult.INTERESTING:
@@ -207,7 +244,7 @@ class ReductionEngine:
         while True:
             attempt = scheduler.next_attempt(current_model)
             if attempt is None:
-                report.stop_reason = "fixed_point"
+                report.stop_reason = getattr(scheduler, "stop_reason", "fixed_point")
                 break
             if self.config.max_candidate_check_calls == 0 or not self._time_budget_allows(started):
                 report.stop_reason = "budget_exhausted"
@@ -257,10 +294,25 @@ class ReductionEngine:
         # Recheck precisely the artifact delivered to the caller. Mandatory
         # evaluations never reuse the verdict cache.
         final_artifact = current_model.materialize(output_path or run_dir / "final" / "model.onnx")
+        artifact_validation = None
+        if isinstance(current_model, ArtifactValidationModel):
+            artifact_validation = current_model.validate_artifact(
+                final_artifact, self.config.validation_mode
+            )
+            self._record_validation(artifact_validation, report)
+            if not artifact_validation.valid:
+                raise ReductionError(f"output artifact is invalid: {artifact_validation.reason}")
         result = evaluator.evaluate(
             final_artifact.model_path, final_artifact.digest, mandatory=True
         )
         self._record_evaluation(result, report)
+        report.artifact_recheck = {
+            "model": str(final_artifact.model_path),
+            "digest": final_artifact.digest,
+            "read_back_validated": artifact_validation is not None,
+            "outcome": result.outcome.value,
+            "cache_hit": result.cache_hit,
+        }
         if result.outcome is not FailureCheckResult.INTERESTING:
             report.stop_reason = "unstable_check"
             self.progress("final output did not reproduce the target failure")
@@ -521,6 +573,12 @@ class ReductionEngine:
                     "scale": attempt.scale,
                     "region_anchor": attempt.region_ids[0] if attempt.region_ids else None,
                     "region_size": len(attempt.region_ids),
+                    **({"stage": attempt.stage} if attempt.stage is not None else {}),
+                    **(
+                        {"region_source": attempt.region_source}
+                        if attempt.region_source is not None
+                        else {}
+                    ),
                     "status": feedback.status if feedback else "budget_exhausted",
                     "cache_source": feedback.cache_source if feedback else None,
                     "failure_check_calls": feedback.failure_check_calls if feedback else 0,

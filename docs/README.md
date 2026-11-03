@@ -20,10 +20,12 @@ onnx-reduce 在保留用户指定故障的前提下，缩减 ONNX 模型。以�
 
 - [性能优化计划](performance-todo.md)
 - [第三批设计：有状态搜索调度器](stateful-search-design.md)
+- [第四批设计：分阶段搜索和独立收尾](staged-search-design.md)
 - [性能基线：采集与基准命令](performance-baseline.md)
 - [性能基线实测：2026-11-02](performance-results.md)
 - [第二批性能实测：2026-11-03](performance-batch2-results.md)
 - [第三批性能实测：2026-11-03](performance-batch3-results.md)
+- [第四批性能实测：2026-11-03](performance-batch4-results.md)
 
 ## 命令与路径约定
 

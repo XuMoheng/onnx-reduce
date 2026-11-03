@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 from collections.abc import Iterable
 from dataclasses import dataclass, replace
@@ -22,6 +23,8 @@ from onnx_reduce.types import (
     EditApplicationError,
     ModelArtifact,
     ModelCost,
+    RegionGraph,
+    RegionValue,
     ValidationResult,
 )
 
@@ -219,6 +222,53 @@ class OnnxModel:
                 links[value.name] = replace(record(value.name), is_graph_output=True)
         return links
 
+    @cached_property
+    def _region_graph(self) -> RegionGraph:
+        graph = self._model.graph
+        links = {}
+        consumers = {}
+        modules = []
+        for node in graph:
+            node_id = self._node_ids[node]
+            # Explicit reducer metadata contract, never guessed from node names.
+            raw = node.metadata_props.get("onnx_reduce.module", "")
+            try:
+                path = json.loads(raw)
+            except (ValueError, TypeError):
+                path = None
+            if (
+                isinstance(path, list)
+                and 0 < len(path) <= 64
+                and all(isinstance(part, str) and 0 < len(part) <= 512 for part in path)
+            ):
+                modules.append((node_id, tuple(path)))
+            for value in node.outputs:
+                if value is not None:
+                    links[id(value)] = value
+            for value in self._node_dependencies(node):
+                if value.graph is graph:
+                    links[id(value)] = value
+                    consumers.setdefault(id(value), set()).add(node_id)
+        for value in graph.outputs:
+            links[id(value)] = value
+        return RegionGraph(
+            self.node_ids,
+            tuple(modules),
+            tuple(
+                RegionValue(
+                    self._node_ids.get(value.producer()),
+                    tuple(sorted(consumers.get(key, ()), key=self.id_to_index.__getitem__)),
+                    value.is_graph_output(),
+                    value.type is not None and value.shape is not None,
+                )
+                for key, value in links.items()
+            ),
+        )
+
+    def region_graph(self) -> RegionGraph:
+        """Read-only graph summary; outer captures count as main-graph dependencies."""
+        return self._region_graph
+
     def dead_node_indices(self) -> tuple[int, ...]:
         """Return main-graph node indices outside the backward closure of all outputs."""
 
@@ -327,6 +377,7 @@ class OnnxModel:
             # inference. Subsequent edits must never see that stale snapshot.
             result.__dict__.pop("_payload", None)
             result.__dict__.pop("_digest", None)
+            result.__dict__.pop("_region_graph", None)
         return result
 
     def _delete_nodes(self, indices: Iterable[int], *, inference_source: OnnxModel) -> None:
@@ -571,3 +622,13 @@ class OnnxModel:
         self.save(destination)
         # Cost, digest and file are derived from exactly the same snapshot.
         return ModelArtifact(destination, (), self._digest, len(self._payload))
+
+    @measured("artifact_validation")
+    def validate_artifact(self, artifact: ModelArtifact, mode: str) -> ValidationResult:
+        """Check actual bytes, then reload and validate independently of the source IR."""
+        with artifact.model_path.open("rb") as stream:
+            actual_digest = hashlib.file_digest(stream, "sha256").hexdigest()
+        if actual_digest != artifact.digest or actual_digest != self.canonical_hash():
+            return ValidationResult(False, "output artifact digest mismatch", mode)
+        loaded = OnnxModel.load(artifact.model_path)
+        return loaded.validate(mode)

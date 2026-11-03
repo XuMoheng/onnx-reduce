@@ -25,3 +25,10 @@ class NodeSearchPass(ReductionPass, Protocol):
     def node_regions(
         self, model: NodeSearchModel, size: int, *, start: int = 0
     ) -> Iterator[tuple[int, ...]]: ...
+
+
+@runtime_checkable
+class StagedPass(ReductionPass, Protocol):
+    """Optional coarse/fine/cleanup candidates; generic passes remain fine-only."""
+
+    def generate_stage(self, model: Any, stage: str) -> Iterator[Candidate]: ...

@@ -6,6 +6,10 @@ from typing import TypeVar
 T = TypeVar("T")
 
 
+def is_coarse(size: int, total: int) -> bool:
+    return size >= max(2, total // 4)
+
+
 def deletion_groups(items: tuple[T, ...], *, keep_one: bool = False) -> Iterator[tuple[T, ...]]:
     """Try the largest legal selection, then balanced partitions down to singletons.
 

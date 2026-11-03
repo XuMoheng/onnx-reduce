@@ -1,0 +1,3421 @@
+{
+  "baseline_commit": "4ac3835a0f6bd1ef3f17f5df3f6323043e93a4d7",
+  "batches": [
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "all",
+        "--size",
+        "128",
+        "--budget",
+        "both",
+        "--candidate-budget",
+        "100",
+        "--time-budget",
+        "1",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/five-128",
+        "--compare-instrumentation"
+      ],
+      "name": "five-128",
+      "path": "output/performance/batch4-matrix/five-128/20261103-203118/baseline.json",
+      "runs": 240,
+      "sha256": "4c1cb4301a0c47528fbe67d5c8dde6cbeb3b0319f53f10fb5159f019f8b66bad"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "all",
+        "--size",
+        "512",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "100",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/five-512"
+      ],
+      "name": "five-512",
+      "path": "output/performance/batch4-matrix/five-512/20261103-203346/baseline.json",
+      "runs": 60,
+      "sha256": "f2fe3708929f8b3f8d1174cfed462fab21a9738d5c1e3003595da604bf7edeca"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "chain",
+        "--size",
+        "32",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "4",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/tight-calls",
+        "--compare-instrumentation"
+      ],
+      "name": "tight-calls",
+      "path": "output/performance/batch4-matrix/tight-calls/20261103-203428/baseline.json",
+      "runs": 24,
+      "sha256": "ee7d18bcc44b1511707d7230caeac1ded7ab7f01764b3798ffb7d88bf94348d9"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "chain",
+        "--size",
+        "128",
+        "--condition",
+        "threshold",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "100",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/threshold-128",
+        "--compare-instrumentation"
+      ],
+      "name": "threshold-128",
+      "path": "output/performance/batch4-matrix/threshold-128/20261103-203443/baseline.json",
+      "runs": 24,
+      "sha256": "51244098f8b9140a582089287565d37d807b98c647efa3d16f6237869ec91284"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "chain",
+        "--size",
+        "16",
+        "--condition",
+        "non-monotonic",
+        "--interesting-sizes",
+        "16,12,6",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "100",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/cover-accept",
+        "--compare-instrumentation"
+      ],
+      "name": "cover-accept",
+      "path": "output/performance/batch4-matrix/cover-accept/20261103-203502/baseline.json",
+      "runs": 24,
+      "sha256": "f387da08fa6beaf74428e6a7114a41f7061ed25d52b826f5e8878d372787ffd8"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "chain",
+        "--size",
+        "128",
+        "--condition",
+        "cross-region",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "100",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/cross-region",
+        "--compare-instrumentation"
+      ],
+      "name": "cross-region",
+      "path": "output/performance/batch4-matrix/cross-region/20261103-203518/baseline.json",
+      "runs": 24,
+      "sha256": "e9bcb325eeaa9d88bb210f67fe79556c22e894fc9e059a1e0edab15803c7fd1b"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "chain",
+        "--size",
+        "128",
+        "--condition",
+        "non-monotonic",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "100",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/non-monotonic",
+        "--compare-instrumentation"
+      ],
+      "name": "non-monotonic",
+      "path": "output/performance/batch4-matrix/non-monotonic/20261103-203536/baseline.json",
+      "runs": 24,
+      "sha256": "d497292b3938d4846001378f21d3de59afb67ae7213c5da90bca8078d374f825"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "chain",
+        "--size",
+        "128",
+        "--module-width",
+        "16",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "100",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/modules",
+        "--compare-instrumentation"
+      ],
+      "name": "modules",
+      "path": "output/performance/batch4-matrix/modules/20261103-203558/baseline.json",
+      "runs": 24,
+      "sha256": "82226ca319ecd3806cf799640ac888ea3eee2d6e6fb58151385923222d384f8f"
+    },
+    {
+      "command": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/../1012/.venv/bin/python",
+        "benchmarks/reduction.py",
+        "--case",
+        "chain",
+        "--size",
+        "32",
+        "--condition",
+        "threshold",
+        "--budget",
+        "calls",
+        "--candidate-budget",
+        "100",
+        "--no-cache",
+        "--repeat",
+        "3",
+        "--compare-staged",
+        "--output",
+        "output/performance/batch4-matrix/no-cache",
+        "--compare-instrumentation"
+      ],
+      "name": "no-cache",
+      "path": "output/performance/batch4-matrix/no-cache/20261103-203613/baseline.json",
+      "runs": 24,
+      "sha256": "f2b960da514c57ec9fa71fd1593926aa4fa551aa7b5a8e0d51c61153767d3d80"
+    }
+  ],
+  "cli": {
+    "commands": "output/performance/batch4-cli/commands.json",
+    "fast_report": "output/performance/batch4-cli/fast.json",
+    "final_actual_path_cache_hit": false,
+    "final_hash": "ce67c5548d7bd368fd46fd199237e65572e6ee81ff2bbc3144d3b6eff8e19a7b",
+    "final_report": "output/performance/batch4-cli/final.json",
+    "identity": {
+      "baseline_identity": [
+        "exit:0",
+        [
+          "DEMO_RELU"
+        ]
+      ],
+      "mode": "baseline",
+      "signature_regex": "assertion: (\\w+)"
+    },
+    "node_counts": [
+      4,
+      4,
+      1
+    ],
+    "strict_validation": true
+  },
+  "comparisons": {
+    "staged-complete": {
+      "equal": 111,
+      "improved": 6
+    },
+    "staged-fast": {
+      "equal": 111,
+      "improved": 6
+    },
+    "stateful": {
+      "equal": 105,
+      "improved": 6,
+      "regressed": 6
+    }
+  },
+  "compatibility": {
+    "after": "output/performance/batch4-compat/after.json",
+    "before": "output/performance/batch4-compat/before.json",
+    "cases": 60,
+    "equal": true,
+    "probe": "output/performance/batch4-compat/probe.py",
+    "probe_sha256": "ed739fa0a51d5a10bc18a52f6278c3c2b74ad145581be7472e57f60d9b0b5d90",
+    "strategies": [
+      "legacy",
+      "stateful"
+    ]
+  },
+  "date": "2026-11-03",
+  "environment": {
+    "cpu_count": 14,
+    "onnx": "1.23.2",
+    "onnxscript": "0.7.2",
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+    "python": "3.11.17 (main, Oct 21 2026, 17:46:53) [Clang 23.1.3 ]",
+    "python_executable": "/home/weifenfc/ms02u/hw/onnx-reduce/1012/.venv/bin/python"
+  },
+  "runs": 468,
+  "scope": "synthetic conditions; no real backend fault measured",
+  "source_sha256": {
+    "benchmarks/reduction.py": "7082677c1557f4d50e6034abc61db122def8e3f13a6967cd818eb05d54e1ee08",
+    "src/onnx_reduce/__init__.py": "ffd0a0359e2cc5f4a53524f116555eca6d4586d109f26e0d64c411bd860c2265",
+    "src/onnx_reduce/__main__.py": "d2a24a77971de1a7e9bd162da0de4180ebdd6187e8ae2750a761b80df2a9deb1",
+    "src/onnx_reduce/cli.py": "24a2700d7d38c962e14316fe408c37c5bfa71bee6ad5985b42d313820d82237e",
+    "src/onnx_reduce/edits.py": "bba98930cbf728f249023a5f5f0fb8c1adaafebc8efcf53db290218153afb33f",
+    "src/onnx_reduce/engine.py": "733e8ea48001279df404311a4ad872b818eeaecb74ed9c67873b68692bed42cb",
+    "src/onnx_reduce/failure_check/__init__.py": "1776601f6a880b42989be2aecfa1864bbe1611dbd1d46035bcf6854e8dbf2316",
+    "src/onnx_reduce/failure_check/contract.py": "9388a16c81e5e2cb7712fc63164a3954b1a206c02d6fd1e045f5d1f03a3cf3de",
+    "src/onnx_reduce/failure_check/evaluator.py": "c9b03a50e9de9e27c26f0f8cc2c7c7bba1a098f49104d43debf2fc0f0bd08f19",
+    "src/onnx_reduce/failure_check/runner.py": "2b74e51fc4cac94f1037842902c005154516037e38992ea79b9c69cff693e86c",
+    "src/onnx_reduce/finalizer.py": "29def60d26ca6037171a96ceb3f9a4d3f22a50a8c8d87824bb7424181d4a9a4b",
+    "src/onnx_reduce/model.py": "226d4615d7e71cfdb4d70fb30a273bc7e4139c4f84a82d3566edb25c0984d6e9",
+    "src/onnx_reduce/passes/__init__.py": "4b3dfce1a3666afecfc1eb8ee69da41e299716da893f5ce9f2caad1b102cc13c",
+    "src/onnx_reduce/passes/base.py": "935e13e789fdc0ef283e5130bf1fa89f6f36f23f58823fd780cea5a76d3f1c30",
+    "src/onnx_reduce/passes/delete_nodes.py": "8017815563ff5df09797c4e2001775a269782e309bd57a77822236e9dacd4d9a",
+    "src/onnx_reduce/passes/drop_outputs.py": "b7bf9a62d0cd801302c5cee603dc0dced6b8f6f1f63972cf2722b2201ac7b429",
+    "src/onnx_reduce/passes/groups.py": "881f15358fabee6c1c867b7e57f2bd5414a424521f1e0620cc77b96d3e07b0c8",
+    "src/onnx_reduce/passes/remove_unused.py": "2edbb3d45a2c39a2863264c23ff7898c1709daa0f1c23293e99231d8cf7bf5ca",
+    "src/onnx_reduce/performance.py": "55f3c2df67338002641b51639473b4457a17dbff2ee1759a7b136ebdea5a7999",
+    "src/onnx_reduce/preparation.py": "cac3cbd57cc4d77e0175e6cd9cf61787c1f29731700094b19be4c2555aff361a",
+    "src/onnx_reduce/regions.py": "63421a9c15f7bc7cb3b498636cdcdc9b8312e918dc629128b503cb4c543a9520",
+    "src/onnx_reduce/report.py": "7cd71d41187479f09c88a6d8fa7e0e234627c43c38acd0eb86e07484e358a8d0",
+    "src/onnx_reduce/resume.py": "87fdc04c299a7a2856d39cf2d3156a073f9e39d1fd6c2b1d4dc0f239b4c6bfbe",
+    "src/onnx_reduce/scheduler.py": "90a4ab3fedcf54118ae90a40765c407d4d2e70e5716c987f5a71d1b218339385",
+    "src/onnx_reduce/search_types.py": "808d9ef965bd5bc1965aff76ba5c440e5213097059861374289e7ea3372f2fd6",
+    "src/onnx_reduce/staged.py": "d1ec31d115fd725e911e433704159a8339303723cee919886a01ad569095356c",
+    "src/onnx_reduce/storage.py": "1759f4725b14defef4402b7841b0ad141805a602ece58aa564c323df7277d981",
+    "src/onnx_reduce/types.py": "948364d29130f6d660f1d19b8fb25c38097d1f78405ea1876c2fa89c761b6aae"
+  },
+  "summaries": [
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 19,
+      "clones_median": 24,
+      "coverage_attempts_median": 25,
+      "coverage_checks_median": 17,
+      "coverage_execution_ms": 37.962,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111161344,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-0-legacy-on/work/run-uklb1qt3",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-1-legacy-on/work/run-g93jhf1n",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-2-legacy-on/work/run-jqjgsq0e"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 74.44,
+      "written_bytes_median": 172793
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 19,
+      "clones_median": 23,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.156,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111157248,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-0-staged-complete-on/work/run-d6c7musk",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-1-staged-complete-on/work/run-o4nxn0sd",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-2-staged-complete-on/work/run-kt5yp2rg"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 77.636,
+      "written_bytes_median": 185885
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 19,
+      "clones_median": 23,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111075328,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-0-staged-fast-on/work/run-pcehhgkq",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-1-staged-fast-on/work/run-89d4jatb",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-2-staged-fast-on/work/run-6s7r16vk"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 76.428,
+      "written_bytes_median": 183238
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 11,
+      "clones_median": 15,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.303,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111161344,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-0-stateful-on/work/run-2bo8vql3",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-1-stateful-on/work/run-kgs4bef1",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-calls-2-stateful-on/work/run-ppc5w_cl"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 43.639,
+      "written_bytes_median": 186921
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "branches",
+      "checks_median": 19,
+      "clones_median": 24,
+      "coverage_attempts_median": 25,
+      "coverage_checks_median": 17,
+      "coverage_execution_ms": 38.008,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111816704,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-0-legacy-on/work/run-h94f3fc6",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-1-legacy-on/work/run-om95xr6y",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-2-legacy-on/work/run-k61d1936"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 74.942,
+      "written_bytes_median": 172710
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "branches",
+      "checks_median": 19,
+      "clones_median": 23,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.16,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111554560,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-0-staged-complete-on/work/run-9mon7cwp",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-1-staged-complete-on/work/run-a4tid8ho",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-2-staged-complete-on/work/run-f1m_c4ls"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 78.266,
+      "written_bytes_median": 185811
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "branches",
+      "checks_median": 19,
+      "clones_median": 23,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111685632,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-0-staged-fast-on/work/run-jca0ml85",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-1-staged-fast-on/work/run-5tk3ppql",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-2-staged-fast-on/work/run-9znhglpn"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 77.464,
+      "written_bytes_median": 183172
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "branches",
+      "checks_median": 11,
+      "clones_median": 15,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.295,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111816704,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-0-stateful-on/work/run-t21eh1qk",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-1-stateful-on/work/run-hds99ex7",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/branches-time-2-stateful-on/work/run-rd11vvgw"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 43.448,
+      "written_bytes_median": 186893
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 21,
+      "coverage_checks_median": 15,
+      "coverage_execution_ms": 29.279,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110960640,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-0-legacy-on/work/run-jwl8jvwe",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-1-legacy-on/work/run-ht20s_g_",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-2-legacy-on/work/run-llo9gbpr"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 45.043,
+      "written_bytes_median": 149912
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.15,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110989312,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-0-staged-complete-on/work/run-3mtzmuj7",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-1-staged-complete-on/work/run-7_tp5i2o",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-2-staged-complete-on/work/run-lo3mkrvd"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 48.002,
+      "written_bytes_median": 171456
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111038464,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-0-staged-fast-on/work/run-mnwvilmg",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-1-staged-fast-on/work/run-3mwf4pjx",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-2-staged-fast-on/work/run-n_gz_vot"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 47.654,
+      "written_bytes_median": 168874
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 13,
+      "clones_median": 17,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.299,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110825472,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-0-stateful-on/work/run-q48xy80k",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-1-stateful-on/work/run-sxryaljz",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-calls-2-stateful-on/work/run-k5_cjkv9"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 42.676,
+      "written_bytes_median": 180879
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 21,
+      "coverage_checks_median": 15,
+      "coverage_execution_ms": 29.47,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110837760,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-0-legacy-on/work/run-mg_q9xtl",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-1-legacy-on/work/run-g1fhxvuu",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-2-legacy-on/work/run-ba_0z921"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 45.321,
+      "written_bytes_median": 149836
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.152,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110948352,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-0-staged-complete-on/work/run-j05ps6nc",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-1-staged-complete-on/work/run-n6iq4ye1",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-2-staged-complete-on/work/run-176o1unn"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 48.067,
+      "written_bytes_median": 171396
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111128576,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-0-staged-fast-on/work/run-n48um92y",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-1-staged-fast-on/work/run-w97i7pw0",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-2-staged-fast-on/work/run-dszymjoh"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 47.4,
+      "written_bytes_median": 168805
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "chain",
+      "checks_median": 13,
+      "clones_median": 17,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.297,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          107,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110841856,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-0-stateful-on/work/run-pacn21hm",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-1-stateful-on/work/run-t1p2hezi",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/chain-time-2-stateful-on/work/run-ilrqe2eo"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 42.68,
+      "written_bytes_median": 180820
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 2,
+      "coverage_execution_ms": 3.146,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110002176,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-0-legacy-on/work/run-d6ldlznr",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-1-legacy-on/work/run-91f72l0v",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-2-legacy-on/work/run-ehfp3bcp"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 10.771,
+      "written_bytes_median": 51485
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.182,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109936640,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-0-staged-complete-on/work/run-5673g791",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-1-staged-complete-on/work/run-f1vno4sk",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-2-staged-complete-on/work/run-p3zeyp4w"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 12.025,
+      "written_bytes_median": 59250
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 110026752,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-0-staged-fast-on/work/run-sevyuehx",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-1-staged-fast-on/work/run-vp8v7k7h",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-2-staged-fast-on/work/run-k62ter5e"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 11.49,
+      "written_bytes_median": 55685
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.191,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109944832,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-0-stateful-on/work/run-dyea83lw",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-1-stateful-on/work/run-7ex8qjya",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-calls-2-stateful-on/work/run-ymnlwpfj"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 11.414,
+      "written_bytes_median": 53801
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 2,
+      "coverage_execution_ms": 3.153,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109895680,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-0-legacy-on/work/run-owtu75iy",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-1-legacy-on/work/run-ghavjinl",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-2-legacy-on/work/run-mlscb0m_"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 10.871,
+      "written_bytes_median": 51462
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.181,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109871104,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-0-staged-complete-on/work/run-7jxdah1k",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-1-staged-complete-on/work/run-_g_jal32",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-2-staged-complete-on/work/run-9d0yu9ud"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 12.112,
+      "written_bytes_median": 59230
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 109862912,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-0-staged-fast-on/work/run-9un7nkax",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-1-staged-fast-on/work/run-21b4xj4c",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-2-staged-fast-on/work/run-1v_h3pk7"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 11.329,
+      "written_bytes_median": 55655
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.186,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110116864,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-0-stateful-on/work/run-_60x_yuj",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-1-stateful-on/work/run-j6qkww67",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/initializers-time-2-stateful-on/work/run-sndi9q2r"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 11.379,
+      "written_bytes_median": 53778
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 21,
+      "coverage_checks_median": 15,
+      "coverage_execution_ms": 57.017,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113520640,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-0-legacy-on/work/run-mva15gmp",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-1-legacy-on/work/run-pee809j9",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-2-legacy-on/work/run-kqwm5xph"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 72.459,
+      "written_bytes_median": 141353
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.155,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113258496,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-0-staged-complete-on/work/run-rv4ymj60",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-1-staged-complete-on/work/run-_t7qao0h",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-2-staged-complete-on/work/run-t2kod2go"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 75.592,
+      "written_bytes_median": 162939
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 113389568,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-0-staged-fast-on/work/run-p9gfmhgf",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-1-staged-fast-on/work/run-75rsdkr0",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-2-staged-fast-on/work/run-44ilre_y"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 75.278,
+      "written_bytes_median": 160302
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 13,
+      "clones_median": 17,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.294,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113520640,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-0-stateful-on/work/run-83p1lamt",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-1-stateful-on/work/run-6ah2vrat",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-calls-2-stateful-on/work/run-p0pn3y32"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 46.026,
+      "written_bytes_median": 174980
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "missing-shape",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 21,
+      "coverage_checks_median": 15,
+      "coverage_execution_ms": 57.03,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114044928,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-0-legacy-on/work/run-yguaav16",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-1-legacy-on/work/run-4ziyz9dh",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-2-legacy-on/work/run-mwlruztz"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 72.468,
+      "written_bytes_median": 141286
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "missing-shape",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.154,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113913856,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-0-staged-complete-on/work/run-v13wfy00",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-1-staged-complete-on/work/run-u_ww1rxm",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-2-staged-complete-on/work/run-caht9j3h"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 75.326,
+      "written_bytes_median": 162854
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "missing-shape",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 113913856,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-0-staged-fast-on/work/run-ras8gfr0",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-1-staged-fast-on/work/run-ad2lx5qm",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-2-staged-fast-on/work/run-y6vbchax"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 75.537,
+      "written_bytes_median": 160268
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "missing-shape",
+      "checks_median": 13,
+      "clones_median": 17,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.297,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          96,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114044928,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-0-stateful-on/work/run-vpsqxnq1",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-1-stateful-on/work/run-7ci88qly",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/missing-shape-time-2-stateful-on/work/run-uliyejrs"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 45.975,
+      "written_bytes_median": 174937
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 5,
+      "coverage_attempts_median": 6,
+      "coverage_checks_median": 5,
+      "coverage_execution_ms": 11.71,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 112209920,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-0-legacy-on/work/run-6xm6bw1z",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-1-legacy-on/work/run-72uagi9z",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-2-legacy-on/work/run-g_8x2qip"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 21.964,
+      "written_bytes_median": 92499
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.16,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 112078848,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-0-staged-complete-on/work/run-qz9wa6l4",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-1-staged-complete-on/work/run-2zcc9dwc",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-2-staged-complete-on/work/run-0osnlc3t"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 24.482,
+      "written_bytes_median": 105897
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 112209920,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-0-staged-fast-on/work/run-9vzfnp_8",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-1-staged-fast-on/work/run-00c5lg7y",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-2-staged-fast-on/work/run-ooox6d9d"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 23.588,
+      "written_bytes_median": 103406
+    },
+    {
+      "batch": "five-128",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.305,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 112209920,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-0-stateful-on/work/run-l6ab6nc5",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-1-stateful-on/work/run-524uv6in",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-calls-2-stateful-on/work/run-6wo3ry6i"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 23.765,
+      "written_bytes_median": 101120
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 5,
+      "coverage_attempts_median": 6,
+      "coverage_checks_median": 5,
+      "coverage_execution_ms": 11.735,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 112865280,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-0-legacy-on/work/run-a6c0qjl7",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-1-legacy-on/work/run-699j6xpz",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-2-legacy-on/work/run-6x6p5fgr"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 21.974,
+      "written_bytes_median": 92449
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.16,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 112734208,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-0-staged-complete-on/work/run-fmgqx3co",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-1-staged-complete-on/work/run-du2i02y6",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-2-staged-complete-on/work/run-0q6y_1kt"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 24.34,
+      "written_bytes_median": 105864
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 112734208,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-0-staged-fast-on/work/run-8ra2srhx",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-1-staged-fast-on/work/run-hy24gx21",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-2-staged-fast-on/work/run-02sbrrq0"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 23.827,
+      "written_bytes_median": 103367
+    },
+    {
+      "batch": "five-128",
+      "budget": "time",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.306,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 112865280,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-0-stateful-on/work/run-4_qbwzrz",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-1-stateful-on/work/run-0bhk72h3",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-128/20261103-203118/outputs-time-2-stateful-on/work/run-ulgrovcl"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 23.55,
+      "written_bytes_median": 101073
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 23,
+      "clones_median": 30,
+      "coverage_attempts_median": 31,
+      "coverage_checks_median": 21,
+      "coverage_execution_ms": 120.826,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114552832,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-0-legacy-on/work/run-y63pj27t",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-1-legacy-on/work/run-fwaywxoc",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-2-legacy-on/work/run-0g273ath"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 144.736,
+      "written_bytes_median": 342561
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 23,
+      "clones_median": 29,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.147,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114577408,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-0-staged-complete-on/work/run-hb1su3x6",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-1-staged-complete-on/work/run-l0lvx8n7",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-2-staged-complete-on/work/run-fca9dc63"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 146.491,
+      "written_bytes_median": 357457
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 23,
+      "clones_median": 29,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 114626560,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-0-staged-fast-on/work/run-1n2o0er6",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-1-staged-fast-on/work/run-y97os2ym",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-2-staged-fast-on/work/run-d6zbjesl"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 145.614,
+      "written_bytes_median": 354728
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "branches",
+      "checks_median": 13,
+      "clones_median": 19,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.294,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          116,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114708480,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-0-stateful-on/work/run-e8nt0fs6",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-1-stateful-on/work/run-iu02sk2k",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/branches-calls-2-stateful-on/work/run-esm20bmp"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 125.158,
+      "written_bytes_median": 363690
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 21,
+      "clones_median": 26,
+      "coverage_attempts_median": 27,
+      "coverage_checks_median": 19,
+      "coverage_execution_ms": 88.024,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          111,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114135040,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-0-legacy-on/work/run-8bud0d2j",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-1-legacy-on/work/run-hfcptvi4",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-2-legacy-on/work/run-7_346zsz"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 111.554,
+      "written_bytes_median": 278134
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 21,
+      "clones_median": 26,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.147,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          111,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114159616,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-0-staged-complete-on/work/run-kcurf5cx",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-1-staged-complete-on/work/run-y3_i_98b",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-2-staged-complete-on/work/run-9sg74fyk"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 116.094,
+      "written_bytes_median": 302337
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 21,
+      "clones_median": 26,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          111,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 114049024,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-0-staged-fast-on/work/run-mikhg3e1",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-1-staged-fast-on/work/run-8r8u055u",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-2-staged-fast-on/work/run-_sito5iy"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 114.595,
+      "written_bytes_median": 299692
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 15,
+      "clones_median": 21,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.298,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          111,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113704960,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-0-stateful-on/work/run-noaofvnn",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-1-stateful-on/work/run-a5eiqmk0",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/chain-calls-2-stateful-on/work/run-bl2l6d_o"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 104.832,
+      "written_bytes_median": 310356
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 2,
+      "coverage_execution_ms": 5.534,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111861760,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-0-legacy-on/work/run-a708m5kn",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-1-legacy-on/work/run-excono_3",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-2-legacy-on/work/run-qfk2rhr1"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 17.26,
+      "written_bytes_median": 108692
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.176,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111656960,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-0-staged-complete-on/work/run-i2hgbryn",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-1-staged-complete-on/work/run-sukxz3ah",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-2-staged-complete-on/work/run-ni5ucibx"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 18.512,
+      "written_bytes_median": 116457
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111648768,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-0-staged-fast-on/work/run-xbld1_0h",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-1-staged-fast-on/work/run-2dd00oxb",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-2-staged-fast-on/work/run-d4vlj7e0"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 17.721,
+      "written_bytes_median": 112891
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "initializers",
+      "checks_median": 4,
+      "clones_median": 2,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.183,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          72,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111550464,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-0-stateful-on/work/run-zx34931b",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-1-stateful-on/work/run-y_u21asy",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/initializers-calls-2-stateful-on/work/run-4gt2qz4o"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 17.743,
+      "written_bytes_median": 111008
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 21,
+      "clones_median": 26,
+      "coverage_attempts_median": 27,
+      "coverage_checks_median": 19,
+      "coverage_execution_ms": 106.091,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          99,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114479104,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-0-legacy-on/work/run-7j36ovdf",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-1-legacy-on/work/run-593kahzc",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-2-legacy-on/work/run-86ka1g6g"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 127.691,
+      "written_bytes_median": 227998
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 21,
+      "clones_median": 26,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.149,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          99,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 114688000,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-0-staged-complete-on/work/run-mreioh6n",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-1-staged-complete-on/work/run-7iewsu80",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-2-staged-complete-on/work/run-m2q4fz8o"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 134.463,
+      "written_bytes_median": 252232
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 21,
+      "clones_median": 26,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          99,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 114548736,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-0-staged-fast-on/work/run-vnn2n7kf",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-1-staged-fast-on/work/run-5gvwfpi9",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-2-staged-fast-on/work/run-_q7goqtv"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 129.924,
+      "written_bytes_median": 249548
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "missing-shape",
+      "checks_median": 15,
+      "clones_median": 21,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.29,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          99,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113496064,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-0-stateful-on/work/run-cnh8ea9n",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-1-stateful-on/work/run-dc5ry7uw",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/missing-shape-calls-2-stateful-on/work/run-s4yspiyp"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 113.645,
+      "written_bytes_median": 271567
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 5,
+      "coverage_attempts_median": 6,
+      "coverage_checks_median": 5,
+      "coverage_execution_ms": 49.155,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113893376,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-0-legacy-on/work/run-g1_ionz_",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-1-legacy-on/work/run-j8gtnrbf",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-2-legacy-on/work/run-rieo6o31"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 64.209,
+      "written_bytes_median": 204969
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.171,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113733632,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-0-staged-complete-on/work/run-1401j9e2",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-1-staged-complete-on/work/run-ftcl8_wx",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-2-staged-complete-on/work/run-qkpts2e_"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 67.474,
+      "written_bytes_median": 218390
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 113639424,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-0-staged-fast-on/work/run-hiyjeclv",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-1-staged-fast-on/work/run-szb7g6ia",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-2-staged-fast-on/work/run-ujl1h135"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 65.64,
+      "written_bytes_median": 215868
+    },
+    {
+      "batch": "five-512",
+      "budget": "calls",
+      "case": "outputs",
+      "checks_median": 7,
+      "clones_median": 6,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.442,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          127,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 113741824,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-0-stateful-on/work/run-qv4pjaq4",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-1-stateful-on/work/run-wu53el7x",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/five-512/20261103-203346/outputs-calls-2-stateful-on/work/run-5if9r0s0"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 66.502,
+      "written_bytes_median": 213612
+    },
+    {
+      "batch": "tight-calls",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 6,
+      "clones_median": 5,
+      "coverage_attempts_median": 4,
+      "coverage_checks_median": 4,
+      "coverage_execution_ms": 6.393,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          395,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 109670400,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-0-legacy-on/work/run-2xwveyhl",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-1-legacy-on/work/run-j5afo3ym",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-2-legacy-on/work/run-yozhaeup"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 16.045,
+      "written_bytes_median": 58611
+    },
+    {
+      "batch": "tight-calls",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 6,
+      "clones_median": 5,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          395,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 109690880,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-0-staged-complete-on/work/run-feky80h2",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-1-staged-complete-on/work/run-lwha0iv_",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-2-staged-complete-on/work/run-cit8khs7"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 16.755,
+      "written_bytes_median": 65271
+    },
+    {
+      "batch": "tight-calls",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 6,
+      "clones_median": 5,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          395,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 109768704,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-0-staged-fast-on/work/run-7mnp5204",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-1-staged-fast-on/work/run-jlq7t9os",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-2-staged-fast-on/work/run-c069kh8b"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 16.868,
+      "written_bytes_median": 65150
+    },
+    {
+      "batch": "tight-calls",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 6,
+      "clones_median": 6,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          412,
+          1,
+          3,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 109752320,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-0-stateful-on/work/run-arwoapt9",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-1-stateful-on/work/run-hbu_1aei",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/tight-calls/20261103-203428/chain-calls-2-stateful-on/work/run-trutswla"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 16.314,
+      "written_bytes_median": 53812
+    },
+    {
+      "batch": "threshold-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 68,
+      "clones_median": 66,
+      "coverage_attempts_median": 66,
+      "coverage_checks_median": 66,
+      "coverage_execution_ms": 149.224,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          32,
+          1614,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110997504,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-0-legacy-on/work/run-7aevd0p6",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-1-legacy-on/work/run-mfulfoui",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-2-legacy-on/work/run-ly0k_80n"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 167.168,
+      "written_bytes_median": 295060
+    },
+    {
+      "batch": "threshold-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 102,
+      "clones_median": 101,
+      "coverage_attempts_median": 95,
+      "coverage_checks_median": 5,
+      "coverage_execution_ms": 20.254,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          32,
+          1614,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111144960,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-0-staged-complete-on/work/run-plfn6coa",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-1-staged-complete-on/work/run-53pk_d5a",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-2-staged-complete-on/work/run-borsordc"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 254.248,
+      "written_bytes_median": 585702
+    },
+    {
+      "batch": "threshold-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 97,
+      "clones_median": 95,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          32,
+          1614,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111157248,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-0-staged-fast-on/work/run-8tllmssc",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-1-staged-fast-on/work/run-xe9e8mrr",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-2-staged-fast-on/work/run-bsm_tfds"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 223.844,
+      "written_bytes_median": 430179
+    },
+    {
+      "batch": "threshold-128",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 102,
+      "clones_median": 101,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          32,
+          1614,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 110944256,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-0-stateful-on/work/run-gtl29n88",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-1-stateful-on/work/run-pr0fw66c",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/threshold-128/20261103-203443/chain-calls-2-stateful-on/work/run-_uo00cm6"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 220.791,
+      "written_bytes_median": 357955
+    },
+    {
+      "batch": "cover-accept",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 16,
+      "clones_median": 14,
+      "coverage_attempts_median": 14,
+      "coverage_checks_median": 14,
+      "coverage_execution_ms": 17.259,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          6,
+          307,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109785088,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-0-legacy-on/work/run-ibyg4wrz",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-1-legacy-on/work/run-14xaaht3",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-2-legacy-on/work/run-dz5ls6bk"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 27.602,
+      "written_bytes_median": 84611
+    },
+    {
+      "batch": "cover-accept",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 23,
+      "clones_median": 21,
+      "coverage_attempts_median": 15,
+      "coverage_checks_median": 6,
+      "coverage_execution_ms": 8.15,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          6,
+          307,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109744128,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-0-staged-complete-on/work/run-lyqh3qrk",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-1-staged-complete-on/work/run-o2spta4p",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-2-staged-complete-on/work/run-m5ei445f"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 41.832,
+      "written_bytes_median": 133722
+    },
+    {
+      "batch": "cover-accept",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 15,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          6,
+          307,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 109809664,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-0-staged-fast-on/work/run-5d8w8o7k",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-1-staged-fast-on/work/run-hkmsw306",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-2-staged-fast-on/work/run-n1fsh72m"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 31.089,
+      "written_bytes_median": 105425
+    },
+    {
+      "batch": "cover-accept",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 75,
+      "clones_median": 74,
+      "coverage_attempts_median": 17,
+      "coverage_checks_median": 3,
+      "coverage_execution_ms": 5.381,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          6,
+          307,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110092288,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-0-stateful-on/work/run-0ogkp__l",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-1-stateful-on/work/run-0e6hzv1j",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cover-accept/20261103-203502/chain-calls-2-stateful-on/work/run-7nb1o9wv"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 130.815,
+      "written_bytes_median": 249160
+    },
+    {
+      "batch": "cross-region",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 79,
+      "clones_median": 87,
+      "coverage_attempts_median": 87,
+      "coverage_checks_median": 77,
+      "coverage_execution_ms": 155.585,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          2,
+          182,
+          1,
+          3,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111472640,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-0-legacy-on/work/run-84e3yul2",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-1-legacy-on/work/run-tw22kkwf",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-2-legacy-on/work/run-4e54pbgr"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 190.007,
+      "written_bytes_median": 470841
+    },
+    {
+      "batch": "cross-region",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 60,
+      "clones_median": 61,
+      "coverage_attempts_median": 3,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.933,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          2,
+          182,
+          1,
+          3,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111308800,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-0-staged-complete-on/work/run-c0_4fuvl",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-1-staged-complete-on/work/run-0ehh4k3x",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-2-staged-complete-on/work/run-bwbdam3l"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 163.921,
+      "written_bytes_median": 431250
+    },
+    {
+      "batch": "cross-region",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 60,
+      "clones_median": 60,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          2,
+          182,
+          1,
+          3,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111448064,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-0-staged-fast-on/work/run-xklno9xl",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-1-staged-fast-on/work/run-m6c__9i0",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-2-staged-fast-on/work/run-bmx908b3"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 160.798,
+      "written_bytes_median": 423991
+    },
+    {
+      "batch": "cross-region",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 44,
+      "clones_median": 56,
+      "coverage_attempts_median": 5,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.713,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          2,
+          182,
+          1,
+          3,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111243264,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-0-stateful-on/work/run-a3kexlnq",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-1-stateful-on/work/run-6ci0k4kx",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/cross-region/20261103-203518/chain-calls-2-stateful-on/work/run-cffro5j4"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 144.187,
+      "written_bytes_median": 387209
+    },
+    {
+      "batch": "non-monotonic",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 102,
+      "clones_median": 101,
+      "coverage_attempts_median": 100,
+      "coverage_checks_median": 100,
+      "coverage_execution_ms": 491.638,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          128,
+          5982,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 114413568,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-0-legacy-on/work/run-glh7qasb",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-1-legacy-on/work/run-ll874wan",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-2-legacy-on/work/run-zmob7_db"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 515.883,
+      "written_bytes_median": 792264
+    },
+    {
+      "batch": "non-monotonic",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 102,
+      "clones_median": 102,
+      "coverage_attempts_median": 93,
+      "coverage_checks_median": 2,
+      "coverage_execution_ms": 15.985,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          32,
+          1499,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111624192,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-0-staged-complete-on/work/run-uxw_b4ni",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-1-staged-complete-on/work/run-ijhwy6e7",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-2-staged-complete-on/work/run-2bcjy78u"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 271.583,
+      "written_bytes_median": 574524
+    },
+    {
+      "batch": "non-monotonic",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 100,
+      "clones_median": 99,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          32,
+          1499,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111722496,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-0-staged-fast-on/work/run-49_3wx9w",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-1-staged-fast-on/work/run-kepqlk6r",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-2-staged-fast-on/work/run-085s8ub_"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 241.615,
+      "written_bytes_median": 422682
+    },
+    {
+      "batch": "non-monotonic",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 102,
+      "clones_median": 101,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          32,
+          1499,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111312896,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-0-stateful-on/work/run-cn1l3xnt",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-1-stateful-on/work/run-x4w51tiy",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/non-monotonic/20261103-203536/chain-calls-2-stateful-on/work/run-7gw6olfb"
+      ],
+      "stop_reasons": [
+        "budget_exhausted"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 223.755,
+      "written_bytes_median": 339880
+    },
+    {
+      "batch": "modules",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 21,
+      "coverage_checks_median": 15,
+      "coverage_execution_ms": 30.083,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          151,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110919680,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-0-legacy-on/work/run-juuiyb40",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-1-legacy-on/work/run-zunv1_t5",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-2-legacy-on/work/run-waym3eu0"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 46.016,
+      "written_bytes_median": 180114
+    },
+    {
+      "batch": "modules",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 1,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.156,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          151,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 111075328,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-0-staged-complete-on/work/run-jts9177r",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-1-staged-complete-on/work/run-s2mkp7td",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-2-staged-complete-on/work/run-tsj8anbk"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 49.651,
+      "written_bytes_median": 204648
+    },
+    {
+      "batch": "modules",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 17,
+      "clones_median": 20,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          151,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 111202304,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-0-staged-fast-on/work/run-4go0qho2",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-1-staged-fast-on/work/run-46zlo20v",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-2-staged-fast-on/work/run-r0nr1p4z"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 48.742,
+      "written_bytes_median": 202038
+    },
+    {
+      "batch": "modules",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 13,
+      "clones_median": 17,
+      "coverage_attempts_median": 2,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0.305,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          1,
+          151,
+          1,
+          2,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110809088,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-0-stateful-on/work/run-0i9s9yn2",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-1-stateful-on/work/run-z1v1cx7f",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/modules/20261103-203558/chain-calls-2-stateful-on/work/run-ibfgi440"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 43.509,
+      "written_bytes_median": 204931
+    },
+    {
+      "batch": "no-cache",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 20,
+      "clones_median": 18,
+      "coverage_attempts_median": 18,
+      "coverage_checks_median": 18,
+      "coverage_execution_ms": 22.656,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          401,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109858816,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-0-legacy-on/work/run-g5y3tkla",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-1-legacy-on/work/run-5mwzoumh",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-2-legacy-on/work/run-c_q9cod7"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "legacy",
+      "wall_median_ms": 33.468,
+      "written_bytes_median": 93113
+    },
+    {
+      "batch": "no-cache",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 60,
+      "clones_median": 58,
+      "coverage_attempts_median": 27,
+      "coverage_checks_median": 27,
+      "coverage_execution_ms": 29.212,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          401,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 110047232,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-0-staged-complete-on/work/run-0_smemp9",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-1-staged-complete-on/work/run-wh770t2g",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-2-staged-complete-on/work/run-ues8esl3"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "staged-complete",
+      "wall_median_ms": 84.209,
+      "written_bytes_median": 193249
+    },
+    {
+      "batch": "no-cache",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 33,
+      "clones_median": 31,
+      "coverage_attempts_median": 0,
+      "coverage_checks_median": 0,
+      "coverage_execution_ms": 0,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          401,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "unproven"
+      ],
+      "peak_rss_bytes_median": 109686784,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-0-staged-fast-on/work/run-dnpovtfs",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-1-staged-fast-on/work/run-xabkhhmz",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-2-staged-fast-on/work/run-j8zu9666"
+      ],
+      "stop_reasons": [
+        "search_exhausted"
+      ],
+      "strategy": "staged-fast",
+      "wall_median_ms": 50.852,
+      "written_bytes_median": 134819
+    },
+    {
+      "batch": "no-cache",
+      "budget": "calls",
+      "case": "chain",
+      "checks_median": 63,
+      "clones_median": 61,
+      "coverage_attempts_median": 28,
+      "coverage_checks_median": 28,
+      "coverage_execution_ms": 30.489,
+      "coverage_restarts": 0,
+      "final_costs": [
+        [
+          8,
+          401,
+          1,
+          1,
+          0
+        ]
+      ],
+      "minimality": [
+        "pass_fixed_point"
+      ],
+      "peak_rss_bytes_median": 109895680,
+      "runs": [
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-0-stateful-on/work/run-dsky4qjc",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-1-stateful-on/work/run-tm21x_oa",
+        "/home/weifenfc/ms02u/hw/onnx-reduce/1012-perf/output/performance/batch4-matrix/no-cache/20261103-203613/chain-calls-2-stateful-on/work/run-a9j6wi6h"
+      ],
+      "stop_reasons": [
+        "fixed_point"
+      ],
+      "strategy": "stateful",
+      "wall_median_ms": 84.424,
+      "written_bytes_median": 181625
+    }
+  ],
+  "validation": {
+    "git_diff_check": true,
+    "matrix_source_and_actual_output_hashes_verified": true,
+    "pytest": {
+      "command": "../1012/.venv/bin/python -m pytest -q",
+      "passed": 277
+    },
+    "relative_documentation_links": 65,
+    "ruff_check": "../1012/.venv/bin/ruff check src tests examples benchmarks",
+    "ruff_format": "../1012/.venv/bin/ruff format --check src tests examples benchmarks"
+  }
+}

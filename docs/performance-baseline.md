@@ -161,3 +161,25 @@ CLI 额外指定报告和后端自行写的文件，也不是磁盘物理写入�
 
 第一批建立测量基础；后续批量清理、准备缓存和有状态调度的独立结果分别见
 [第二批实测](performance-batch2-results.md)与[第三批实测](performance-batch3-results.md)。
+
+### 第四批阶段对照
+
+`--compare-staged` 在同一输入、缓存和预算下比较 legacy、stateful、staged-fast 和
+staged-complete；与 `--compare-instrumentation` 联用时检查固定调用预算的有序轨迹一致性。
+也可用 `--scheduler staged-fast` 或 `staged-complete` 单独运行；这些是基准标签，
+产品 CLI 使用 `--scheduler staged --goal fast|complete`。
+
+```bash
+uv run --locked python benchmarks/reduction.py \
+  --case all --size 128 --repeat 3 --budget both \
+  --candidate-budget 100 --time-budget 1 \
+  --compare-staged --compare-instrumentation
+uv run --locked python benchmarks/reduction.py \
+  --case chain --size 128 --module-width 16 --repeat 3 --budget calls \
+  --candidate-budget 100 --compare-staged
+```
+
+`--module-width N` 给合成模型每 N 个节点加一个明确模块路径，只用于验证模块候选，
+不代表真实导出器元信息。比较完整字典序成本，并分别读取 `scheduler.sources`、
+`scheduler.finalization`、`scheduler.coverage` 和 `artifact_recheck`，区分搜索工作、
+收尾工作及最终输出保证。

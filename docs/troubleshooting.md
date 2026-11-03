@@ -17,13 +17,14 @@
 正常收尾时，运行目录总会有 `report.json`；`--report` 额外导出一份相同报告。
 初检失败、加载失败或中断时可能没有最终报告。
 
-当前 JSON schema 的版本字段为 `version: 4`，在版本 3 上增加 `scheduler`。主要字段如下：
+当前 JSON schema 的版本字段为 `version: 5`，新增实际产物的 `artifact_recheck`，
+staged 还会扩展 scheduler 中的阶段和收尾信息。主要字段如下：
 
 | 字段 | 读法 |
 |---|---|
 | `original` / `final` | 主图节点数、字节数、输入、输出、initializer 数量 |
 | `node_reduction_rate` / `byte_reduction_rate` | `1 - final/original`；原值为 0 时为 `null`，字节缩减率可能为负 |
-| `stop_reason` | `fixed_point`：完整一轮未接受候选；`budget_exhausted`：预算阻止继续；`unstable_check`：最终复检未通过 |
+| `stop_reason` | `fixed_point`：完整一轮未接受；`budget_exhausted`：预算停止；`unstable_check`：复检失败；staged 另有 `search_exhausted`、`plateau`、`coverage_inconclusive` |
 | `minimality.status` | `pass_fixed_point` 或 `unproven`；精确条件见[架构说明](architecture.md#接受条件与最小性) |
 | `minimality.sweep_inconclusive_candidate_count` | 最终模型搜索轮次中的无法判定候选数 |
 | `failure_checks.calls` | 实际调用数，包含初检和最终复检；因此可能大于候选配额 |
@@ -35,7 +36,10 @@
 | `passes` | 每个 pass 的候选、无效、实际调用、接受、成本未下降统计 |
 | `scheduler.strategy` / `model_version` | 本次策略，以及接受编辑后递增的模型版本 |
 | `scheduler.coverage` | 被扫描的摘要、版本、候选范围、是否完成及不确定候选数 |
-| `scheduler.sources` | heuristic / coverage 各阶段累计完成尝试、实际调用、缓存命中和接受数 |
+| `scheduler.sources` | heuristic / coverage，或 coarse / regions / fine / cleanup / coverage 的尝试、实际调用、缓存命中和接受数 |
+| `scheduler.finalization` | staged 独立收尾是否启动、尝试、接受后重启与同版本去重次数 |
+| `scheduler.stage_accepted_cost_delta` | staged 各阶段接受编辑的完整成本变化；某些分量可能为负 |
+| `artifact_recheck` | 实际输出路径、摘要、是否读回校验、强制复检结果及缓存标志 |
 | `scheduler.buckets` | 按 pass / 方向 / 二次幂尺度桶汇总的拒绝类型、接受率、缓存来源和接受成本变化 |
 | `scheduler.phase_revisits` / `scale_reuses` / `deduplicated` | 跨版本阶段重访、接受后尺度续用、启发式节点编辑去重次数 |
 | `requested_validation_mode` / `effective_validation_modes` / `custom_domains` | 请求的校验策略和运行中观察到的模式与自定义 domain |
@@ -45,6 +49,8 @@
 `fixed_point` 不一定意味着 `pass_fixed_point`：如果最终轮次有无法判定的候选，最小性仍为
 `unproven`。即使 `pass_fixed_point` 也只针对 `minimality.scope` 描述的候选范围，不保证全局最小。
 `scheduler.coverage` 只证明所记录摘要对应的模型，不能把旧版本的完成标志用于新模型。
+staged fast 的 `search_exhausted`、`plateau` 均表示快速阶段停止，最小性始终未证明；
+staged complete 的 `coverage_inconclusive` 表示完成扫描但仍有无法判定候选，同样为 unproven。
 `scheduler.sources`、`buckets` 汇总整个运行，包含此前失效扫描；预算中止的在途尝试不计为
 完成尝试，见 `scheduler.jsonl`。计时仅在 `--performance` 开启时采集，否则为 `null`。
 其中 preparation 是候选执行中判定路径之外的耗时；evaluation 包含目标匹配和判定证据记录，
@@ -187,6 +193,8 @@ uv run --locked onnx-reduce "$checkpoint_model" \
 先查看 checkpoint 内嵌报告，若其 `stop_reason=unstable_check`，先排查最终复检失败。
 
 这会开启**新一轮搜索**：重新初检并建立基线，使用新预算，不恢复旧缓存、旧搜索位置或剩余预算。
+若要保留此前目标身份并只做独立收尾，应使用已经正常复检的最终输出和
+`--scheduler staged --finalize-from RUN_DIR`，详见[使用指南](usage.md#分阶段搜索与独立收尾实验)。
 保留 checkpoint 引用的 `.onnx` 文件；仅复制 JSON 清单不足以恢复模型。
 
 ## 准备缺陷报告

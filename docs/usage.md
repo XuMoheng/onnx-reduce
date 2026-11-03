@@ -128,7 +128,9 @@ uv run --locked onnx-reduce cases/original.onnx \
 | `--timeout SECONDS` | `60`；单次判定超时，必须为有限正数 |
 | `--max-candidate-check-calls N` | 不设上限；非负整数，`0` 跳过候选搜索 |
 | `--time-budget-seconds N` | 不设上限；软墙钟预算，必须为有限正数 |
-| `--scheduler legacy\|stateful` | `legacy`；原顺序重启，或实验性的有状态分区与阶段轮转 |
+| `--scheduler legacy\|stateful\|staged` | `legacy`；另提供有状态调度与分阶段搜索两种实验策略 |
+| `--goal fast\|complete` | 仅 staged；默认 complete，fast 省略固定点扫描 |
+| `--finalize-from RUN_DIR` | 仅 staged complete；恢复源运行目标，独立收尾其已验证输出 |
 | `--validation-mode strict\|structural\|permissive` | `strict`；[模型校验策略](architecture.md#模型校验策略) |
 | `--target-mode baseline\|script` | `baseline`；匹配原模型结束方式或信任脚本 |
 | `--signature-regex REGEX` | 不提取签名；指定后要求基线签名匹配 |
@@ -172,7 +174,7 @@ stateful 的启发式搜索结束后，还会在当前模型上扫描全部配�
 ## 确认结果
 
 工具先在工作目录中检查原模型，接受缩减后写 checkpoint，最后将模型写到 `-o` 指定位置，
-并在这个实际交付路径上绕过缓存独立复检。正常收尾后应能找到：
+先重新读取实际文件并校验，再在实际交付路径上绕过缓存独立复检。正常收尾后应能找到：
 
 - `results/reduced.onnx`：自包含的输出模型，external data 已内嵌。
 - `results/report.json`：通过 `--report` 指定的报告副本。
@@ -217,3 +219,38 @@ echo $?
 当前用于不依赖具体输入数据的编译错误、崩溃和挂起。编辑仅作用于主图，可能将中间值
 提升为新图输入，保留故障不代表计算语义等价。暂不缩减输入数据或比较数值差异；
 模型规模、平台、缓存和子图边界见[当前边界](architecture.md#当前边界)。
+
+## 分阶段搜索与独立收尾（实验）
+
+`--scheduler staged` 按粗分组、图区域、小组/单项搜索，然后独立验证固定点。
+默认目标为 `complete`；`--goal fast` 省略固定点扫描，无论模型多小都只报告最小性未证明。
+搜索和收尾共享现有总预算。完整目标若预算用尽，同样为 `unproven`。
+
+```bash
+uv run --locked onnx-reduce cases/original.onnx \
+  --test '.venv/bin/python check_backend.py' \
+  --signature-regex 'onnx-reduce-target: (YOUR_TARGET_ERROR)' \
+  --scheduler staged --goal fast --time-budget-seconds 60 \
+  -o results/fast.onnx --report results/fast.json
+```
+
+需要随后独立收尾时，从 `results/fast.json` 读取 `work_directory`，替换下面的 `run-EXAMPLE`。
+保持判定命令、签名、超时、校验模式和工作目录与第一次一致：
+
+```bash
+uv run --locked onnx-reduce results/fast.onnx \
+  --test '.venv/bin/python check_backend.py' \
+  --signature-regex 'onnx-reduce-target: (YOUR_TARGET_ERROR)' \
+  --scheduler staged --goal complete \
+  --finalize-from results/fast.onnx.work/run-EXAMPLE \
+  --time-budget-seconds 600 -o results/final.onnx
+```
+
+独立入口验证源产物摘要、恢复原始目标故障身份，再进行新的初检与完整扫描；
+不会重新建立目标身份，也不恢复旧缓存和旧搜索进度。必须保留完整的源运行目录，
+输入须与源运行最终输出一致；未正常结束的 checkpoint 不能使用此入口。
+
+区域首先读取显式 `onnx_reduce.module` 节点标注，再使用无分叉链，最后回退拓扑分区。
+未标注模型无需额外准备。边界缺类型会影响排序，不会永久跳过该区域。
+当前标注格式、范围保证和内部额度见[第四批设计](staged-search-design.md)，
+质量与成本对照见[第四批实测](performance-batch4-results.md)。

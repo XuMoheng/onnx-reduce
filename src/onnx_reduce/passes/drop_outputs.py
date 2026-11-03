@@ -6,7 +6,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from onnx_reduce.edits import Candidate, DropOutputs
-from onnx_reduce.passes.groups import deletion_groups
+from onnx_reduce.passes.groups import deletion_groups, is_coarse
 
 
 class DropOutputsPass:
@@ -16,3 +16,11 @@ class DropOutputsPass:
         # Preserve the old reverse-output preference within each batch.
         for names in deletion_groups(tuple(reversed(model.output_names)), keep_one=True):
             yield Candidate((DropOutputs(names),))
+
+    def generate_stage(self, model: Any, stage: str) -> Iterator[Candidate]:
+        if stage == "cleanup":
+            return
+        for candidate in self.generate(model):
+            coarse = is_coarse(len(candidate.edits[0].names), len(model.output_names))
+            if coarse == (stage == "coarse"):
+                yield candidate

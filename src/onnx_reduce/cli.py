@@ -54,9 +54,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--scheduler",
-        choices=("legacy", "stateful"),
+        choices=("legacy", "stateful", "staged"),
         default="legacy",
-        help="candidate scheduling strategy (stateful is experimental)",
+        help="candidate scheduling strategy (stateful and staged are experimental)",
+    )
+    parser.add_argument(
+        "--goal",
+        choices=("fast", "complete"),
+        help="staged search goal (default: complete); fast never proves minimality",
+    )
+    parser.add_argument(
+        "--finalize-from",
+        type=Path,
+        metavar="RUN_DIR",
+        help="finalize a verified previous output; restore its target and verify check configuration",
     )
     parser.add_argument(
         "--performance", action="store_true", help="collect stage timings and resource counters"
@@ -116,6 +127,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             target_mode=args.target_mode,
             signature_regex=args.signature_regex,
             scheduler=args.scheduler,
+            goal=args.goal,
+            finalize_from=str(args.finalize_from.resolve()) if args.finalize_from else None,
         )
         if args.report:
             for model_path in (args.model, args.output):

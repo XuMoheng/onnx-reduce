@@ -172,6 +172,11 @@ def worker(args):
         proto = make_model(
             args.case, args.size, trigger_position=args.trigger_position, condition=args.condition
         )
+        if args.module_width:
+            for index, node in enumerate(proto.graph.node):
+                prop = node.metadata_props.add()
+                prop.key = "onnx_reduce.module"
+                prop.value = json.dumps(["model", f"block{index // args.module_width}"])
         onnx.checker.check_model(proto, full_check=True)
         model = OnnxModel.from_proto(proto)
         runner = (
@@ -187,7 +192,10 @@ def worker(args):
         max_candidate_check_calls=args.candidate_budget if args.budget == "calls" else None,
         time_budget_seconds=args.time_budget if args.budget == "time" else None,
         signature_regex=args.signature_regex,
-        scheduler=args.scheduler,
+        scheduler="staged" if args.scheduler.startswith("staged") else args.scheduler,
+        goal=("fast" if args.scheduler == "staged-fast" else "complete")
+        if args.scheduler.startswith("staged")
+        else None,
     )
     started = time.perf_counter()
     passes = [RepeatedDeletionPass()] if args.case == "preparation" else None
@@ -210,6 +218,7 @@ def worker(args):
         "instrumented": not args.no_performance,
         "scheduler": args.scheduler,
         "condition": args.condition,
+        "module_width": args.module_width,
         "trigger_position": args.trigger_position,
         "wall_seconds": elapsed,
         "peak_rss_bytes": PerformanceStats.peak_rss(),
@@ -246,6 +255,7 @@ def run_worker(args, case, budget, repeat, enabled, scheduler, batch):
         "--trigger-position",
         args.trigger_position,
     ]
+    command += ["--module-width", str(args.module_width)]
     if not enabled:
         command.append("--no-performance")
     if args.no_cache:
@@ -301,40 +311,36 @@ def assert_same_decisions(first, second):
 
 def scheduler_comparisons(group):
     comparisons = []
+    fields = ("node_count", "byte_size", "output_count", "input_count", "initializer_count")
     for legacy in (r for r in group if r["scheduler"] == "legacy"):
-        stateful = next(
-            (
-                r
-                for r in group
-                if r["scheduler"] == "stateful"
-                and r["repeat"] == legacy["repeat"]
-                and r["instrumented"] == legacy["instrumented"]
-            ),
-            None,
-        )
-        if stateful is None:
-            continue
-        fields = ("node_count", "byte_size", "output_count", "input_count", "initializer_count")
-        before, after = (
-            tuple(r["report"]["final"][name] for name in fields) for r in (legacy, stateful)
-        )
-        comparisons.append(
-            {
-                "case": legacy["case"],
-                "budget": legacy["budget"],
-                "repeat": legacy["repeat"],
-                "instrumented": legacy["instrumented"],
-                "quality": "improved"
-                if after < before
-                else "regressed"
-                if after > before
-                else "equal",
-                "legacy_cost": before,
-                "stateful_cost": after,
-                "legacy_run": legacy["report"]["work_directory"],
-                "stateful_run": stateful["report"]["work_directory"],
-            }
-        )
+        for other in group:
+            if (
+                other["scheduler"] == "legacy"
+                or other["repeat"] != legacy["repeat"]
+                or other["instrumented"] != legacy["instrumented"]
+            ):
+                continue
+            before, after = (
+                tuple(r["report"]["final"][name] for name in fields) for r in (legacy, other)
+            )
+            comparisons.append(
+                {
+                    "case": legacy["case"],
+                    "budget": legacy["budget"],
+                    "repeat": legacy["repeat"],
+                    "instrumented": legacy["instrumented"],
+                    "strategy": other["scheduler"],
+                    "quality": "improved"
+                    if after < before
+                    else "regressed"
+                    if after > before
+                    else "equal",
+                    "legacy_cost": before,
+                    "candidate_cost": after,
+                    "legacy_run": legacy["report"]["work_directory"],
+                    "candidate_run": other["report"]["work_directory"],
+                }
+            )
     return comparisons
 
 
@@ -349,7 +355,22 @@ def main():
     parser.add_argument("--candidate-budget", type=int, default=600)
     parser.add_argument("--time-budget", type=float, default=5.0)
     parser.add_argument("--compare-instrumentation", action="store_true")
-    parser.add_argument("--scheduler", choices=("legacy", "stateful"), default="legacy")
+    parser.add_argument(
+        "--scheduler",
+        choices=("legacy", "stateful", "staged-fast", "staged-complete"),
+        default="legacy",
+    )
+    parser.add_argument(
+        "--compare-staged",
+        action="store_true",
+        help="compare legacy/stateful/staged-fast/staged-complete",
+    )
+    parser.add_argument(
+        "--module-width",
+        type=int,
+        default=0,
+        help="explicit module annotations every N synthetic nodes (0 disables)",
+    )
     parser.add_argument("--compare-schedulers", action="store_true")
     parser.add_argument(
         "--condition",
@@ -381,6 +402,8 @@ def main():
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--no-performance", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if args.module_width < 0 or (args.module_width and args.model):
+        parser.error("--module-width must be nonnegative and applies only to synthetic models")
     if args.size < 1 or args.repeat < 1 or args.candidate_budget < 0 or args.time_budget <= 0:
         parser.error(
             "size/repeat/time budget must be positive; candidate budget must be nonnegative"
@@ -429,7 +452,13 @@ def main():
             group = []
             for repeat in range(args.repeat):
                 # Alternate execution order to reduce systematic warm-cache bias.
-                strategies = ["legacy", "stateful"] if args.compare_schedulers else [args.scheduler]
+                strategies = (
+                    ["legacy", "stateful", "staged-fast", "staged-complete"]
+                    if args.compare_staged
+                    else ["legacy", "stateful"]
+                    if args.compare_schedulers
+                    else [args.scheduler]
+                )
                 if repeat % 2:
                     strategies.reverse()
                 for strategy in strategies:
