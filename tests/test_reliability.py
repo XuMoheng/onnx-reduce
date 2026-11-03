@@ -153,7 +153,7 @@ def test_inconclusive_neighbors_do_not_prove_minimality(tmp_path):
     assert report.minimality["sweep_inconclusive_candidate_count"] > 0
 
 
-def test_duplicate_candidates_are_cached_and_have_unique_paths(tmp_path):
+def test_duplicate_attempts_reuse_existing_artifact_with_unique_sequence_numbers(tmp_path):
     class Duplicates:
         name = "duplicates"
 
@@ -186,10 +186,14 @@ def test_duplicate_candidates_are_cached_and_have_unique_paths(tmp_path):
         for line in (Path(report.work_directory) / "evaluations.jsonl").read_text().splitlines()
     ]
     candidates = [r for r in records if r["candidate"]]
-    assert len({r["model"] for r in candidates}) == 2
+    assert len({r["model"] for r in candidates}) == 1
+    assert all(Path(r["model"]).is_file() for r in candidates)
+    assert len({r["candidate"]["sequence_number"] for r in candidates}) == 2
+    assert len(list((Path(report.work_directory) / "candidates").glob("*/model.onnx"))) == 1
     assert candidates[0]["candidate"]["base_digest"]
     assert candidates[0]["candidate"]["edits"][0]["op"] == "DeleteNodes"
     assert candidates[1]["cache_hit"]
+    assert candidates[1]["cache_source"] == "edit"
 
 
 def test_no_free_pass_bypasses_failure_check(tmp_path):
