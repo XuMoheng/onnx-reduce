@@ -55,7 +55,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--performance", action="store_true", help="collect stage timings and resource counters"
     )
-    parser.add_argument("--no-cache", action="store_true", help="disable per-run verdict cache")
+    parser.add_argument(
+        "--no-cache", action="store_true", help="disable per-run preparation and verdict caches"
+    )
     parser.add_argument(
         "--target-mode",
         choices=("baseline", "script"),

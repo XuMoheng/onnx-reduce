@@ -52,6 +52,26 @@ uv run --locked python benchmarks/reduction.py --case backend \
 此入口使用实际判定进程，按默认规则匹配终止身份和可选签名。
 没有真实故障模型时，不把合成场景结果视为真实后端验收。
 
+### 准备缓存基准
+
+`preparation` 不包含在 `all` 的五类场景中。它生成省略中间 shape 的链图，对每个节点
+依次生成单次删除、重复索引删除、相同单次删除三种候选。判定条件是必须保留全部节点，
+因此所有候选均被拒绝，可以分别观察 shape 共享、相同内容和相同编辑的命中。
+以下两条命令使用相同候选序列，分别开启和关闭三类缓存：
+
+```bash
+uv run --locked python benchmarks/reduction.py \
+  --case preparation --size 128 --repeat 3 --budget calls \
+  --candidate-budget 600 --compare-instrumentation
+uv run --locked python benchmarks/reduction.py \
+  --case preparation --size 128 --repeat 3 --budget calls \
+  --candidate-budget 600 --compare-instrumentation --no-cache
+```
+
+缓存开关会改变实际判定次数；该对照应使用足够完成扫描的调用预算，并比较编辑、状态、
+内容摘要与最终结果，不能要求包含命中字段的原始日志字节完全一致。
+采集开关的原有严格轨迹对照仍分别执行。
+
 ## 对单次缩减采集
 
 在已有 CLI 命令中增加 `--performance`，例如：
@@ -78,6 +98,9 @@ Python 接口对应 `EngineConfig(collect_performance=True)`。
 | `counters.write_calls` | 上述文件写入次数，空日志也计一次 |
 | `counters.candidate_status.*` | 候选拒绝/判定/预算停止的原因，细节仍在 `candidates.jsonl` |
 | `counters.content_cache_*` | 候选内容缓存命中、未命中或禁用次数，不含强制首尾检查 |
+| `counters.edit_cache_*` / `shape_cache_*` | 编辑准备和 shape 摘要的命中、未命中或禁用次数 |
+| `counters.*_cache_evictions` / `*_cache_oversized` | 各缓存的淘汰、超限不保留次数 |
+| `samples.*_cache_bytes` / `*_cache_entries` | 各缓存保留的编码键值字节数和项数采样，`max` 为本次运行峰值 |
 | `samples.*` | 候选编辑数量、选择项数量、编辑后节点/字节规模的数量、总和、最大值 |
 | `peak_rss_bytes` | 当前缩减进程生命周期的峰值 RSS，含原生库分配，排除子进程 |
 

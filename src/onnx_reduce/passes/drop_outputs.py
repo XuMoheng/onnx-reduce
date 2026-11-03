@@ -6,15 +6,13 @@ from collections.abc import Iterator
 from typing import Any
 
 from onnx_reduce.edits import Candidate, DropOutputs
+from onnx_reduce.passes.groups import deletion_groups
 
 
 class DropOutputsPass:
     name = "drop_outputs"
 
     def generate(self, model: Any) -> Iterator[Candidate]:
-        names = model.output_names
-        # An ONNX M1 candidate always keeps at least one output.  Dropping in
-        # reverse order makes the candidate sequence deterministic.
-        if len(names) > 1:
-            for name in reversed(names):
-                yield Candidate((DropOutputs((name,)),))
+        # Preserve the old reverse-output preference within each batch.
+        for names in deletion_groups(tuple(reversed(model.output_names)), keep_one=True):
+            yield Candidate((DropOutputs(names),))

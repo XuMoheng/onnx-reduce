@@ -28,6 +28,7 @@ from onnx_reduce.performance import (
     sample,
     timed_candidates,
 )
+from onnx_reduce.preparation import current_preparation, edit_key, preparation_caches
 from onnx_reduce.report import PassStats, ReductionReport
 from onnx_reduce.storage import write_json, write_text
 from onnx_reduce.types import EditApplicationError, ModelAdapter, ValidationResult
@@ -110,7 +111,10 @@ class ReductionEngine:
         *,
         output_path: str | Path | None = None,
     ) -> tuple[ModelAdapter, ReductionReport]:
-        with collect_performance(self.config.collect_performance) as performance:
+        with (
+            collect_performance(self.config.collect_performance) as performance,
+            preparation_caches(self.config.cache_enabled, self.config.validation_mode),
+        ):
             reduced, report = self._run(
                 model, failure_check_runner, workdir, output_path=output_path
             )
@@ -310,6 +314,36 @@ class ReductionEngine:
                     for edit in candidate.edits
                 ),
             )
+        caches = current_preparation()
+        cached = caches.edits.get(edit_key(candidate, caches.validation_mode))
+        if cached is not None:
+            entry = json.loads(cached)
+            status, details = entry["status"], entry["details"]
+            if "cost" in details:
+                sample("candidate_nodes", details["cost"]["node_count"])
+                sample("candidate_bytes", details["cost"]["byte_size"])
+            if status in {"edit_failed", "invalid"}:
+                report.candidates_invalid += 1
+                stats.invalid += 1
+                if "validation" in details:
+                    self._record_validation(ValidationResult(**details["validation"]), report)
+            elif status == "not_cheaper":
+                report.candidates_not_cheaper += 1
+                stats.not_cheaper += 1
+            else:
+                result = evaluator.reuse(
+                    Path(entry["model"]),
+                    details["digest"],
+                    Evaluation(
+                        FailureCheckResult(status),
+                        target_identity_mismatch=details["target_identity_mismatch"],
+                    ),
+                    metadata=candidate.to_dict(),
+                )
+                self._record_evaluation(result, report)
+                details["cache_hit"] = True
+            self._record_candidate(run_dir, candidate, status, **details, edit_cache_hit=True)
+            return None
         try:
             candidate_model = base_model.apply_candidate(candidate)
         except EditApplicationError as exc:
@@ -331,36 +365,55 @@ class ReductionEngine:
         if not validation.valid:
             report.candidates_invalid += 1
             stats.invalid += 1
-            self._record_candidate(run_dir, candidate, "invalid", validation=asdict(validation))
+            self._record_candidate(
+                run_dir,
+                candidate,
+                "invalid",
+                validation=asdict(validation),
+                cost=asdict(candidate_cost),
+            )
             return None
-        artifact = candidate_model.materialize(
-            run_dir / "candidates" / f"{candidate.sequence_number:08d}" / "model.onnx"
-        )
+        digest = candidate_model.canonical_hash()
+        candidate_path = run_dir / "candidates" / f"{candidate.sequence_number:08d}" / "model.onnx"
         if not self._time_budget_allows(started):
             self._record_candidate(run_dir, candidate, "budget_exhausted", reason="time")
             raise EvaluationBudgetExceeded("search time budget exhausted")
+
+        def prepare():
+            candidate_model.materialize(candidate_path)
+            if not self._time_budget_allows(started):
+                raise EvaluationBudgetExceeded("search time budget exhausted")
+
         # Cached decisions consume no calls, even when the quota is exactly
         # spent. The evaluator checks its cache before enforcing this limit.
         try:
             result = evaluator.evaluate(
-                artifact.model_path,
-                artifact.digest,
+                candidate_path,
+                digest,
                 metadata=candidate.to_dict(),
                 allow_execution=(
                     self.config.max_candidate_check_calls is None
                     or report.failure_check_calls - 1 < self.config.max_candidate_check_calls
                 ),
+                prepare=prepare,
             )
         except EvaluationBudgetExceeded:
-            self._record_candidate(run_dir, candidate, "budget_exhausted", reason="calls")
+            self._record_candidate(
+                run_dir,
+                candidate,
+                "budget_exhausted",
+                reason="calls" if self._time_budget_allows(started) else "time",
+            )
             raise
         self._record_candidate(
             run_dir,
             candidate,
             result.outcome.value,
-            digest=artifact.digest,
+            digest=digest,
             cost=asdict(candidate_cost),
             cache_hit=result.cache_hit,
+            _model_path=str(result.model_path),
+            target_identity_mismatch=result.target_identity_mismatch,
         )
         self._record_evaluation(result, report)
         if not result.cache_hit:
@@ -379,7 +432,7 @@ class ReductionEngine:
             json.dumps(
                 {
                     "candidate": candidate.to_dict(),
-                    "digest": artifact.digest,
+                    "digest": digest,
                     "cost": asdict(candidate_cost),
                 },
                 sort_keys=True,
@@ -390,9 +443,29 @@ class ReductionEngine:
         return candidate_model
 
     @staticmethod
-    def _record_candidate(run_dir: Path, candidate: Candidate, status: str, **details) -> None:
+    def _record_candidate(
+        run_dir: Path, candidate: Candidate, status: str, *, _model_path=None, **details
+    ) -> None:
         """Keep rejection evidence even when a candidate never reaches the failure check runner."""
         count(f"candidate_status.{status}")
+        caches = current_preparation()
+        if (
+            caches is not None
+            and not details.get("edit_cache_hit")
+            and status
+            in {
+                "edit_failed",
+                "not_cheaper",
+                "invalid",
+                "not_interesting",
+            }
+        ):
+            caches.edits.put(
+                edit_key(candidate, caches.validation_mode),
+                json.dumps(
+                    {"status": status, "details": details, "model": _model_path}, sort_keys=True
+                ).encode(),
+            )
         write_text(
             run_dir / "candidates.jsonl",
             json.dumps(

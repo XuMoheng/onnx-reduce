@@ -21,11 +21,12 @@ onnx-reduce 在保留用户指定故障的前提下，缩减 ONNX 模型。以�
 - [性能优化计划](performance-todo.md)
 - [性能基线：采集与基准命令](performance-baseline.md)
 - [性能基线实测：2026-11-02](performance-results.md)
+- [第二批性能实测：2026-11-03](performance-batch2-results.md)
 
 ## 命令与路径约定
 
 文档中的命令均从 **Git 仓库根目录**（包含 `pyproject.toml` 的目录）执行。
-本地工作区对应 `1012/`，克隆到其他位置时以实际仓库根目录为准。
+当前性能工作区对应 `1012-perf/`，克隆到其他位置时以实际仓库根目录为准。
 先按 README 安装依赖。`your-backend`、`YOUR_TARGET_ERROR` 和 `/absolute/path/...`
 表示必须替换的内容；`examples/relu/` 中的教学示例无需外部后端。
 

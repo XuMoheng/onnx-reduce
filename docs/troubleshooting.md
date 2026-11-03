@@ -27,7 +27,7 @@
 | `minimality.status` | `pass_fixed_point` 或 `unproven`；精确条件见[架构说明](architecture.md#接受条件与最小性) |
 | `minimality.sweep_inconclusive_candidate_count` | 最终模型搜索轮次中的无法判定候选数 |
 | `failure_checks.calls` | 实际调用数，包含初检和最终复检；因此可能大于候选配额 |
-| `failure_checks.cache_hits` | 复用内容判定的次数，不增加 `calls` |
+| `failure_checks.cache_hits` | 经编辑或内容缓存复用判定的次数，不增加 `calls`；准备失败的复用不计入 |
 | `failure_checks.interesting` / `not_interesting` / `inconclusive` | 实际调用经目标匹配后的结果计数，不含缓存命中 |
 | `failure_checks.target_identity_mismatches` | 实际调用中结束方式或签名不符的次数 |
 | `candidates` | `generated`、`invalid`、`accepted`、`not_cheaper` 等候选统计 |
@@ -63,6 +63,9 @@
 `observation.outcome` 是进程执行的原始分类。两者不同通常意味着故障身份不匹配。
 `observation` 还包含 `returncode`、`termination`、`timed_out`、`output_truncated`
 和日志目录 `logs`。缓存命中记录没有新的 `observation`。
+命中记录的 `cache_source` 为 `edit` 或 `content`，`model` 指向已有的实际产物；
+当前尝试由 `candidate.sequence_number` 区分，不会为命中再写一份模型。
+`candidates.jsonl` 中 `edit_cache_hit=true` 也可用于识别编辑失败、校验失败或成本未下降的准备复用。
 
 `replay.json` 记录模型路径、摘要、判定配置、基线身份和工作目录，供手工复现参考；
 当前没有直接读取它自动重放的 CLI 参数，也不会保存全部环境变量或后端程序。

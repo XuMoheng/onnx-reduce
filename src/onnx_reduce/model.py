@@ -14,7 +14,8 @@ from google.protobuf.message import DecodeError
 from onnxscript import ir
 
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs, DropOutputs
-from onnx_reduce.performance import count, measure, measured
+from onnx_reduce.performance import count, measured
+from onnx_reduce.preparation import current_preparation, metadata_key
 from onnx_reduce.storage import atomic_write
 from onnx_reduce.types import (
     EditApplicationError,
@@ -285,9 +286,11 @@ class OnnxModel:
             raise EditApplicationError("candidate base digest does not match the model")
         result = self.copy()
         # Each edit addresses the result of the preceding edit.
-        for edit in candidate.edits:
+        for edit_index, edit in enumerate(candidate.edits):
             if isinstance(edit, DeleteNodes):
-                result._delete_nodes(edit.indices)
+                result._delete_nodes(
+                    edit.indices, inference_source=self if edit_index == 0 else result
+                )
             elif isinstance(edit, DropOutputs):
                 result._drop_outputs(edit.names)
             elif isinstance(edit, DropInputs):
@@ -296,9 +299,13 @@ class OnnxModel:
                 result._drop_initializers(edit.names)
             else:
                 raise EditApplicationError(f"unsupported edit: {type(edit).__name__}")
+            # An intermediate edit may have acquired a serialized snapshot for
+            # inference. Subsequent edits must never see that stale snapshot.
+            result.__dict__.pop("_payload", None)
+            result.__dict__.pop("_digest", None)
         return result
 
-    def _delete_nodes(self, indices: Iterable[int]) -> None:
+    def _delete_nodes(self, indices: Iterable[int], *, inference_source: OnnxModel) -> None:
         """Delete main-graph nodes and promote still-used boundary outputs to graph inputs."""
 
         graph = self._model.graph
@@ -342,7 +349,7 @@ class OnnxModel:
                     promoted_values.append(value)
 
         # 4. Infer missing information before detaching, then replace boundaries with inputs.
-        inferred_types = self._infer_value_types(
+        inferred_types = inference_source._infer_value_types(
             value for value in promoted_values if value.type is None or value.shape is None
         )
         # Remove use-def edges from deleted attribute graphs too. Otherwise
@@ -405,28 +412,47 @@ class OnnxModel:
         missing = [value for value in values if value.name]
         if not missing:
             return {}
-        with measure("shape_inference"):
-            try:
-                inferred_proto = onnx.shape_inference.infer_shapes(self.to_proto())
-                inferred_model = ir.from_proto(inferred_proto)
-                if not isinstance(inferred_model, ir.Model):
-                    return {}
-                # Promotions are main-graph edits. Nested scopes can reuse local
-                # names, so never flatten their value names into this lookup.
-                graph = inferred_model.graph
-                available = {value.name: value for value in graph.inputs}
-                for node in graph:
-                    available.update({value.name: value for value in node.outputs if value.name})
-                return {
-                    value.name: available[value.name]
-                    for value in missing
-                    if value.name in available
-                }
-            except Exception:
-                count("shape_inference_failures")
-                # An untyped promotion will be rejected by the configured checker.
-                # This is preferable to failing the whole reduction run.
-                return {}
+        caches = current_preparation()
+        key = metadata_key("shape", self.canonical_hash()) if caches is not None else None
+        summary = caches.shapes.get(key) if caches is not None else None
+        if summary is None:
+            summary = self._infer_type_summary()
+            if caches is not None:
+                caches.shapes.put(key, summary)
+        # Empty bytes are a cached failure, distinct from a cache miss (None).
+        graph = onnx.GraphProto.FromString(summary)
+        wanted = {value.name for value in missing}
+        return {
+            value.name: ir.serde.deserialize_value_info_proto(value, None)
+            for value in graph.value_info
+            if value.name in wanted
+        }
+
+    @measured("shape_inference")
+    def _infer_type_summary(self) -> bytes:
+        """Retain only main-graph names and types, without weights or IR references."""
+
+        try:
+            inferred_proto = onnx.shape_inference.infer_shapes(self._payload)
+            # Match IR import semantics, including main-graph outputs whose types
+            # come from graph.output instead of intermediate value_info.
+            inferred_model = ir.from_proto(inferred_proto)
+            if not isinstance(inferred_model, ir.Model):
+                return b""
+            graph = inferred_model.graph
+            available = {value.name: value for value in graph.inputs}
+            for node in graph:
+                available.update({value.name: value for value in node.outputs if value.name})
+            summary = onnx.GraphProto()
+            for value in available.values():
+                info = summary.value_info.add()
+                info.name = value.name
+                info.type.CopyFrom(ir.serde.serialize_value(value).type)
+            return summary.SerializeToString(deterministic=True)
+        except Exception:
+            count("shape_inference_failures")
+            # An untyped promotion will be rejected by the configured checker.
+            return b""
 
     # ==========================================
     # Cost Calculation and Model Validation
@@ -478,9 +504,8 @@ class OnnxModel:
         if effective_mode == "permissive":
             return ValidationResult(True, None, effective_mode, domains)
         try:
-            proto = self.to_proto()
             onnx.checker.check_model(
-                proto,
+                self._payload,
                 full_check=True,
                 check_custom_domain=effective_mode == "strict",
             )

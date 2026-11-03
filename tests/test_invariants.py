@@ -101,6 +101,8 @@ def test_artifact_snapshot_is_shared_by_cost_hash_and_materialization(tmp_path, 
 
     monkeypatch.setattr(model, "to_proto", to_proto)
     cost = model.cost()
+    assert model.validate().valid
+    assert model.validate("structural").valid
     digest = model.canonical_hash()
     model.save(tmp_path / "saved.onnx")
     artifact = model.materialize(tmp_path / "artifact.onnx")

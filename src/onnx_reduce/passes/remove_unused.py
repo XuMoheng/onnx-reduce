@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from typing import Any
 
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs
+from onnx_reduce.passes.groups import deletion_groups
 
 
 class RemoveUnusedPass:
@@ -19,7 +20,7 @@ class RemoveUnusedPass:
         dead_indices = model.dead_node_indices()
         if dead_indices:
             yield Candidate((DeleteNodes(tuple(dead_indices)),))
-        for name in model.unused_input_names():
-            yield Candidate((DropInputs((name,)),))
-        for name in model.unused_initializer_names():
-            yield Candidate((DropInitializers((name,)),))
+        for names in deletion_groups(model.unused_input_names()):
+            yield Candidate((DropInputs(names),))
+        for names in deletion_groups(model.unused_initializer_names()):
+            yield Candidate((DropInitializers(names),))

@@ -23,6 +23,7 @@ import onnx
 import onnxscript
 from onnx import TensorProto, helper
 
+from onnx_reduce.edits import Candidate, DeleteNodes
 from onnx_reduce.engine import EngineConfig, ReductionEngine
 from onnx_reduce.failure_check.contract import FailureCheckResult, make_failure_check_config
 from onnx_reduce.failure_check.runner import FailureCheckRunner
@@ -47,14 +48,14 @@ def make_model(case: str, size: int) -> onnx.ModelProto:
             helper.make_tensor(f"unused_{i:04d}", TensorProto.FLOAT, [1], [1.0])
             for i in range(size)
         ]
-    elif case in {"chain", "missing-shape"}:
+    elif case in {"chain", "missing-shape", "preparation"}:
         previous = "x"
         for i in range(size):
             name = "y" if i == size - 1 else f"v{i}"
             nodes.append(
                 helper.make_node("Relu" if i == size // 2 else "Identity", [previous], [name])
             )
-            if name != "y" and case != "missing-shape":
+            if name != "y" and case == "chain":
                 infos.append(value(name))
             previous = name
     else:
@@ -91,6 +92,31 @@ class ReluCheck:
         )
 
 
+class NodeCountCheck:
+    """Synthetic threshold failure: every node must remain for the bug to reproduce."""
+
+    def __init__(self, size):
+        self.size = size
+
+    def run(self, path):
+        return (
+            FailureCheckResult.INTERESTING
+            if len(onnx.load(path).graph.node) == self.size
+            else FailureCheckResult.NOT_INTERESTING
+        )
+
+
+class RepeatedDeletionPass:
+    name = "repeated_deletion"
+
+    def generate(self, model):
+        for index in range(model.node_count):
+            yield Candidate((DeleteNodes((index,)),))
+            # Different edit, identical content, then an identical edit.
+            yield Candidate((DeleteNodes((index, index)),))
+            yield Candidate((DeleteNodes((index,)),))
+
+
 def worker(args):
     destination = args.output.resolve()
     destination.mkdir(parents=True, exist_ok=True)
@@ -108,15 +134,17 @@ def worker(args):
         proto = make_model(args.case, args.size)
         onnx.checker.check_model(proto, full_check=True)
         model = OnnxModel.from_proto(proto)
-        runner = ReluCheck()
+        runner = NodeCountCheck(args.size) if args.case == "preparation" else ReluCheck()
     config = EngineConfig(
+        cache_enabled=not args.no_cache,
         collect_performance=not args.no_performance,
         max_candidate_check_calls=args.candidate_budget if args.budget == "calls" else None,
         time_budget_seconds=args.time_budget if args.budget == "time" else None,
         signature_regex=args.signature_regex,
     )
     started = time.perf_counter()
-    _, report = ReductionEngine(config=config).run(
+    passes = [RepeatedDeletionPass()] if args.case == "preparation" else None
+    _, report = ReductionEngine(passes, config=config).run(
         model,
         runner,
         destination / "work",
@@ -141,13 +169,18 @@ def worker(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--case", choices=(*CASES, "backend", "all"), default="initializers")
+    parser.add_argument(
+        "--case", choices=(*CASES, "preparation", "backend", "all"), default="initializers"
+    )
     parser.add_argument("--size", type=int, default=512)
     parser.add_argument("--repeat", type=int, default=3)
     parser.add_argument("--budget", choices=("calls", "time", "both"), default="both")
     parser.add_argument("--candidate-budget", type=int, default=600)
     parser.add_argument("--time-budget", type=float, default=5.0)
     parser.add_argument("--compare-instrumentation", action="store_true")
+    parser.add_argument(
+        "--no-cache", action="store_true", help="disable preparation/verdict caches"
+    )
     parser.add_argument("--output", type=Path, default=ROOT / "output" / "performance")
     parser.add_argument(
         "--model", type=Path, help="real backend reproducer, used with --case backend"
@@ -208,6 +241,8 @@ def main():
                     ]
                     if not enabled:
                         command.append("--no-performance")
+                    if args.no_cache:
+                        command.append("--no-cache")
                     if args.model:
                         command += [
                             "--model",

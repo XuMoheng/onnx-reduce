@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from onnx_reduce.failure_check.contract import FailureCheckResult
 from onnx_reduce.failure_check.runner import FailureCheckObservation, FailureCheckRunnable
-from onnx_reduce.performance import count, measure
+from onnx_reduce.performance import measure
+from onnx_reduce.preparation import MetadataCache, metadata_key
 from onnx_reduce.storage import write_text
 
 
@@ -18,6 +20,7 @@ class Evaluation:
     outcome: FailureCheckResult
     cache_hit: bool = False
     target_identity_mismatch: bool = False
+    model_path: Path | None = None
 
 
 class EvaluationBudgetExceeded(RuntimeError):
@@ -77,7 +80,7 @@ class Evaluator:
         self.workdir.mkdir(parents=True, exist_ok=True)
         self.cache_enabled = cache_enabled
         self.matcher = TargetMatcher(target_mode, signature_regex)
-        self.cache: dict[str, Evaluation] = {}
+        self.cache = MetadataCache("content", enabled=cache_enabled)
         self.calls = 0
         self.cache_hits = 0
 
@@ -90,18 +93,28 @@ class Evaluator:
         mandatory: bool = False,
         metadata: dict | None = None,
         allow_execution: bool = True,
+        prepare: Callable[[], None] | None = None,
     ) -> Evaluation:
-        if not mandatory and self.cache_enabled and digest in self.cache:
-            cached = self.cache[digest]
-            result = Evaluation(cached.outcome, True, cached.target_identity_mismatch)
-            self.cache_hits += 1
-            count("content_cache_hits")
-            self._record(path, digest, result, None, metadata)
-            return result
+        key = metadata_key("content", digest)
         if not mandatory:
-            count("content_cache_misses" if self.cache_enabled else "content_cache_disabled")
+            cached = self.cache.get(key)
+            if cached is not None:
+                entry = json.loads(cached)
+                return self.reuse(
+                    Path(entry["model"]),
+                    digest,
+                    Evaluation(
+                        FailureCheckResult(entry["outcome"]),
+                        target_identity_mismatch=entry["target_identity_mismatch"],
+                    ),
+                    metadata=metadata,
+                    source="content",
+                )
         if not mandatory and not allow_execution:
             raise EvaluationBudgetExceeded("candidate failure check call budget exhausted")
+        # Preparation is lazy: hits and exhausted call quotas need no model file.
+        if prepare is not None:
+            prepare()
         self.calls += 1
         observe = getattr(self.failure_check_runner, "observe", None)
         with measure("external_check"):
@@ -110,17 +123,34 @@ class Evaluator:
                 if observe is not None
                 else FailureCheckObservation(self.failure_check_runner.run(path))
             )
-        result = self.matcher.match(observation, initial=initial)
+        result = replace(self.matcher.match(observation, initial=initial), model_path=path)
         logs = self.workdir / "checks" / f"{self.calls:08d}"
         logs.mkdir(parents=True)
         write_text(logs / "stdout.log", observation.stdout)
         write_text(logs / "stderr.log", observation.stderr)
         self._record(path, digest, result, observation, metadata)
         if self.cache_enabled and result.outcome is not FailureCheckResult.INCONCLUSIVE:
-            self.cache[digest] = result
+            self.cache.put(
+                key,
+                json.dumps(
+                    {
+                        "model": str(path),
+                        "outcome": result.outcome.value,
+                        "target_identity_mismatch": result.target_identity_mismatch,
+                    }
+                ).encode(),
+            )
         return result
 
-    def _record(self, path, digest, result, observation, metadata):
+    def reuse(self, path, digest, result, *, metadata=None, source="edit") -> Evaluation:
+        """Record a cached verdict against its existing artifact and this attempt's edits."""
+
+        result = replace(result, cache_hit=True, model_path=path)
+        self.cache_hits += 1
+        self._record(path, digest, result, None, metadata, cache_source=source)
+        return result
+
+    def _record(self, path, digest, result, observation, metadata, *, cache_source=None):
         record = {
             "model": str(path),
             "digest": digest,
@@ -129,6 +159,8 @@ class Evaluator:
             "target_identity_mismatch": result.target_identity_mismatch,
             "candidate": metadata,
         }
+        if cache_source is not None:
+            record["cache_source"] = cache_source
         if observation is not None:
             record["observation"] = {
                 "outcome": observation.outcome.value,

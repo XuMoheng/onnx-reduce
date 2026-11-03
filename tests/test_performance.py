@@ -100,7 +100,8 @@ def test_cache_and_rejections_are_measured_without_extra_checks(tmp_path):
     counters = report.performance.counters
     assert counters["candidate_status.edit_failed"] == 1
     assert counters["candidate_status.not_cheaper"] == 1
-    assert counters["content_cache_hits"] == 1
+    assert counters["edit_cache_hits"] == 1
+    assert counters["content_cache_hits"] == 0
     assert report.failure_check_calls == 3  # initial, one candidate, final
     assert report.performance.samples["candidate_selected_items"]["count"] == 4
 

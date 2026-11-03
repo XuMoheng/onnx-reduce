@@ -134,7 +134,7 @@ uv run --locked onnx-reduce cases/original.onnx \
 | `--inconclusive-code CODE` | `125`；可重复，显式指定后替换默认集合；范围 1–255 |
 | `--no-crash-interesting` | 默认信号终止视为复现；使用此选项后视为未复现 |
 | `--timeout-interesting` | 默认超时无法判定；使用此选项后视为复现 |
-| `--no-cache` | 默认启用单次运行内的内容判定缓存；使用此选项关闭 |
+| `--no-cache` | 默认启用单次运行内的编辑、shape 摘要与内容判定缓存；使用此选项全部关闭 |
 | `--work-dir DIR` | `OUTPUT.work`；日志和 checkpoint 的根目录，每次创建独立 `run-*` |
 | `-v, --verbose` | 默认 INFO；开启 DEBUG 日志 |
 
