@@ -25,6 +25,7 @@ from onnx_reduce.edits import (
     DropInputs,
     DropNodeAttribute,
     DropOutputs,
+    ResizeOperator,
     ShrinkDimension,
 )
 from onnx_reduce.performance import count, measured
@@ -460,12 +461,23 @@ class OnnxModel(SnapshotModel):
                 result._drop_initializers(edit.names)
             elif isinstance(
                 edit,
-                (BypassNode, DropNodeAttribute, ShrinkDimension, DeleteSubgraphNodes, CleanupGraph),
+                (
+                    BypassNode,
+                    DropNodeAttribute,
+                    ShrinkDimension,
+                    ResizeOperator,
+                    DeleteSubgraphNodes,
+                    CleanupGraph,
+                ),
             ):
                 from onnx_reduce.rewrites import apply_rewrite
 
                 proto = result.to_proto()
-                if isinstance(edit, ShrinkDimension):
+                if isinstance(edit, ResizeOperator):
+                    from onnx_reduce.local_tensors import resize_operator
+
+                    resize_operator(proto, edit)
+                elif isinstance(edit, ShrinkDimension):
                     from onnx_reduce.tensors import shrink_dimension
 
                     shrink_dimension(proto, edit.old, edit.new)
@@ -499,8 +511,10 @@ class OnnxModel(SnapshotModel):
         from onnx_reduce.rewrites import rewrite_candidates
 
         if kind == "tensors":
+            from onnx_reduce.local_tensors import local_tensor_candidates
             from onnx_reduce.tensors import tensor_candidates
 
+            yield from local_tensor_candidates(self._snapshot)
             yield from tensor_candidates(self._snapshot)
         elif kind == "subgraphs":
             from onnx_reduce.graphs import subgraph_candidates

@@ -58,6 +58,14 @@ class ShrinkDimension:
 
 
 @dataclass(frozen=True)
+class ResizeOperator:
+    index: int
+    kind: str
+    new: int
+    graph_path: tuple[tuple[int, str, int], ...] = ()
+
+
+@dataclass(frozen=True)
 class DeleteSubgraphNodes:
     graph_path: tuple[tuple[int, str, int], ...]
     indices: tuple[int, ...]
@@ -76,6 +84,7 @@ Edit = (
     | BypassNode
     | DropNodeAttribute
     | ShrinkDimension
+    | ResizeOperator
     | DeleteSubgraphNodes
     | CleanupGraph
 )
