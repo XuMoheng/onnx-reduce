@@ -15,7 +15,8 @@ from onnx_reduce.failure_check.contract import FailureCheckResult as F
 from onnx_reduce.failure_check.runner import FailureCheckError
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.passes.delete_nodes import DeleteNodesPass
-from onnx_reduce.scheduler import CandidateFeedback, StatefulScheduler
+from onnx_reduce.search.stateful import StatefulScheduler
+from onnx_reduce.search.types import CandidateFeedback
 from tests.helpers import chain_model, tensor_value
 from tests.test_engine import ReluFailureCheck
 from tests.test_reliability import Always, two_outputs
@@ -477,20 +478,11 @@ def test_feedback_distinguishes_preparation_and_cache_branches(tmp_path, monkeyp
                     yield Candidate(()) if edit is None else Candidate((edit,))
             yield Candidate((DeleteNodes((2, 2)),))
 
-    class RecordingEngine(ReductionEngine):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.feedback = []
-
-        def _try_candidate(self, *args, **kwargs):
-            result = super()._try_candidate(*args, **kwargs)
-            self.feedback.append(result.feedback)
-            return result
-
     monkeypatch.setattr(OnnxModel, "_infer_type_summary", lambda self: b"")
-    engine = RecordingEngine([Rejections()])
+    engine = ReductionEngine([Rejections()])
     _, report = engine.run(OnnxModel.from_proto(chain_model(3, 1)), RejectCandidates(), tmp_path)
-    assert [feedback.status for feedback in engine.feedback] == [
+    feedback = rows(report)
+    assert [item["status"] for item in feedback] == [
         "edit_failed",
         "edit_failed",
         "not_cheaper",
@@ -501,7 +493,7 @@ def test_feedback_distinguishes_preparation_and_cache_branches(tmp_path, monkeyp
         "not_interesting",
         "not_interesting",
     ]
-    assert [feedback.cache_source for feedback in engine.feedback] == [
+    assert [item["cache_source"] for item in feedback] == [
         None,
         "edit",
         None,
@@ -512,5 +504,5 @@ def test_feedback_distinguishes_preparation_and_cache_branches(tmp_path, monkeyp
         "edit",
         "content",
     ]
-    assert sum(feedback.failure_check_calls for feedback in engine.feedback) == 1
+    assert sum(item["failure_check_calls"] for item in feedback) == 1
     assert report.failure_check_calls == 3

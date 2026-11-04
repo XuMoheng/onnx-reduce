@@ -10,7 +10,8 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from onnx_reduce import __version__
-from onnx_reduce.engine import EngineConfig, ReductionEngine, ReductionError
+from onnx_reduce.config import EngineConfig
+from onnx_reduce.engine import ReductionEngine, ReductionError
 from onnx_reduce.failure_check.contract import make_failure_check_config
 from onnx_reduce.failure_check.runner import FailureCheckError, FailureCheckRunner
 from onnx_reduce.model import OnnxModel

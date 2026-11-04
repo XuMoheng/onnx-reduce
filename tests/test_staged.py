@@ -16,12 +16,12 @@ from onnx_reduce.engine import EngineConfig, InitialNotInteresting, ReductionEng
 from onnx_reduce.failure_check.contract import FailureCheckConfig
 from onnx_reduce.failure_check.contract import FailureCheckResult as F
 from onnx_reduce.failure_check.runner import FailureCheckObservation
-from onnx_reduce.finalizer import Finalizer
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.passes import default_passes
 from onnx_reduce.passes.delete_nodes import DeleteNodesPass
-from onnx_reduce.search_types import CandidateFeedback
-from onnx_reduce.staged import StagedScheduler
+from onnx_reduce.search.coverage import Finalizer
+from onnx_reduce.search.staged import StagedScheduler
+from onnx_reduce.search.types import CandidateFeedback
 from tests.helpers import chain_model, tensor_value
 from tests.test_engine import ReluFailureCheck
 from tests.test_scheduler import CountCheck, rows
@@ -428,8 +428,8 @@ def test_fault_shapes_remain_preserved_in_complete_goal(tmp_path, cache, conditi
 
 @pytest.mark.parametrize("max_seen", [0, 1, 4096])
 def test_finalizer_dedup_eviction_cannot_skip_distinct_edits_or_prevent_termination(max_seen):
-    from onnx_reduce.finalizer import iter_coverage
     from onnx_reduce.preparation import edit_key
+    from onnx_reduce.search.coverage import iter_coverage
 
     model = OnnxModel.from_proto(chain_model(8, 4))
     passes = default_passes()

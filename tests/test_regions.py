@@ -6,11 +6,11 @@ import pytest
 from onnx import TensorProto, helper
 
 from onnx_reduce.edits import Candidate, DeleteNodes
-from onnx_reduce.finalizer import iter_coverage
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.passes.delete_nodes import DeleteNodesPass
 from onnx_reduce.performance import collect_performance
-from onnx_reduce.regions import NodeRegion, graph_regions
+from onnx_reduce.search.coverage import iter_coverage
+from onnx_reduce.search.regions import NodeRegion, graph_regions
 from tests.helpers import chain_model, tensor_value
 
 

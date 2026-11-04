@@ -17,7 +17,8 @@ sys.path.insert(0, str(ROOT / "src"))
 import onnx
 
 from benchmarks.quality_cases import SimulatedFailure, quality_cases
-from onnx_reduce.engine import EngineConfig, ReductionEngine
+from onnx_reduce.config import EngineConfig
+from onnx_reduce.engine import ReductionEngine
 from onnx_reduce.failure_check.contract import FailureCheckResult, make_failure_check_config
 from onnx_reduce.failure_check.runner import FailureCheckRunner
 from onnx_reduce.model import OnnxModel

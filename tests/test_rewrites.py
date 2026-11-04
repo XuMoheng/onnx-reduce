@@ -207,8 +207,8 @@ def test_type_incompatible_bypass_fails_validation():
 
 
 def test_independent_finalizer_includes_rewrites():
-    from onnx_reduce.finalizer import Finalizer
     from onnx_reduce.passes import default_passes
+    from onnx_reduce.search.coverage import Finalizer
 
     model = make_model([helper.make_node("LeakyRelu", ["x"], ["y"], alpha=0.2)])
     finalizer = Finalizer(default_passes(), model)

@@ -23,8 +23,9 @@ import onnx
 import onnxscript
 from onnx import TensorProto, helper
 
+from onnx_reduce.config import EngineConfig
 from onnx_reduce.edits import Candidate, DeleteNodes
-from onnx_reduce.engine import EngineConfig, ReductionEngine
+from onnx_reduce.engine import ReductionEngine
 from onnx_reduce.failure_check.contract import FailureCheckResult, make_failure_check_config
 from onnx_reduce.failure_check.runner import FailureCheckRunner
 from onnx_reduce.model import OnnxModel

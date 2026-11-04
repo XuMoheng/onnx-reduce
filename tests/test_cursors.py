@@ -7,15 +7,15 @@ from pathlib import Path
 import onnx
 import pytest
 
-from onnx_reduce.cursors import RejectionOrder, RemovalCursor, history_key
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers
 from onnx_reduce.engine import EngineConfig, ReductionEngine
 from onnx_reduce.failure_check.contract import FailureCheckResult as F
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.passes.base import RemovalGroup
 from onnx_reduce.passes.delete_nodes import DeleteNodesPass
-from onnx_reduce.search_types import CandidateFeedback, ScheduledAttempt
-from onnx_reduce.staged import StagedScheduler
+from onnx_reduce.search.cursors import RejectionOrder, RemovalCursor, history_key
+from onnx_reduce.search.staged import StagedScheduler
+from onnx_reduce.search.types import CandidateFeedback, ScheduledAttempt
 from tests.helpers import chain_model
 from tests.test_engine import ReluFailureCheck
 

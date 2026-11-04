@@ -11,8 +11,8 @@ from onnx_reduce.passes.base import NodeSearchPass, ReductionPass
 from onnx_reduce.passes.delete_nodes import _granularities
 from onnx_reduce.performance import measured, timed_candidates
 from onnx_reduce.preparation import edit_key
-from onnx_reduce.regions import NodeRegion, graph_regions, region_choices
-from onnx_reduce.search_types import NODE_SCOPE, PASS_SCOPE, CoverageSummary, ScheduledAttempt
+from onnx_reduce.search.regions import NodeRegion, graph_regions, region_choices
+from onnx_reduce.search.types import NODE_SCOPE, PASS_SCOPE, CoverageSummary, ScheduledAttempt
 from onnx_reduce.types import ModelAdapter, NodeSearchModel
 
 REGION_SCOPE = NODE_SCOPE + " and module, chain and topology region delete/keep candidates (v1)"

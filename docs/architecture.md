@@ -9,37 +9,82 @@
 
 ```text
 src/onnx_reduce/
-├── __main__.py          # python -m onnx_reduce 入口，调用 CLI
-├── cli.py               # 参数解析、配置与判定器创建、输入加载、CLI 退出码
-├── engine.py            # 初检、候选搜索、预算、接受决策、checkpoint 与最终复检
-├── scheduler.py         # legacy / stateful 调度、结构化反馈与当前版本覆盖记账
-├── staged.py            # 实验性的 coarse / regions / fine / deep 阶段与清理机会
-├── finalizer.py         # 覆盖候选枚举、独立收尾与版本失效
-├── regions.py           # 模块、无分叉链与拓扑区域，边界排序
-├── search_types.py      # 调度记录、反馈和覆盖摘要
-├── resume.py            # 跨运行恢复目标身份与核对配置
-├── types.py             # ModelAdapter 协议、字典序成本、校验结果与落盘产物
-├── edits.py             # 候选及有序编辑：删除节点、输出、输入或权重
-├── model.py             # IR / 只读 protobuf 快照、校验、序列化与摘要
+├── __main__.py          # python -m onnx_reduce 入口
+├── cli.py               # 参数解析、模型与判定器创建、CLI 退出码
+├── config.py            # EngineConfig 与参数组合校验
+├── engine.py            # 初检、搜索循环、接受模型、覆盖核验与最终复检的编排
+├── runtime/             # 一次运行的执行与证据
+│   ├── candidate.py     # 单个候选的缓存查询、编辑、成本比较、校验与判定
+│   ├── budget.py        # 软时间预算和候选实际判定次数配额
+│   ├── reporting.py     # 候选、调度、接受记录及报告计数，不写执行缓存
+│   ├── artifacts.py     # 已接受模型的 checkpoint 与清单
+│   └── resume.py        # 跨运行目标身份恢复与配置核对
+├── search/              # 候选选择；不执行编辑、故障判定或 checkpoint 写入
+│   ├── base.py          # Scheduler 协议
+│   ├── types.py         # 候选反馈、调度记录、覆盖摘要
+│   ├── state.py         # 共享版本、覆盖记账与统计，不包含选择策略
+│   ├── legacy.py        # 固定 pass 顺序，接受后重启
+│   ├── stateful.py      # 有状态分区、尺度复用与轮转
+│   ├── staged.py        # coarse / regions / fine / deep 阶段与清理机会
+│   ├── coverage.py      # 确定性覆盖枚举、独立 Finalizer 与版本失效
+│   ├── regions.py       # 模块、无分叉链与拓扑区域
+│   └── cursors.py       # 稳定身份游标与有界历史排序
+├── types.py             # 模型协议、成本、校验结果、落盘产物与图摘要
+├── edits.py             # 候选及有序编辑的数据描述
+├── model.py             # ONNX IR 适配器、查询、编辑、校验与序列化
 ├── snapshot.py          # 保守的 protobuf 删除与平坦图查询
-├── cursors.py           # stable ID / 资源名游标、有界历史排序
-├── passes/              # 按确定顺序生成候选，不自行决定是否接受
-│   ├── __init__.py      # 注册内置 pass，定义默认执行顺序
-│   ├── base.py          # ReductionPass 协议
-│   ├── drop_outputs.py  # 裁剪主图输出
-│   ├── remove_unused.py # 清理无用节点、输入与权重的候选
-│   ├── delete_nodes.py  # 删除连续节点块的候选
-│   └── rewrite.py       # 节点旁路和可选属性删除
-├── rewrites.py          # ONNX schema 查询、连接重写和子图捕获处理
+├── passes/              # 内置候选生成规则和默认执行顺序
+│   ├── base.py          # pass 协议及可选节点、游标、阶段能力
+│   ├── drop_outputs.py
+│   ├── remove_unused.py
+│   ├── delete_nodes.py
+│   ├── rewrite.py       # 旁路、属性、张量和子图候选入口
+│   ├── combinations.py  # 有界复合候选
+│   └── groups.py        # 资源分组规则
+├── rewrites.py          # schema 查询、连接重写与子图捕获处理
+├── graphs.py            # 子图定位、候选生成与清理编辑
+├── tensors.py           # 张量成本、全局维度候选与修改
+├── local_tensors.py     # 带算子约束的局部张量轴缩减
 ├── failure_check/
-│   ├── contract.py      # 判定配置、退出码到三态结果的转换
-│   ├── runner.py        # 判定进程执行、超时清理、日志与结束方式收集
-│   └── evaluator.py     # 基线身份与签名匹配、单次运行缓存、判定证据
-├── performance.py       # 可选的运行内阶段计时、规模和资源统计
-├── preparation.py       # 有容量边界的运行内编辑与 shape 摘要缓存
+│   ├── contract.py      # 判定配置、退出码与三态结果
+│   ├── runner.py        # 进程执行、超时清理与原始观察
+│   └── evaluator.py     # 故障身份匹配、内容缓存与判定证据
+├── performance.py       # 可选的运行内计时、规模和资源统计
+├── preparation.py       # 有容量边界的元数据缓存及模型准备上下文
 ├── report.py            # 统计项与 JSON schema version 7
-└── storage.py           # 同目录临时文件与原子替换写入
+└── storage.py           # 临时文件、原子替换与 checkpoint 文件复用
 ```
+
+## 模块职责与修改入口
+
+CLI 负责组装配置和输入；engine 编排任务生命周期。engine 将当前模型交给 scheduler
+选择候选，再交给 `CandidateExecutor.execute()` 执行。执行器返回 `AttemptResult`，
+engine 把反馈交回 scheduler，并在接受后切换当前模型、保存 checkpoint。
+
+三种 scheduler 独立实现 `search/base.py` 中的协议，不互相继承。每个策略组合一个
+`SearchState`，共享模型版本、候选绑定、覆盖状态与统计。策略自行决定接受后的游标
+和阶段变化；`SearchState` 不选择下一候选。staged 的最终覆盖状态由独立 Finalizer 提供。
+
+候选执行器显式接收本次运行的缓存、预算、判定器和报告。确定性拒绝的缓存写入
+属于执行器；`runtime/reporting.py` 仅写证据、更新观察统计，停用候选日志不会改变
+缓存命中和判定调用次数。模型准备仍使用运行内上下文，以便现有 shape、校验及编辑
+后端共享设置；这部分与模型表示、编辑实现的拆分属于后续重构范围。
+
+| 修改需求 | 主要入口 |
+|---|---|
+| 新增缩减候选 | `passes/`，以及相应模型查询、编辑实现 |
+| 调整候选顺序、阶段或游标 | `search/` 中对应策略 |
+| 调整接受条件或候选缓存 | `runtime/candidate.py` |
+| 调整预算 | `runtime/budget.py` |
+| 调整日志与计数 | `runtime/reporting.py`、`report.py` |
+| 调整 checkpoint 或跨运行核对 | `runtime/artifacts.py`、`runtime/resume.py` |
+| 调整后端进程或故障匹配 | `failure_check/runner.py`、`failure_check/evaluator.py` |
+
+`EngineConfig` 的定义位于 `config.py`。原有
+`from onnx_reduce.engine import EngineConfig` 入口继续可用，命令行参数、默认值、
+任务配置和报告字段保持兼容。旧的根级搜索模块已迁移到 `search/`，仓库内部导入
+直接使用新路径。历史批次设计和性能证据记录当时的实现；当前源码位置以本文为准。
+
 
 ## 一次缩减的流程
 
@@ -47,7 +92,7 @@ src/onnx_reduce/
 2. 按选定策略校验原模型，在 `initial/model.onnx` 上执行强制初检。
    只有判为 `interesting` 才建立基线身份并写首次 checkpoint，否则报错退出。
 3. 由所选 scheduler 返回下一候选；engine 分配序号并绑定、核对当前模型的内容摘要。
-4. 先查询同基准、同编辑序列的准备缓存；未命中时在模型副本上应用编辑，检查成本是否严格降低，再校验合法性。
+4. 候选执行器先查询同基准、同编辑序列的准备缓存；未命中时在模型副本上应用编辑，检查成本是否严格降低，再校验合法性。
    编辑失败、成本未降低、校验失败均记录决策，不执行后端判定。
 5. 对合法候选先查询内容判定缓存；未命中且有调用预算时才落盘，检查时间预算并执行实际判定。
    只有匹配目标故障的 `interesting` 候选会被接受。
@@ -81,18 +126,18 @@ src/onnx_reduce/
 旁路会更新消费者、图输出及嵌套子图中的外层捕获引用。替换来源在子图中被局部定义遮蔽、
 或替换导致重复图输出时拒绝编辑；类型不匹配由候选校验拒绝。旁路及属性删除都可能改变
 计算语义，每个候选仍须成本严格下降、通过模型校验并保留目标故障。
-新增 pass 默认启用，随接受后重扫；staged complete 的独立最终扫描也包含这两类候选。
+内置 pass 默认启用，接受后按调度策略重新访问；staged complete 的独立最终扫描包含全部配置 pass。
 这扩展了固定点的范围，仍不证明任意节点组合或任意 ONNX 模型中的全局最小。
 
 删除节点时，仍被删除区域之外使用、或仍是图输出的边界值会被替换为新图输入。
 工具先尝试推断缺失的类型和形状；推断失败不会终止整轮搜索，后续校验会决定候选能否继续。
 同一基准摘要共享推导结果或失败摘要；只缓存主图值的名字、类型和形状。复合编辑中的后续
 推导针对前序编辑后的图，每次编辑后清除中间快照，避免把旧推导或旧字节用于新图。
-删除含属性子图的主图节点时，会清理随之移除的嵌套节点引用，但不会独立搜索子图内部编辑。
+删除含属性子图的主图节点时，会清理随之移除的嵌套节点引用；子图内部候选由 `reduce_subgraphs` 单独提供。
 
 ## 搜索调度与节点身份
 
-`EngineConfig.scheduler` / `--scheduler` 默认为 `legacy`。两种调度器共用候选执行路径，
+`EngineConfig.scheduler` / `--scheduler` 默认为 `legacy`。三种调度器共用候选执行路径，
 不执行编辑或判定，不决定接受条件，也不写 checkpoint。反馈区分编辑失败、成本未下降、
 校验失败、未复现、无法判定和接受，同时提供缓存来源、实际调用数及完整成本。
 

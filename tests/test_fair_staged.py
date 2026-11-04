@@ -2,8 +2,8 @@
 
 from onnx_reduce.edits import Candidate, DeleteNodes
 from onnx_reduce.model import OnnxModel
-from onnx_reduce.search_types import CandidateFeedback
-from onnx_reduce.staged import StagedScheduler
+from onnx_reduce.search.staged import StagedScheduler
+from onnx_reduce.search.types import CandidateFeedback
 from tests.helpers import chain_model
 
 

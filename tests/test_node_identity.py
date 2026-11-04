@@ -8,7 +8,7 @@ from onnxscript import ir
 
 from onnx_reduce.edits import Candidate, DeleteNodes, DropInputs, DropOutputs
 from onnx_reduce.model import OnnxModel
-from onnx_reduce.scheduler import NodeRegion
+from onnx_reduce.search.regions import NodeRegion
 from tests.helpers import chain_model, control_flow_model, tensor_value
 
 
