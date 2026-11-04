@@ -1,12 +1,102 @@
-"""Bounded atomic paths; intermediate edits need not lower cost or reproduce.
+"""Bounded atomic paths, balanced across depths, topology and edit families."""
 
-Only the final model is checked and accepted. Enumeration bounds are explicit,
-so fixed point claims cover this finite set, never all possible combinations.
-"""
+from collections import deque
+from itertools import combinations, islice
 
-from itertools import combinations, islice, product
+from onnx_reduce.edits import Candidate, CleanupGraph, DeleteNodes
 
-from onnx_reduce.edits import BypassNode, Candidate, CleanupGraph, DeleteNodes
+
+def interleave(streams):
+    """Deterministic round robin, including streams that happen to be empty."""
+    pending = deque(iter(stream) for stream in streams)
+    while pending:
+        stream = pending.popleft()
+        item = next(stream, None)
+        if item is not None:
+            yield item
+            pending.append(stream)
+
+
+def spread_indices(count):
+    """Visit both ends before progressively filling gaps throughout the graph."""
+    if not count:
+        return
+    yield 0
+    if count == 1:
+        return
+    yield count - 1
+    pending = deque([(1, count - 2)])
+    while pending:
+        lo, hi = pending.popleft()
+        if lo > hi:
+            continue
+        mid = (lo + hi) // 2
+        yield mid
+        pending.extend(((lo, mid - 1), (mid + 1, hi)))
+
+
+def balanced_groups(count, size, limit, related=()):
+    """Bounded topology hints mixed with dispersed, reproducible exploration.
+
+    No finite prefix covers all combinations. Each depth gets its own stream;
+    an O(limit * size) exploration avoids scanning C(n, k) rejected prefixes.
+    """
+    if count < size or not limit:
+        return
+
+    def explore():
+        anchors = tuple(spread_indices(count))
+        distances = tuple(dict.fromkeys((1, 2, max(1, count // 2), max(1, count // 3))))
+        for distance in distances:
+            for anchor in anchors:
+                group = tuple(sorted({(anchor - distance * i) % count for i in range(size)}))
+                if len(group) == size:
+                    yield group
+        # Small graphs can afford a complete fallback; large graphs remain bounded.
+        yield from islice(combinations(anchors, size), limit)
+
+    hints = (tuple(sorted(group)) for group in related if len(group) == size)
+    seen = set()
+    for group in islice(interleave((hints, explore())), 2 * limit):
+        if group not in seen:
+            seen.add(group)
+            yield group
+            if len(seen) == limit:
+                return
+
+
+def topology_groups(model, depth, limit):
+    if not hasattr(model, "region_graph"):
+        return ()
+    graph = model.region_graph()
+    positions = model.id_to_index
+    groups = []
+    for value in (graph.values[i] for i in spread_indices(len(graph.values))):
+        ids = tuple(
+            dict.fromkeys((() if value.producer is None else (value.producer,)) + value.consumers)
+        )
+        indices = tuple(positions[item] for item in ids if item in positions)
+        for size in range(2, depth + 1):
+            groups.extend(islice(combinations(indices, size), 2))
+        if len(groups) >= limit:
+            break
+    # Spread hints too: an early high-degree region must not consume the pool.
+    return tuple(groups[i] for i in islice(spread_indices(len(groups)), limit))
+
+
+def dispersed_pool(stream, limit):
+    items = list(stream)
+    return tuple(items[i] for i in islice(spread_indices(len(items)), limit))
+
+
+def balanced_product(left, right, limit):
+    """Diagonals diversify both partners instead of fixing the first left item."""
+    if not left or not right:
+        return
+    order = tuple(spread_indices(len(right)))
+    for offset in range(min(len(right), limit)):
+        for index, item in enumerate(left):
+            yield item, right[order[(index + offset) % len(right)]]
 
 
 class CombinationsPass:
@@ -20,49 +110,45 @@ class CombinationsPass:
         if self.depth < 2 or not self.limit or not hasattr(model, "rewrite_candidates"):
             return
         count = model.node_count
-        # Include noncontiguous deletions even when every singleton fails.
-        deletions = (
+        related = topology_groups(model, self.depth, self.limit)
+        groups = interleave(
+            balanced_groups(count, size, self.limit, related) for size in range(2, self.depth + 1)
+        )
+        yield from (
             Candidate((DeleteNodes(indices), CleanupGraph()))
-            for size in range(2, self.depth + 1)
-            for indices in combinations(range(count), size)
+            for indices in islice(groups, self.limit)
         )
-        yield from islice(deletions, self.limit)
-        # Descending indices keep all original addresses valid when nodes vanish.
-        edits = list(islice((c.edits[0] for c in model.rewrite_candidates("bypass")), self.limit))
+        edits = dispersed_pool((c.edits[0] for c in model.rewrite_candidates("bypass")), self.limit)
 
-        def paths():
-            for size in range(2, self.depth + 1):
-                for group in islice(combinations(edits, size), self.limit):
-                    if len({e.index for e in group}) == size:
-                        yield Candidate((*sorted(group, key=lambda e: -e.index), CleanupGraph()))
+        def paths(size):
+            for indices in balanced_groups(len(edits), size, self.limit):
+                group = tuple(edits[i] for i in indices)
+                if len({e.index for e in group}) == size:
+                    yield Candidate((*sorted(group, key=lambda e: -e.index), CleanupGraph()))
 
-        yield from islice(paths(), self.limit)
-        # Attribute simplification or shape shrinking may only preserve the
-        # failure when paired with bypass. Rebind after removal by editing first.
-        partners = list(
-            islice(
-                (
-                    c.edits[0]
-                    for kind in ("attributes", "tensors")
-                    for c in model.rewrite_candidates(kind)
-                ),
-                self.limit,
-            )
-        )
+        yield from islice(interleave(paths(size) for size in range(2, self.depth + 1)), self.limit)
+        pools = [
+            dispersed_pool((c.edits[0] for c in model.rewrite_candidates(kind)), self.limit)
+            for kind in ("attributes", "tensors")
+        ]
         yield from islice(
-            (
-                Candidate((partner, bypass, CleanupGraph()))
-                for partner, bypass in product(partners, edits)
-                if isinstance(bypass, BypassNode)
+            interleave(
+                (
+                    Candidate((partner, bypass, CleanupGraph()))
+                    for partner, bypass in balanced_product(pool, edits, self.limit)
+                )
+                for pool in pools
             ),
             self.limit,
         )
-        # Shrinking and deleting are one transaction when a standalone resize
-        # creates a temporary incompatible operator contract.
+        nodes = tuple(spread_indices(count))
         yield from islice(
-            (
-                Candidate((partner, DeleteNodes((index,)), CleanupGraph()))
-                for partner, index in product(partners, range(count))
+            interleave(
+                (
+                    Candidate((partner, DeleteNodes((index,)), CleanupGraph()))
+                    for partner, index in balanced_product(pool, nodes, self.limit)
+                )
+                for pool in pools
             ),
             self.limit,
         )
