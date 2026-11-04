@@ -1,7 +1,8 @@
-"""Coarse, region and fine search followed by an independent optional finalizer."""
+"""Fair coarse, region, fine and deep search followed by independent finalization."""
 
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import asdict, replace
 
 from onnx_reduce.cursors import RejectionOrder, RemovalCursor
@@ -17,7 +18,9 @@ from onnx_reduce.types import NodeSearchModel
 
 class StagedScheduler(LegacyScheduler):
     name = "staged"
-    stages = ("coarse", "regions", "fine")
+    stages = ("coarse", "regions", "fine", "deep")
+    pass_quantum = 8
+    deep_no_progress_limit = 256
     no_progress_limit = 64
     cleanup_quantum = 2
 
@@ -53,7 +56,13 @@ class StagedScheduler(LegacyScheduler):
         if self._node_passes and not isinstance(model, NodeSearchModel):
             raise ValueError("staged node search requires node_ids and id_to_index on the model")
         self.scope = REGION_SCOPE if self._node_passes else PASS_SCOPE
-        self._stage_index = 3 if finalize_only else 0
+        self._stage_index = len(self.stages) if finalize_only else 0
+        self._turn_pass = 0
+        self._turn_used = 0
+        self._turn_budget = None
+        self._pass_history = {}
+        self._pass_failures = {}
+        self._pass_states = {}
         self._iterator = None
         self._cleanup_iterator = None
         self._cleanup_used = 0
@@ -67,47 +76,120 @@ class StagedScheduler(LegacyScheduler):
 
     @property
     def stage(self):
-        return self.stages[self._stage_index] if self._stage_index < 3 else "finalization"
+        return (
+            self.stages[self._stage_index]
+            if self._stage_index < len(self.stages)
+            else "finalization"
+        )
 
-    def _pass_candidates(self, model, stage):
-        indices = list(range(len(self.passes)))
-        if stage == "coarse" and self.search_policy == "cursor":
-            indices = indices[self._coarse_start :] + indices[: self._coarse_start]
-        for index in indices:
-            reduction_pass = self.passes[index]
-            if (
-                stage == "fine"
-                and self.search_policy == "cursor"
-                and isinstance(reduction_pass, CursorPass)
-            ):
-                for group in reduction_pass.removal_groups(model):
-                    key = (index, group.key)
-                    cursor = self._fine_cursors.setdefault(key, RemovalCursor(group))
-                    while True:
-                        state = cursor.state()
-                        candidate = cursor.next_candidate(model, group)
-                        if candidate is None:
-                            break
+    def _one_pass(self, model, stage, index):
+        reduction_pass = self.passes[index]
+        if (
+            stage == "deep"
+            and isinstance(reduction_pass, NodeSearchPass)
+            and self._region_anchor in model.id_to_index
+        ):
+            from onnx_reduce.regions import NodeRegion
+
+            anchor = model.id_to_index[self._region_anchor]
+            for width in (1, 2, 4, 8):
+                ids = model.node_ids[max(0, anchor - width // 2) : anchor + max(1, width // 2)]
+                for direction in ("delete", "keep"):
+                    candidate = NodeRegion(ids).candidate(model, direction, self.base_digest)
+                    if candidate is not None:
                         yield self._attempt(
                             candidate,
                             index,
                             source=stage,
                             stage=stage,
-                            cursor_key=key,
-                            cursor_state=state,
+                            direction=direction,
+                            region_ids=ids,
+                            scale=len(ids),
                         )
-            elif isinstance(reduction_pass, StagedPass):
-                with measure("candidate_generation"):
-                    iterator = iter(reduction_pass.generate_stage(model, stage))
+        if (
+            stage == "fine"
+            and self.search_policy == "cursor"
+            and isinstance(reduction_pass, CursorPass)
+        ):
+            for group in reduction_pass.removal_groups(model):
+                key = (index, group.key)
+                cursor = self._fine_cursors.setdefault(key, RemovalCursor(group))
                 while True:
-                    with measure("candidate_generation"):
-                        candidate = next(iterator, None)
+                    state = cursor.state()
+                    candidate = cursor.next_candidate(model, group)
                     if candidate is None:
                         break
-                    yield self._attempt(candidate, index, source=stage, stage=stage)
-            elif stage == "fine":
-                for candidate in timed_candidates(reduction_pass, model):
-                    yield self._attempt(candidate, index, source=stage, stage=stage)
+                    yield self._attempt(
+                        candidate,
+                        index,
+                        source=stage,
+                        stage=stage,
+                        cursor_key=key,
+                        cursor_state=state,
+                    )
+        elif isinstance(reduction_pass, StagedPass) and stage != "deep":
+            with measure("candidate_generation"), measure(f"generate/{reduction_pass.name}"):
+                iterator = iter(reduction_pass.generate_stage(model, stage))
+            while True:
+                with measure("candidate_generation"), measure(f"generate/{reduction_pass.name}"):
+                    candidate = next(iterator, None)
+                if candidate is None:
+                    break
+                yield self._attempt(candidate, index, source=stage, stage=stage)
+        elif stage in {"fine", "deep"}:
+            for candidate in timed_candidates(reduction_pass, model):
+                yield self._attempt(candidate, index, source=stage, stage=stage)
+
+    def _quantum(self, index):
+        history = self._pass_history.get(index, ())
+        # Deterministic success feedback, never wall-clock timings. Every pass
+        # retains an eight-attempt turn; productive passes get at most sixteen.
+        return self.pass_quantum * (
+            2 if len(history) >= 8 and sum(history) * 4 >= len(history) else 1
+        )
+
+    def _pass_candidates(self, model, stage):
+        indices = list(range(len(self.passes)))
+        start = self._turn_pass if stage != "cleanup" else 0
+        indices = indices[start:] + indices[:start]
+        queue = deque((index, iter(self._one_pass(model, stage, index))) for index in indices)
+        for index in indices:
+            self._pass_states.setdefault(f"{stage}/{self.passes[index].name}", "not_visited")
+        limit = (
+            self.deep_no_progress_limit
+            if stage == "deep" and self.no_progress_limit
+            else self.no_progress_limit
+        )
+        while queue:
+            index, stream = queue.popleft()
+            key = (stage, index)
+            if self._pass_failures.get(key, 0) >= limit:
+                self._pass_states[f"{stage}/{self.passes[index].name}"] = "plateau"
+                continue
+            state_key = f"{stage}/{self.passes[index].name}"
+            yielded = False
+            quantum = self._quantum(index)
+            if index == self._turn_pass and stage != "cleanup":
+                quantum = max(1, (self._turn_budget or quantum) - self._turn_used)
+            for _ in range(quantum):
+                if self._pass_failures.get(key, 0) >= limit:
+                    break
+                attempt = next(stream, None)
+                if attempt is None:
+                    self._pass_states[state_key] = (
+                        "exhausted"
+                        if yielded or self._pass_states.get(state_key) == "visited"
+                        else "no_candidates"
+                    )
+                    break
+                yielded = True
+                self._pass_states[state_key] = "visited"
+                yield attempt
+            else:
+                queue.append((index, stream))
+                continue
+            if self._pass_failures.get(key, 0) >= limit:
+                self._pass_states[state_key] = "plateau"
 
     def _generate(self, model):
         attempts = self._generate_raw(model)
@@ -166,7 +248,7 @@ class StagedScheduler(LegacyScheduler):
     @measured("scheduler")
     def next_attempt(self, model):
         self._current_model = model
-        while self._stage_index < 3:
+        while self._stage_index < (3 if self.goal == "fast" else len(self.stages)):
             if self._cleanup_pending:
                 if self._cleanup_iterator is None:
                     self._cleanup_iterator = iter(self._pass_candidates(model, "cleanup"))
@@ -177,7 +259,7 @@ class StagedScheduler(LegacyScheduler):
                         return attempt
                 self._cleanup_pending = False
                 self._cleanup_iterator = None
-            if self._without_accept >= self.no_progress_limit:
+            if self.stage == "regions" and self._without_accept >= self.no_progress_limit:
                 attempt = None
                 reason = "plateau"
             else:
@@ -187,12 +269,18 @@ class StagedScheduler(LegacyScheduler):
                 reason = "exhausted"
             if attempt is not None:
                 return attempt
+            if any(
+                state == "plateau"
+                for key, state in self._pass_states.items()
+                if key.startswith(self.stage + "/")
+            ):
+                reason = "plateau"
             self._stage_ends[self.stage] = reason
             self._stage_index += 1
             if self._history is not None:
                 self._history.pending.clear()
             self._direction_stats = {"delete": [0, 0], "keep": [0, 0]}
-            if self._stage_index == 3:
+            if self._stage_index >= 3:
                 self._fine_cursors.clear()
             self._iterator = None
             self._without_accept = 0
@@ -224,6 +312,23 @@ class StagedScheduler(LegacyScheduler):
     def observe(self, attempt, feedback, accepted_model=None):
         self._record(attempt, feedback)
         if self._finalizer is None:
+            if attempt.stage != "cleanup":
+                if self._turn_pass != attempt.pass_index:
+                    self._turn_used = 0
+                    self._turn_budget = None
+                if self._turn_budget is None:
+                    self._turn_budget = self._quantum(attempt.pass_index)
+                self._pass_history.setdefault(attempt.pass_index, deque(maxlen=16)).append(
+                    feedback.status == "accepted"
+                )
+                self._turn_pass = attempt.pass_index
+                self._turn_used += 1
+                if self._turn_used >= self._turn_budget:
+                    self._turn_pass = (attempt.pass_index + 1) % max(1, len(self.passes))
+                    self._turn_used = 0
+                    self._turn_budget = None
+                key = (attempt.stage, attempt.pass_index)
+                self._pass_failures[key] = self._pass_failures.get(key, 0) + 1
             if self._history is not None:
                 self._history.observe(attempt, self._current_model, feedback)
             if attempt.direction in self._direction_stats:
@@ -246,14 +351,24 @@ class StagedScheduler(LegacyScheduler):
                     restored.add(pending.cursor_key)
             self._history.pending.clear()
         self._accept(accepted_model)
+        self._pass_failures.clear()
+        self._pass_states.clear()
         for cursor in self._fine_cursors.values():
             cursor.accepted()
         if attempt.stage == "coarse" and self.passes:
             self._coarse_start = (attempt.pass_index + 1) % len(self.passes)
-        if attempt.region_ids:
+        affected_ids = attempt.region_ids
+        if not affected_ids and isinstance(self._current_model, NodeSearchModel):
+            affected_ids = tuple(
+                self._current_model.node_ids[i]
+                for edit in attempt.candidate.edits
+                for i in getattr(edit, "indices", ())
+                if 0 <= i < len(self._current_model.node_ids)
+            )
+        if affected_ids:
             old_ids = self._current_model.node_ids
             old_positions = self._current_model.id_to_index
-            end = max(old_positions[item] for item in attempt.region_ids)
+            end = max(old_positions[item] for item in affected_ids)
             neighborhood = old_ids[end + 1 :] + old_ids[: end + 1]
             self._region_anchor = next(
                 (item for item in neighborhood if item in accepted_model.id_to_index), None
@@ -298,6 +413,11 @@ class StagedScheduler(LegacyScheduler):
             if self._history
             else None,
             "stage": self.stage if self.goal == "complete" or self._stage_index < 3 else "done",
+            "pass_quantum": self.pass_quantum,
+            "max_pass_quantum": self.pass_quantum * 2,
+            "deep_no_progress_limit": self.deep_no_progress_limit,
+            "pass_states": dict(self._pass_states),
+            "pass_state_model_version": self.model_version,
             "stage_ends": dict(self._stage_ends),
             "stage_accepted_cost_delta": {
                 key: dict(value) for key, value in self._stage_cost_delta.items()
