@@ -1,0 +1,406 @@
+{
+  "condition_source": "architecture_simulated",
+  "baseline": "original three passes under the same engine, metrics and budgets",
+  "config": {"objective": "nodes", "max_candidate_check_calls": 200, "time_budget_seconds": 15.0, "combination_limit": 16},
+  "cases": [
+    {
+      "name": "resnet18_tiny",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 23, "tensor_elements": 23370, "byte_size": 86646, "input_count": 1, "output_count": 1, "initializer_count": 34},
+          "final": {"node_count": 1, "tensor_elements": 16938, "byte_size": 2641, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 21, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 13, "not_interesting": 8, "inconclusive": 0},
+          "duration_seconds": 0.042364,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/resnet18_tiny/original_passes/run-i8d4nucz/final/model.onnx", "digest": "3403aa44f60b9e9d076ee59f4818619c74bd24a6cacfaacd4153e8eee623f1ec", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 23, "tensor_elements": 23370, "byte_size": 86646, "input_count": 1, "output_count": 1, "initializer_count": 34},
+          "final": {"node_count": 1, "tensor_elements": 4, "byte_size": 455, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 28, "cache_hits": 22, "target_identity_mismatches": 0, "interesting": 17, "not_interesting": 11, "inconclusive": 0},
+          "duration_seconds": 0.058394,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/resnet18_tiny/extended/run-soqlt0ij/final/model.onnx", "digest": "ecd3de10ede5d0793f2dcdf8d3203795f4f8fa890bb1b15b954d6b8ee61f00d1", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "mobilenet_tiny",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 30, "tensor_elements": 6588, "byte_size": 32147, "input_count": 1, "output_count": 1, "initializer_count": 64},
+          "final": {"node_count": 1, "tensor_elements": 8204, "byte_size": 287, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 23, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 15, "not_interesting": 8, "inconclusive": 0},
+          "duration_seconds": 0.045909,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/mobilenet_tiny/original_passes/run-bcxp61oq/final/model.onnx", "digest": "8687e751f3e7bcce3fd56ede6b6ea5dc471aa4c8a8553a51b5bf9c50983a728d", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 30, "tensor_elements": 6588, "byte_size": 32147, "input_count": 1, "output_count": 1, "initializer_count": 64},
+          "final": {"node_count": 1, "tensor_elements": 4, "byte_size": 287, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 29, "cache_hits": 17, "target_identity_mismatches": 0, "interesting": 18, "not_interesting": 11, "inconclusive": 0},
+          "duration_seconds": 0.061864,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/mobilenet_tiny/extended/run-2pxg6qfj/final/model.onnx", "digest": "441c95c72b3bd3a28a5b22926ba830c3ebcb5dc168f0dff3e5fc6b760a8f7b14", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "vgg_tiny",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 19, "tensor_elements": 6994, "byte_size": 28859, "input_count": 1, "output_count": 1, "initializer_count": 28},
+          "final": {"node_count": 1, "tensor_elements": 714, "byte_size": 2832, "input_count": 1, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 16, "cache_hits": 0, "target_identity_mismatches": 0, "interesting": 15, "not_interesting": 1, "inconclusive": 0},
+          "duration_seconds": 0.029242,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/vgg_tiny/original_passes/run-ga8rkyuv/final/model.onnx", "digest": "f96cedd00467f7c2970a9f49e9471ab09bfbbfbc47c3501220214b95141ca207", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 19, "tensor_elements": 6994, "byte_size": 28859, "input_count": 1, "output_count": 1, "initializer_count": 28},
+          "final": {"node_count": 1, "tensor_elements": 3, "byte_size": 227, "input_count": 1, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 25, "cache_hits": 3, "target_identity_mismatches": 0, "interesting": 18, "not_interesting": 7, "inconclusive": 0},
+          "duration_seconds": 0.046593,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/vgg_tiny/extended/run-qsr3hqb9/final/model.onnx", "digest": "424c090cbb5066cc79c9792c9adb2dc1d38bb0ca6f63ac6e689fafc28fe2ed7e", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "unet_tiny",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 13, "tensor_elements": 3986, "byte_size": 17697, "input_count": 1, "output_count": 1, "initializer_count": 22},
+          "final": {"node_count": 1, "tensor_elements": 904, "byte_size": 2409, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 21, "cache_hits": 1, "target_identity_mismatches": 0, "interesting": 12, "not_interesting": 9, "inconclusive": 0},
+          "duration_seconds": 0.033018,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/unet_tiny/original_passes/run-mvaonpd7/final/model.onnx", "digest": "e93d6ea92d5067a543d361ce3eb58c029fa30d09bdc8b8836d092d05d3dd1700", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 13, "tensor_elements": 3986, "byte_size": 17697, "input_count": 1, "output_count": 1, "initializer_count": 22},
+          "final": {"node_count": 1, "tensor_elements": 4, "byte_size": 321, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 30, "cache_hits": 25, "target_identity_mismatches": 0, "interesting": 17, "not_interesting": 13, "inconclusive": 0},
+          "duration_seconds": 0.057132,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/unet_tiny/extended/run-dox6skca/final/model.onnx", "digest": "ef04751dd16b2e3792df227632e3297f5fb56ac303d1a04761b1186889a25b8a", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "yolo_head",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 19, "tensor_elements": 7900, "byte_size": 33544, "input_count": 1, "output_count": 3, "initializer_count": 38},
+          "final": {"node_count": 2, "tensor_elements": 760, "byte_size": 1574, "input_count": 2, "output_count": 1, "initializer_count": 4},
+          "failure_checks": {"calls": 46, "cache_hits": 3, "target_identity_mismatches": 0, "interesting": 19, "not_interesting": 27, "inconclusive": 0},
+          "duration_seconds": 0.08498,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/yolo_head/original_passes/run-m01rxmfs/final/model.onnx", "digest": "4d285a6d8f1d1bb72b18a1976bf6135c25c02f3ed99db2dea583026a162ae046", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 19, "tensor_elements": 7900, "byte_size": 33544, "input_count": 1, "output_count": 3, "initializer_count": 38},
+          "final": {"node_count": 2, "tensor_elements": 6, "byte_size": 694, "input_count": 2, "output_count": 1, "initializer_count": 4},
+          "failure_checks": {"calls": 69, "cache_hits": 33, "target_identity_mismatches": 0, "interesting": 24, "not_interesting": 45, "inconclusive": 0},
+          "duration_seconds": 0.17961,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/yolo_head/extended/run-3a74bnx8/final/model.onnx", "digest": "31fbdb955e2a57bd99bdc873b9df3327392529a61c9226ac91250fab141d5bc3", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "transformer_2block",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 68, "tensor_elements": 17720, "byte_size": 79917, "input_count": 1, "output_count": 1, "initializer_count": 60},
+          "final": {"node_count": 1, "tensor_elements": 1536, "byte_size": 232, "input_count": 2, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 36, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 20, "not_interesting": 16, "inconclusive": 0},
+          "duration_seconds": 0.068694,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/transformer_2block/original_passes/run-8jte817w/final/model.onnx", "digest": "d5bf400b6fa473752dddb63ad41f51389c3dc2529acb3dc326695bd5eff3fab0", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 68, "tensor_elements": 17720, "byte_size": 79917, "input_count": 1, "output_count": 1, "initializer_count": 60},
+          "final": {"node_count": 1, "tensor_elements": 2, "byte_size": 210, "input_count": 2, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 43, "cache_hits": 12, "target_identity_mismatches": 0, "interesting": 24, "not_interesting": 19, "inconclusive": 0},
+          "duration_seconds": 0.078738,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/transformer_2block/extended/run-bh41c6fh/final/model.onnx", "digest": "61491aa69712fc8c4010ac21847f9e1b760e1e0bdbc1c0fdbbd134de0b4a3c85", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "bert_embedding",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 16, "tensor_elements": 38867, "byte_size": 157424, "input_count": 1, "output_count": 1, "initializer_count": 11},
+          "final": {"node_count": 1, "tensor_elements": 32048, "byte_size": 128275, "input_count": 2, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 19, "cache_hits": 4, "target_identity_mismatches": 0, "interesting": 10, "not_interesting": 9, "inconclusive": 0},
+          "duration_seconds": 0.046967,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/bert_embedding/original_passes/run-mkltvifn/final/model.onnx", "digest": "47a05ff8f3b2402c6a8f44d0c591ee7d6b4516d50ea04efa799b0242c55663c2", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 16, "tensor_elements": 38867, "byte_size": 157424, "input_count": 1, "output_count": 1, "initializer_count": 11},
+          "final": {"node_count": 1, "tensor_elements": 3, "byte_size": 261, "input_count": 2, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 26, "cache_hits": 19, "target_identity_mismatches": 0, "interesting": 14, "not_interesting": 12, "inconclusive": 0},
+          "duration_seconds": 0.063981,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/bert_embedding/extended/run-q90g4_2d/final/model.onnx", "digest": "61370d988fa0667976aaa2c0d328353b23ae5e16c8564375abb860a57116c8e2", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "vit_tiny",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 39, "tensor_elements": 11276, "byte_size": 48355, "input_count": 1, "output_count": 1, "initializer_count": 37},
+          "final": {"node_count": 1, "tensor_elements": 362, "byte_size": 1587, "input_count": 1, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 21, "cache_hits": 0, "target_identity_mismatches": 0, "interesting": 20, "not_interesting": 1, "inconclusive": 0},
+          "duration_seconds": 0.041735,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/vit_tiny/original_passes/run-kpd70xcz/final/model.onnx", "digest": "f936180522c86c6ecb67d3d4b9b510376d7caf6bc29cdfa4e9f736399f7c836a", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 39, "tensor_elements": 11276, "byte_size": 48355, "input_count": 1, "output_count": 1, "initializer_count": 37},
+          "final": {"node_count": 1, "tensor_elements": 3, "byte_size": 262, "input_count": 1, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 30, "cache_hits": 3, "target_identity_mismatches": 0, "interesting": 23, "not_interesting": 7, "inconclusive": 0},
+          "duration_seconds": 0.06058,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/vit_tiny/extended/run-9lfma8zi/final/model.onnx", "digest": "09a8ecd92d14989705cfa89502d2ba11437173e88f0f2a4eac57f8c09abb6206", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "dynamic_transformer",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 34, "tensor_elements": 8604, "byte_size": 39203, "input_count": 1, "output_count": 1, "initializer_count": 29},
+          "final": {"node_count": 1, "tensor_elements": 36, "byte_size": 248, "input_count": 2, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 33, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 17, "not_interesting": 16, "inconclusive": 0},
+          "duration_seconds": 0.052643,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/dynamic_transformer/original_passes/run-xq6p3btt/final/model.onnx", "digest": "54e8a734d6e2de87fc65690c6d3bb3c0028eb841a1b68d471c5d3200f9ea20a8", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 34, "tensor_elements": 8604, "byte_size": 39203, "input_count": 1, "output_count": 1, "initializer_count": 29},
+          "final": {"node_count": 1, "tensor_elements": 2, "byte_size": 226, "input_count": 2, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 38, "cache_hits": 10, "target_identity_mismatches": 0, "interesting": 20, "not_interesting": 18, "inconclusive": 0},
+          "duration_seconds": 0.062737,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/dynamic_transformer/extended/run-odiww8j0/final/model.onnx", "digest": "3bc3ffd010723da116537c4f407c59f8f9c35ff9ea506896ce13f4206237fdb3", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "einsum_attention",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 17, "tensor_elements": 684, "byte_size": 3496, "input_count": 1, "output_count": 1, "initializer_count": 8},
+          "final": {"node_count": 1, "tensor_elements": 384, "byte_size": 217, "input_count": 3, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 20, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 13, "not_interesting": 7, "inconclusive": 0},
+          "duration_seconds": 0.029569,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/einsum_attention/original_passes/run-5v3wx9v0/final/model.onnx", "digest": "c8683c7e60bb6eefd661e3f2ba8be2400041f033864f7bc9c889d79be90ac2f4", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 17, "tensor_elements": 684, "byte_size": 3496, "input_count": 1, "output_count": 1, "initializer_count": 8},
+          "final": {"node_count": 1, "tensor_elements": 3, "byte_size": 217, "input_count": 3, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 26, "cache_hits": 13, "target_identity_mismatches": 0, "interesting": 16, "not_interesting": 10, "inconclusive": 0},
+          "duration_seconds": 0.040029,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/einsum_attention/extended/run-bomspd_l/final/model.onnx", "digest": "7e36af0b15fd79eb611eb605e0c811e6b9de4e79da9c9ba660382ae0179fdfe5", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "lstm_seq",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 4, "tensor_elements": 6860, "byte_size": 27532, "input_count": 1, "output_count": 1, "initializer_count": 6},
+          "final": {"node_count": 1, "tensor_elements": 6538, "byte_size": 25930, "input_count": 2, "output_count": 1, "initializer_count": 3},
+          "failure_checks": {"calls": 14, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 8, "not_interesting": 6, "inconclusive": 0},
+          "duration_seconds": 0.019024,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/lstm_seq/original_passes/run-llzg5_86/final/model.onnx", "digest": "e0bbb898a75cfe31ef203d5a6f076664465b4c2688891c578bfe9320a244b5f5", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 4, "tensor_elements": 6860, "byte_size": 27532, "input_count": 1, "output_count": 1, "initializer_count": 6},
+          "final": {"node_count": 1, "tensor_elements": 5, "byte_size": 313, "input_count": 2, "output_count": 1, "initializer_count": 3},
+          "failure_checks": {"calls": 27, "cache_hits": 10, "target_identity_mismatches": 0, "interesting": 15, "not_interesting": 12, "inconclusive": 0},
+          "duration_seconds": 0.038677,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/lstm_seq/extended/run-gx1cniy3/final/model.onnx", "digest": "1e902d6346968a4721acbfbcd13b7bb5773ef4640efe6517021cea077e1ed886", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "gru_seq",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 3, "tensor_elements": 6724, "byte_size": 27294, "input_count": 1, "output_count": 1, "initializer_count": 12},
+          "final": {"node_count": 1, "tensor_elements": 3408, "byte_size": 13383, "input_count": 2, "output_count": 1, "initializer_count": 3},
+          "failure_checks": {"calls": 14, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 8, "not_interesting": 6, "inconclusive": 0},
+          "duration_seconds": 0.018737,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/gru_seq/original_passes/run-6q9jkxmy/final/model.onnx", "digest": "8981dffb93a97cd488dacb1f4fc031d74aa67b50369826ae32b28122008bf219", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 3, "tensor_elements": 6724, "byte_size": 27294, "input_count": 1, "output_count": 1, "initializer_count": 12},
+          "final": {"node_count": 1, "tensor_elements": 5, "byte_size": 286, "input_count": 2, "output_count": 1, "initializer_count": 3},
+          "failure_checks": {"calls": 26, "cache_hits": 11, "target_identity_mismatches": 0, "interesting": 15, "not_interesting": 11, "inconclusive": 0},
+          "duration_seconds": 0.03805,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/gru_seq/extended/run-nxoxyul2/final/model.onnx", "digest": "2e006375f3e6120267eb34ce6ff7706b0b36df48dc5ada2f6c402753785f0fe3", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "exporter_artifacts",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 16, "tensor_elements": 1707, "byte_size": 4576, "input_count": 1, "output_count": 1, "initializer_count": 9},
+          "final": {"node_count": 0, "tensor_elements": 292, "byte_size": 261, "input_count": 3, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 22, "cache_hits": 1, "target_identity_mismatches": 0, "interesting": 14, "not_interesting": 8, "inconclusive": 0},
+          "duration_seconds": 0.030294,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/exporter_artifacts/original_passes/run-xve71q9v/final/model.onnx", "digest": "12b31b189b63e41a1f8978a1c32404812f491a69894aa9850c58d6e5daf179af", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 16, "tensor_elements": 1707, "byte_size": 4576, "input_count": 1, "output_count": 1, "initializer_count": 9},
+          "final": {"node_count": 0, "tensor_elements": 3, "byte_size": 261, "input_count": 3, "output_count": 1, "initializer_count": 0},
+          "failure_checks": {"calls": 32, "cache_hits": 3, "target_identity_mismatches": 0, "interesting": 17, "not_interesting": 15, "inconclusive": 0},
+          "duration_seconds": 0.038651,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/exporter_artifacts/extended/run-z1pkaxki/final/model.onnx", "digest": "6200c04d92cc41f40d90a175816a0ccccb3a6afbaa58a70ee6dcc532036dd39a", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "training_graph",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 11, "tensor_elements": 1102, "byte_size": 5907, "input_count": 1, "output_count": 1, "initializer_count": 16},
+          "final": {"node_count": 1, "tensor_elements": 517, "byte_size": 293, "input_count": 2, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 20, "cache_hits": 1, "target_identity_mismatches": 0, "interesting": 12, "not_interesting": 8, "inconclusive": 0},
+          "duration_seconds": 0.027211,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/training_graph/original_passes/run-9gyuah6z/final/model.onnx", "digest": "0f09fb2da2f5bb7b54cb80a36c8d0b4c76c7c9771371eb16bdbe13274af3a6ce", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 11, "tensor_elements": 1102, "byte_size": 5907, "input_count": 1, "output_count": 1, "initializer_count": 16},
+          "final": {"node_count": 1, "tensor_elements": 3, "byte_size": 293, "input_count": 2, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 24, "cache_hits": 9, "target_identity_mismatches": 0, "interesting": 14, "not_interesting": 10, "inconclusive": 0},
+          "duration_seconds": 0.036522,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/training_graph/extended/run-cco1h0n5/final/model.onnx", "digest": "905ae02f323f702bced9a11b0cb6221cd559e536b70011ae46e9c64d506ad8be", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "qdq_resnet_block",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 19, "tensor_elements": 1042, "byte_size": 2946, "input_count": 1, "output_count": 1, "initializer_count": 12},
+          "final": {"node_count": 1, "tensor_elements": 1100, "byte_size": 304, "input_count": 3, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 23, "cache_hits": 2, "target_identity_mismatches": 0, "interesting": 13, "not_interesting": 10, "inconclusive": 0},
+          "duration_seconds": 0.034726,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/qdq_resnet_block/original_passes/run-hqt3f5cj/final/model.onnx", "digest": "0d3fdb7e87f000b72b43dbf6361ee25e258a1104870f6867e50b609958e64cae", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 19, "tensor_elements": 1042, "byte_size": 2946, "input_count": 1, "output_count": 1, "initializer_count": 12},
+          "final": {"node_count": 1, "tensor_elements": 4, "byte_size": 259, "input_count": 3, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 30, "cache_hits": 22, "target_identity_mismatches": 0, "interesting": 17, "not_interesting": 13, "inconclusive": 0},
+          "duration_seconds": 0.056858,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/qdq_resnet_block/extended/run-_k3sl6jj/final/model.onnx", "digest": "b5020ce31734101f275c86cf97e8e341fd05f2051aefcedec8d4cc3e7e883aec", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "qlinear_block",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 8, "tensor_elements": 1074, "byte_size": 4296, "input_count": 1, "output_count": 1, "initializer_count": 16},
+          "final": {"node_count": 1, "tensor_elements": 426, "byte_size": 728, "input_count": 2, "output_count": 1, "initializer_count": 8},
+          "failure_checks": {"calls": 13, "cache_hits": 3, "target_identity_mismatches": 0, "interesting": 7, "not_interesting": 6, "inconclusive": 0},
+          "duration_seconds": 0.021896,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/qlinear_block/original_passes/run-ml3ij0ha/final/model.onnx", "digest": "7dc1556ab8ad2479690393e19dad607e8b22da7a7e863792ffdc052f63d375fe", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 8, "tensor_elements": 1074, "byte_size": 4296, "input_count": 1, "output_count": 1, "initializer_count": 16},
+          "final": {"node_count": 1, "tensor_elements": 10, "byte_size": 492, "input_count": 2, "output_count": 1, "initializer_count": 8},
+          "failure_checks": {"calls": 20, "cache_hits": 53, "target_identity_mismatches": 0, "interesting": 11, "not_interesting": 9, "inconclusive": 0},
+          "duration_seconds": 0.076074,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/qlinear_block/extended/run-0i7gqj9a/final/model.onnx", "digest": "b33073c5d0f1544c600d007545472bae930910e621160d761c420d5082b9359c", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "scan_loop_accum",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 5, "tensor_elements": 8, "byte_size": 594, "input_count": 6, "output_count": 5, "initializer_count": 2},
+          "final": {"node_count": 5, "tensor_elements": 7, "byte_size": 556, "input_count": 6, "output_count": 5, "initializer_count": 1},
+          "failure_checks": {"calls": 4, "cache_hits": 0, "target_identity_mismatches": 0, "interesting": 3, "not_interesting": 1, "inconclusive": 0},
+          "duration_seconds": 0.005535,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/scan_loop_accum/original_passes/run-s6m1f9ms/final/model.onnx", "digest": "0adeb75a71e73a1777b0e278c1093387fae47eb458ad01650a8d925db6e4419d", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 5, "tensor_elements": 8, "byte_size": 594, "input_count": 6, "output_count": 5, "initializer_count": 2},
+          "final": {"node_count": 4, "tensor_elements": 7, "byte_size": 510, "input_count": 6, "output_count": 5, "initializer_count": 1},
+          "failure_checks": {"calls": 8, "cache_hits": 4, "target_identity_mismatches": 0, "interesting": 4, "not_interesting": 4, "inconclusive": 0},
+          "duration_seconds": 0.025371,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/scan_loop_accum/extended/run-p8iguser/final/model.onnx", "digest": "16e5ce3258644d917406ab1c3992bfee37b948db314e226b1db41b8bec735192", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "resize_upsample",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 5, "tensor_elements": 253, "byte_size": 1887, "input_count": 1, "output_count": 1, "initializer_count": 9},
+          "final": {"node_count": 1, "tensor_elements": 324, "byte_size": 309, "input_count": 2, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 17, "cache_hits": 3, "target_identity_mismatches": 0, "interesting": 9, "not_interesting": 8, "inconclusive": 0},
+          "duration_seconds": 0.022641,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/resize_upsample/original_passes/run-rub0p0d8/final/model.onnx", "digest": "6fb8f1928c049fc6959b3106751ecf3cf489eb5453d76fd496d600e8948f20c2", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 5, "tensor_elements": 253, "byte_size": 1887, "input_count": 1, "output_count": 1, "initializer_count": 9},
+          "final": {"node_count": 1, "tensor_elements": 6, "byte_size": 213, "input_count": 2, "output_count": 1, "initializer_count": 1},
+          "failure_checks": {"calls": 25, "cache_hits": 31, "target_identity_mismatches": 0, "interesting": 14, "not_interesting": 11, "inconclusive": 0},
+          "duration_seconds": 0.054675,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/resize_upsample/extended/run-c2x75hsq/final/model.onnx", "digest": "9d604293da545ab15f82d6d211c7465278cbe4c2f20731ab950bfb25fc323685", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    },
+    {
+      "name": "embedding_large",
+      "runs": {
+        "original_passes": {
+          "original": {"node_count": 4, "tensor_elements": 1056797, "byte_size": 4227740, "input_count": 1, "output_count": 1, "initializer_count": 5},
+          "final": {"node_count": 1, "tensor_elements": 24712, "byte_size": 33099, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 10, "cache_hits": 1, "target_identity_mismatches": 0, "interesting": 7, "not_interesting": 3, "inconclusive": 0},
+          "duration_seconds": 0.066518,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/embedding_large/original_passes/run-2x2zdi7w/final/model.onnx", "digest": "b24882033e85726dadcfbe7ce2874801f42a25aecd83c831cd9d072d10202bfd", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        },
+        "extended": {
+          "original": {"node_count": 4, "tensor_elements": 1056797, "byte_size": 4227740, "input_count": 1, "output_count": 1, "initializer_count": 5},
+          "final": {"node_count": 1, "tensor_elements": 4, "byte_size": 286, "input_count": 2, "output_count": 1, "initializer_count": 2},
+          "failure_checks": {"calls": 17, "cache_hits": 21, "target_identity_mismatches": 0, "interesting": 11, "not_interesting": 6, "inconclusive": 0},
+          "duration_seconds": 0.087844,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {"model": "/tmp/onnx-reduce-architecture-quality-final/embedding_large/extended/run-5t4scl5j/final/model.onnx", "digest": "6ab419ab9db7aaae39d5167bdd0fcb7fdd4b0217d4a2f438cea12e9cd3cb8b35", "read_back_validated": true, "outcome": "interesting", "cache_hit": false}
+        }
+      }
+    }
+  ]
+}
