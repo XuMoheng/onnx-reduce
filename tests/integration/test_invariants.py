@@ -167,7 +167,7 @@ def test_expired_time_budget_after_preparation_does_not_start_failure_check(
 ):
     # A fake clock makes the deadline deterministic without slow sleeps.
     clock = [0.0]
-    monkeypatch.setattr("onnx_reduce.engine.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr("onnx_reduce.runtime.engine.time.monotonic", lambda: clock[0])
     materialize = OnnxModel.materialize
 
     def slow_materialize(model, path):

@@ -123,3 +123,33 @@ def record_acceptance(run_dir: Path, candidate: Candidate, digest: str, cost: Mo
         + "\n",
         append=True,
     )
+
+
+def record_attempt(run_dir, candidate, pass_name, outcome, report, progress):
+    """Consume execution facts; reporting never decides budgets, edits or caches."""
+    feedback = outcome.feedback
+    stats = report.pass_stats[pass_name]
+    stats.generated += 1
+    report.candidates_generated += 1
+    if outcome.validation is not None:
+        record_validation(outcome.validation, report)
+    if outcome.evaluation is not None:
+        record_evaluation(outcome.evaluation, report)
+    stats.failure_check_calls += feedback.failure_check_calls
+    if feedback.status in {"edit_failed", "invalid"}:
+        report.candidates_invalid += 1
+        stats.invalid += 1
+    elif feedback.status == "not_cheaper":
+        report.candidates_not_cheaper += 1
+        stats.not_cheaper += 1
+    elif feedback.status == "accepted":
+        report.candidates_accepted += 1
+        stats.accepted += 1
+    record_candidate(run_dir, candidate, outcome.record_status, **outcome.details)
+    if outcome.accepted_model is not None:
+        before, after = feedback.base_cost, feedback.candidate_cost
+        progress(
+            f"accepted {pass_name}: nodes {before.node_count}->{after.node_count}, "
+            f"bytes {before.byte_size}->{after.byte_size}"
+        )
+        record_acceptance(run_dir, candidate, outcome.details["digest"], after)

@@ -18,8 +18,8 @@ from onnx_reduce.passes.delete_nodes import DeleteNodesPass
 from onnx_reduce.search.stateful import StatefulScheduler
 from onnx_reduce.search.types import CandidateFeedback
 from tests.helpers import chain_model, tensor_value
-from tests.test_engine import ReluFailureCheck
-from tests.test_reliability import Always, two_outputs
+from tests.integration.test_reliability import Always, two_outputs
+from tests.runtime.test_engine import ReluFailureCheck
 
 
 def rows(report, filename="scheduler.jsonl"):

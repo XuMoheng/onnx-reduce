@@ -9,8 +9,7 @@ import math
 import numpy as np
 from onnx import numpy_helper
 
-from onnx_reduce.edits import Candidate, ResizeOperator
-from onnx_reduce.model.operations.graphs import graph_at, walk_graphs
+from onnx_reduce.model.operations.graphs import graph_at
 from onnx_reduce.types import EditApplicationError
 
 
@@ -84,20 +83,6 @@ def plan(graph, index, kind):
             return None
         return ((node.input[0], 0),), data[0], 1
     return None
-
-
-def local_tensor_candidates(proto):
-    for path, graph in walk_graphs(proto):
-        for index, _ in enumerate(graph.node):
-            for kind in ("contract", "conv_input", "conv_output", "reshape"):
-                match = plan(graph, index, kind)
-                if match is None:
-                    continue
-                _, old, unit = match
-                targets = {unit, (old // 2 // unit) * unit, old - unit}
-                for new in sorted(targets):
-                    if 0 < new < old and new % unit == 0:
-                        yield Candidate((ResizeOperator(index, kind, new, path),))
 
 
 def resize_axis(graph, name, axis, old, new):

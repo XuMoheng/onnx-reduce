@@ -4,6 +4,7 @@ from collections import deque
 from itertools import combinations, islice
 
 from onnx_reduce.edits import Candidate, CleanupGraph, DeleteNodes
+from onnx_reduce.passes.candidates import rewrite_candidates, supports_rewrites
 
 
 def interleave(streams):
@@ -107,7 +108,7 @@ class CombinationsPass:
         self.limit = limit
 
     def generate(self, model):
-        if self.depth < 2 or not self.limit or not hasattr(model, "rewrite_candidates"):
+        if self.depth < 2 or not self.limit or not supports_rewrites(model):
             return
         count = model.node_count
         related = topology_groups(model, self.depth, self.limit)
@@ -118,7 +119,9 @@ class CombinationsPass:
             Candidate((DeleteNodes(indices), CleanupGraph()))
             for indices in islice(groups, self.limit)
         )
-        edits = dispersed_pool((c.edits[0] for c in model.rewrite_candidates("bypass")), self.limit)
+        edits = dispersed_pool(
+            (c.edits[0] for c in rewrite_candidates(model, "bypass")), self.limit
+        )
 
         def paths(size):
             for indices in balanced_groups(len(edits), size, self.limit):
@@ -128,7 +131,7 @@ class CombinationsPass:
 
         yield from islice(interleave(paths(size) for size in range(2, self.depth + 1)), self.limit)
         pools = [
-            dispersed_pool((c.edits[0] for c in model.rewrite_candidates(kind)), self.limit)
+            dispersed_pool((c.edits[0] for c in rewrite_candidates(model, kind)), self.limit)
             for kind in ("attributes", "tensors")
         ]
         yield from islice(

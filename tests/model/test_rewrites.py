@@ -8,6 +8,7 @@ from onnx_reduce.edits import BypassNode, Candidate, DropNodeAttribute
 from onnx_reduce.engine import EngineConfig, ReductionEngine
 from onnx_reduce.failure_check.contract import FailureCheckResult
 from onnx_reduce.model import OnnxModel
+from onnx_reduce.passes.candidates import rewrite_candidates
 from onnx_reduce.passes.delete_nodes import DeleteNodesPass
 from onnx_reduce.passes.drop_outputs import DropOutputsPass
 from onnx_reduce.passes.remove_unused import RemoveUnusedPass
@@ -99,14 +100,14 @@ def test_optional_attributes_are_failure_gated(tmp_path, scheduler):
 
 def test_required_and_custom_attributes_are_not_offered():
     model = make_model([helper.make_node("Cast", ["x"], ["y"], to=TensorProto.FLOAT)])
-    assert not list(model.rewrite_candidates("attributes"))
+    assert not list(rewrite_candidates(model, "attributes"))
     with pytest.raises(EditApplicationError, match="schema-optional"):
         model.apply_candidate(Candidate((DropNodeAttribute(0, "to"),)))
     custom = model.to_proto()
     custom.graph.node[0].domain = "custom"
     custom.opset_import.append(helper.make_opsetid("custom", 1))
     custom = OnnxModel.from_proto(custom)
-    assert not list(custom.rewrite_candidates("attributes"))
+    assert not list(rewrite_candidates(custom, "attributes"))
 
 
 def test_bypass_output_and_duplicate_guard():
@@ -223,10 +224,10 @@ def test_bypass_can_choose_second_input_and_skips_multi_output_nodes():
     model = make_model(
         [helper.make_node("Add", ["x", "z"], ["y"])], inputs=[tensor_value("x"), tensor_value("z")]
     )
-    edits = [c.edits[0] for c in model.rewrite_candidates("bypass")]
+    edits = [c.edits[0] for c in rewrite_candidates(model, "bypass")]
     assert edits == [BypassNode(0, 0), BypassNode(0, 1)]
     reduced = model.apply_candidate(Candidate((edits[1],)))
     assert reduced.output_names == ("z",)
     assert reduced.validate("strict").valid
     model = make_model([helper.make_node("Dropout", ["x"], ["y", "mask"])])
-    assert not list(model.rewrite_candidates("bypass"))
+    assert not list(rewrite_candidates(model, "bypass"))

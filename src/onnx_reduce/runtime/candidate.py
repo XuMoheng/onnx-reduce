@@ -4,26 +4,18 @@ from __future__ import annotations
 
 import json
 import time
-from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
 
-from onnx_reduce.config import EngineConfig
+from onnx_reduce.config import ExecutionConfig
 from onnx_reduce.edits import Candidate
 from onnx_reduce.failure_check.contract import FailureCheckResult
 from onnx_reduce.failure_check.evaluator import Evaluation, EvaluationBudgetExceeded, Evaluator
-from onnx_reduce.passes.base import ReductionPass
 from onnx_reduce.performance import current_performance, sample
 from onnx_reduce.preparation import PreparationCaches, edit_key
-from onnx_reduce.report import ReductionReport
 from onnx_reduce.runtime.budget import SearchBudget
-from onnx_reduce.runtime.reporting import (
-    record_acceptance,
-    record_candidate,
-    record_evaluation,
-    record_validation,
-)
-from onnx_reduce.search.types import AttemptResult, CandidateFeedback
+from onnx_reduce.runtime.result import AttemptResult
+from onnx_reduce.search.types import CandidateFeedback
 from onnx_reduce.types import EditApplicationError, ModelAdapter, ModelCost, ValidationResult
 
 
@@ -33,34 +25,36 @@ class CandidateExecutor:
     def __init__(
         self,
         *,
-        config: EngineConfig,
+        config: ExecutionConfig,
+        validation_mode: str,
         evaluator: Evaluator,
         run_dir: Path,
-        report: ReductionReport,
         caches: PreparationCaches,
         budget: SearchBudget,
-        progress: Callable[[str], None],
     ):
         self.config = config
+        self.validation_mode = validation_mode
         self.evaluator = evaluator
         self.run_dir = run_dir
-        self.report = report
         self.caches = caches
         self.budget = budget
-        self.progress = progress
+        self.initial_calls = evaluator.calls
 
     def execute(
         self,
         base_model: ModelAdapter,
         candidate: Candidate,
-        reduction_pass: ReductionPass,
     ) -> AttemptResult:
-        report, evaluator, run_dir = self.report, self.evaluator, self.run_dir
+        evaluator, run_dir = self.evaluator, self.run_dir
         clock = time.perf_counter if current_performance() is not None else None
         attempt_started = clock() if clock else None
         evaluation_seconds = 0.0
         materialization_seconds = 0.0
         base_cost = base_model.cost()
+        validation = None
+        result = None
+        evidence = {}
+        record_status = None
 
         def finish(status, cost=None, accepted_model=None, **details):
             preparation_seconds = (
@@ -76,11 +70,12 @@ class CandidateExecutor:
                     **details,
                 ),
                 accepted_model,
+                record_status=record_status or status,
+                details=evidence,
+                validation=validation,
+                evaluation=result,
             )
 
-        stats = report.pass_stats[reduction_pass.name]
-        stats.generated += 1
-        report.candidates_generated += 1
         if current_performance() is not None:
             sample("candidate_edit_count", len(candidate.edits))
             sample(
@@ -102,15 +97,9 @@ class CandidateExecutor:
             if "cost" in details:
                 sample("candidate_nodes", details["cost"]["node_count"])
                 sample("candidate_bytes", details["cost"]["byte_size"])
-            if status in {"edit_failed", "invalid"}:
-                report.candidates_invalid += 1
-                stats.invalid += 1
-                if "validation" in details:
-                    record_validation(ValidationResult(**details["validation"]), report)
-            elif status == "not_cheaper":
-                report.candidates_not_cheaper += 1
-                stats.not_cheaper += 1
-            else:
+            if "validation" in details:
+                validation = ValidationResult(**details["validation"])
+            if status == "not_interesting":
                 result = evaluator.reuse(
                     Path(entry["model"]),
                     details["digest"],
@@ -120,9 +109,8 @@ class CandidateExecutor:
                     ),
                     metadata=candidate.to_dict(),
                 )
-                record_evaluation(result, report)
                 details["cache_hit"] = True
-            record_candidate(run_dir, candidate, status, **details, edit_cache_hit=True)
+            evidence = {**details, "edit_cache_hit": True}
             return finish(
                 status,
                 ModelCost(**details["cost"]) if "cost" in details else None,
@@ -132,35 +120,28 @@ class CandidateExecutor:
         try:
             candidate_model = base_model.apply_candidate(candidate)
         except EditApplicationError as exc:
-            report.candidates_invalid += 1
-            stats.invalid += 1
             self._cache_rejection(candidate, "edit_failed", reason=str(exc))
-            record_candidate(run_dir, candidate, "edit_failed", reason=str(exc))
+            evidence = {"reason": str(exc)}
             return finish("edit_failed")
         candidate_cost = candidate_model.cost()
         sample("candidate_nodes", candidate_cost.node_count)
         sample("candidate_bytes", candidate_cost.byte_size)
         if candidate_cost.key(self.config.objective) >= base_cost.key(self.config.objective):
-            report.candidates_not_cheaper += 1
-            stats.not_cheaper += 1
             details = {"cost": asdict(candidate_cost)}
             self._cache_rejection(candidate, "not_cheaper", **details)
-            record_candidate(run_dir, candidate, "not_cheaper", **details)
+            evidence = details
             return finish("not_cheaper", candidate_cost)
-        validation = candidate_model.validate(self.config.validation_mode)
-        record_validation(validation, report)
+        validation = candidate_model.validate(self.validation_mode)
         if not validation.valid:
-            report.candidates_invalid += 1
-            stats.invalid += 1
             details = {"validation": asdict(validation), "cost": asdict(candidate_cost)}
             self._cache_rejection(candidate, "invalid", **details)
-            record_candidate(run_dir, candidate, "invalid", **details)
+            evidence = details
             return finish("invalid", candidate_cost)
         digest = candidate_model.canonical_hash()
         candidate_path = run_dir / "candidates" / f"{candidate.sequence_number:08d}" / "model.onnx"
         if not self.budget.allows_time():
-            record_candidate(run_dir, candidate, "budget_exhausted", reason="time")
-            raise EvaluationBudgetExceeded("search time budget exhausted")
+            evidence = {"reason": "time"}
+            return finish("budget_exhausted")
 
         def prepare():
             nonlocal materialization_seconds
@@ -179,7 +160,7 @@ class CandidateExecutor:
                 candidate_path,
                 digest,
                 metadata=candidate.to_dict(),
-                allow_execution=self.budget.allows_call(report.failure_check_calls - 1),
+                allow_execution=self.budget.allows_call(evaluator.calls - self.initial_calls),
                 prepare=prepare,
             )
             if clock:
@@ -187,13 +168,8 @@ class CandidateExecutor:
                     0.0, clock() - evaluation_started - materialization_seconds
                 )
         except EvaluationBudgetExceeded:
-            record_candidate(
-                run_dir,
-                candidate,
-                "budget_exhausted",
-                reason="calls" if self.budget.allows_time() else "time",
-            )
-            raise
+            evidence = {"reason": "calls" if self.budget.allows_time() else "time"}
+            return finish("budget_exhausted")
         details = {
             "digest": digest,
             "cost": asdict(candidate_cost),
@@ -206,10 +182,8 @@ class CandidateExecutor:
             model_path=str(result.model_path),
             **details,
         )
-        record_candidate(run_dir, candidate, result.outcome.value, **details)
-        record_evaluation(result, report)
-        if not result.cache_hit:
-            stats.failure_check_calls += 1
+        evidence = details
+        record_status = result.outcome.value
         if result.outcome is not FailureCheckResult.INTERESTING:
             return finish(
                 result.outcome.value,
@@ -219,13 +193,6 @@ class CandidateExecutor:
                 target_identity_mismatch=result.target_identity_mismatch,
             )
         # All passes, including cleanup, are gated by failure checks.
-        report.candidates_accepted += 1
-        stats.accepted += 1
-        self.progress(
-            f"accepted {reduction_pass.name}: nodes {base_cost.node_count}->{candidate_cost.node_count}, "
-            f"bytes {base_cost.byte_size}->{candidate_cost.byte_size}"
-        )
-        record_acceptance(run_dir, candidate, digest, candidate_cost)
         return finish(
             "accepted",
             candidate_cost,

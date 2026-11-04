@@ -78,7 +78,6 @@ class MetadataCache:
 class PreparationCaches:
     enabled: bool
     validation_mode: str
-    model_edit_mode: str = "ir"
     validation_cache_enabled: bool = True
     edits: MetadataCache = field(init=False)
     shapes: MetadataCache = field(init=False)
@@ -110,10 +109,8 @@ def edit_key(candidate, validation_mode):
 
 
 @contextmanager
-def preparation_caches(
-    enabled=True, validation_mode="strict", model_edit_mode="ir", validation_cache_enabled=True
-):
-    caches = PreparationCaches(enabled, validation_mode, model_edit_mode, validation_cache_enabled)
+def preparation_caches(enabled=True, validation_mode="strict", validation_cache_enabled=True):
+    caches = PreparationCaches(enabled, validation_mode, validation_cache_enabled)
     token = _ACTIVE.set(caches)
     try:
         yield caches

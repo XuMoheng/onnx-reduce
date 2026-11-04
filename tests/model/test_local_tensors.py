@@ -6,7 +6,7 @@ from onnx import numpy_helper
 from benchmarks.quality_cases import model, value
 from onnx_reduce.edits import Candidate, ResizeOperator
 from onnx_reduce.model import OnnxModel
-from onnx_reduce.model.operations.local_tensors import local_tensor_candidates
+from onnx_reduce.passes.candidates import local_tensor_candidates
 from onnx_reduce.types import EditApplicationError
 
 

@@ -54,7 +54,7 @@ def test_run_files_use_consistent_configuration_and_report_fields(tmp_path):
     run_dir = Path(report.work_directory)
     task = json.loads((run_dir / "task.json").read_text())
     assert set(task) == {"engine", "failure_check_config", "cwd"}
-    assert task["engine"] == asdict(config)
+    assert task["engine"] == config.to_dict()
     assert task["failure_check_config"] == {
         "command": [sys.executable],
         "timeout_seconds": 60.0,
@@ -160,3 +160,25 @@ def test_cli_uses_explicit_validation_and_candidate_call_options():
     )
     assert args.validation_mode == "structural"
     assert args.max_candidate_check_calls == 4
+
+
+def test_grouped_configuration_preserves_flat_manifest_and_validates_combinations():
+    import pytest
+
+    from onnx_reduce.config import CheckConfig, ExecutionConfig, ExperimentConfig, SearchConfig
+
+    grouped = EngineConfig(
+        search=SearchConfig(scheduler="staged", goal="complete"),
+        execution=ExecutionConfig(max_candidate_check_calls=7),
+        checking=CheckConfig(validation_mode="structural"),
+        experiments=ExperimentConfig(search_policy="cursor", history_order="defer"),
+    )
+    assert EngineConfig(**grouped.to_dict()) == grouped
+    assert EngineConfig(**asdict(grouped)) == grouped
+    with pytest.raises(ValueError, match="requires scheduler=staged"):
+        EngineConfig(experiments=ExperimentConfig(search_policy="cursor"))
+    with pytest.raises(ValueError, match="history/direction"):
+        EngineConfig(
+            search=SearchConfig(scheduler="staged"),
+            experiments=ExperimentConfig(history_order="defer"),
+        )

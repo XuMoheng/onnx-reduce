@@ -18,8 +18,8 @@ from onnx_reduce.preparation import (
     preparation_caches,
 )
 from tests.helpers import chain_model
-from tests.test_engine import NeverInteresting, ReluFailureCheck
-from tests.test_invariants import RejectCandidates
+from tests.integration.test_invariants import RejectCandidates
+from tests.runtime.test_engine import NeverInteresting, ReluFailureCheck
 
 
 def test_lru_has_byte_and_entry_bounds_and_replacement_accounting():

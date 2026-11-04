@@ -17,7 +17,7 @@ from onnx_reduce.search.cursors import RejectionOrder, RemovalCursor, history_ke
 from onnx_reduce.search.staged import StagedScheduler
 from onnx_reduce.search.types import CandidateFeedback, ScheduledAttempt
 from tests.helpers import chain_model
-from tests.test_engine import ReluFailureCheck
+from tests.runtime.test_engine import ReluFailureCheck
 
 
 def test_cursor_rebinds_stable_ids_and_visits_newly_freed_position():
@@ -197,7 +197,7 @@ def test_finalizer_acceptance_never_reenters_cursor_or_history(tmp_path, monkeyp
 
 
 def test_independent_finalization_can_change_optimization_options(tmp_path):
-    from tests.test_staged import SignatureCheck
+    from tests.search.test_staged import SignatureCheck
 
     _, first = ReductionEngine(
         config=EngineConfig(
@@ -225,7 +225,7 @@ def test_independent_finalization_can_change_optimization_options(tmp_path):
 
 
 def test_ordinary_custom_pass_keeps_its_protocol_with_an_opaque_adapter(tmp_path):
-    from tests.test_scheduler import OpaqueModel
+    from tests.search.test_scheduler import OpaqueModel
 
     class Custom:
         name = "delete_nodes"
@@ -251,7 +251,7 @@ def test_ordinary_custom_pass_keeps_its_protocol_with_an_opaque_adapter(tmp_path
 
 def test_cursor_node_requirement_is_checked_before_backend(tmp_path):
     from onnx_reduce.passes.remove_unused import RemoveUnusedPass
-    from tests.test_scheduler import OpaqueModel
+    from tests.search.test_scheduler import OpaqueModel
 
     class NotCalled:
         def run(self, path):
@@ -272,7 +272,7 @@ def test_deferred_fine_lookahead_is_rewound_after_acceptance():
     scheduler = StagedScheduler(
         [DeleteNodesPass()], model, search_policy="cursor", history_order="defer"
     )
-    scheduler._stage_index = 2
+    scheduler._progress.index = 2
     # Reject the first physical edit on an earlier base, forcing lookahead.
     first = replace(
         attempt(model, 0), base_digest="old", candidate=Candidate((DeleteNodes((0, 1)),))

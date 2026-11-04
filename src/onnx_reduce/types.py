@@ -135,3 +135,19 @@ class ArtifactValidationModel(Protocol):
 
 class EditApplicationError(RuntimeError):
     """An edit could not be applied to the current model."""
+
+
+@dataclass(frozen=True)
+class EditOptions:
+    """Model editing policy, independent of preparation-cache lifetime."""
+
+    mode: str = "ir"
+
+    def __post_init__(self):
+        if self.mode not in {"ir", "auto"}:
+            raise ValueError(f"unknown model edit mode: {self.mode}")
+
+
+@runtime_checkable
+class ConfigurableEditingModel(Protocol):
+    def with_edit_options(self, options: EditOptions) -> ModelAdapter: ...

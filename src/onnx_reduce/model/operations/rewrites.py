@@ -6,7 +6,7 @@ The engine must check validity, cost and the target failure for every candidate.
 
 import onnx
 
-from onnx_reduce.edits import BypassNode, Candidate, DropNodeAttribute
+from onnx_reduce.edits import DropNodeAttribute
 from onnx_reduce.model.operations.graphs import graph_at
 from onnx_reduce.types import EditApplicationError
 
@@ -36,17 +36,6 @@ def optional_attributes(proto, node):
         and not attr.ref_attr_name
         and attr.type not in {onnx.AttributeProto.GRAPH, onnx.AttributeProto.GRAPHS}
     )
-
-
-def rewrite_candidates(proto, kind):
-    for index, node in enumerate(proto.graph.node):
-        if kind == "bypass" and len(node.output) == 1 and node.output[0]:
-            for input_index, name in enumerate(node.input):
-                if name and name != node.output[0]:
-                    yield Candidate((BypassNode(index, input_index),))
-        elif kind == "attributes":
-            for name in optional_attributes(proto, node):
-                yield Candidate((DropNodeAttribute(index, name),))
 
 
 def _replace_captures(graph, old, new):

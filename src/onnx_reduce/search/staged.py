@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-from collections import deque
-from dataclasses import asdict, replace
+from dataclasses import replace
 
 from onnx_reduce.edits import DeleteNodes
 from onnx_reduce.passes.base import CursorPass, NodeSearchPass, StagedPass
 from onnx_reduce.performance import measure, measured, timed_candidates
 from onnx_reduce.search.coverage import REGION_SCOPE, Finalizer
 from onnx_reduce.search.cursors import RejectionOrder, RemovalCursor
+from onnx_reduce.search.progress import StageProgress
 from onnx_reduce.search.regions import graph_regions, region_choices
+from onnx_reduce.search.rotation import PassRotation
 from onnx_reduce.search.state import SearchState
 from onnx_reduce.search.types import PASS_SCOPE
 from onnx_reduce.types import NodeSearchModel
@@ -59,31 +60,19 @@ class StagedScheduler:
         if self._node_passes and not isinstance(model, NodeSearchModel):
             raise ValueError("staged node search requires node_ids and id_to_index on the model")
         self._state.scope = REGION_SCOPE if self._node_passes else PASS_SCOPE
-        self._stage_index = len(self.stages) if finalize_only else 0
-        self._turn_pass = 0
-        self._turn_used = 0
-        self._turn_budget = None
-        self._pass_history = {}
-        self._pass_failures = {}
-        self._pass_states = {}
+        self._progress = StageProgress(self.stages, len(self.stages) if finalize_only else 0)
+        self._rotation = PassRotation()
         self._iterator = None
         self._cleanup_iterator = None
         self._cleanup_used = 0
         self._cleanup_pending = False
-        self._without_accept = 0
-        self._stage_ends = {}
-        self._stage_cost_delta = {}
         self._finalizer = None
         self.stop_reason = "search_exhausted"
         self._finalize_only = finalize_only
 
     @property
     def stage(self):
-        return (
-            self.stages[self._stage_index]
-            if self._stage_index < len(self.stages)
-            else "finalization"
-        )
+        return self._progress.stage
 
     def _one_pass(self, model, stage, index):
         reduction_pass = self._state.passes[index]
@@ -143,56 +132,20 @@ class StagedScheduler:
             for candidate in timed_candidates(reduction_pass, model):
                 yield self._state.attempt(candidate, index, source=stage, stage=stage)
 
-    def _quantum(self, index):
-        history = self._pass_history.get(index, ())
-        # Deterministic success feedback, never wall-clock timings. Every pass
-        # retains an eight-attempt turn; productive passes get at most sixteen.
-        return self.pass_quantum * (
-            2 if len(history) >= 8 and sum(history) * 4 >= len(history) else 1
-        )
-
     def _pass_candidates(self, model, stage):
-        indices = list(range(len(self._state.passes)))
-        start = self._turn_pass if stage != "cleanup" else 0
-        indices = indices[start:] + indices[:start]
-        queue = deque((index, iter(self._one_pass(model, stage, index))) for index in indices)
-        for index in indices:
-            self._pass_states.setdefault(f"{stage}/{self._state.passes[index].name}", "not_visited")
         limit = (
             self.deep_no_progress_limit
             if stage == "deep" and self.no_progress_limit
             else self.no_progress_limit
         )
-        while queue:
-            index, stream = queue.popleft()
-            key = (stage, index)
-            if self._pass_failures.get(key, 0) >= limit:
-                self._pass_states[f"{stage}/{self._state.passes[index].name}"] = "plateau"
-                continue
-            state_key = f"{stage}/{self._state.passes[index].name}"
-            yielded = False
-            quantum = self._quantum(index)
-            if index == self._turn_pass and stage != "cleanup":
-                quantum = max(1, (self._turn_budget or quantum) - self._turn_used)
-            for _ in range(quantum):
-                if self._pass_failures.get(key, 0) >= limit:
-                    break
-                attempt = next(stream, None)
-                if attempt is None:
-                    self._pass_states[state_key] = (
-                        "exhausted"
-                        if yielded or self._pass_states.get(state_key) == "visited"
-                        else "no_candidates"
-                    )
-                    break
-                yielded = True
-                self._pass_states[state_key] = "visited"
-                yield attempt
-            else:
-                queue.append((index, stream))
-                continue
-            if self._pass_failures.get(key, 0) >= limit:
-                self._pass_states[state_key] = "plateau"
+        yield from self._rotation.candidates(
+            model,
+            stage,
+            passes=self._state.passes,
+            generate=self._one_pass,
+            quantum=self.pass_quantum,
+            limit=limit,
+        )
 
     def _generate(self, model):
         attempts = self._generate_raw(model)
@@ -251,7 +204,7 @@ class StagedScheduler:
     @measured("scheduler")
     def next_attempt(self, model):
         self._current_model = model
-        while self._stage_index < (3 if self.goal == "fast" else len(self.stages)):
+        while self._progress.index < (3 if self.goal == "fast" else len(self.stages)):
             if self._cleanup_pending:
                 if self._cleanup_iterator is None:
                     self._cleanup_iterator = iter(self._pass_candidates(model, "cleanup"))
@@ -262,7 +215,7 @@ class StagedScheduler:
                         return attempt
                 self._cleanup_pending = False
                 self._cleanup_iterator = None
-            if self.stage == "regions" and self._without_accept >= self.no_progress_limit:
+            if self.stage == "regions" and self._progress.without_accept >= self.no_progress_limit:
                 attempt = None
                 reason = "plateau"
             else:
@@ -274,22 +227,20 @@ class StagedScheduler:
                 return attempt
             if any(
                 state == "plateau"
-                for key, state in self._pass_states.items()
+                for key, state in self._rotation.pass_states.items()
                 if key.startswith(self.stage + "/")
             ):
                 reason = "plateau"
-            self._stage_ends[self.stage] = reason
-            self._stage_index += 1
+            self._progress.advance(reason)
             if self._history is not None:
                 self._history.pending.clear()
             self._direction_stats = {"delete": [0, 0], "keep": [0, 0]}
-            if self._stage_index >= 3:
+            if self._progress.index >= 3:
                 self._fine_cursors.clear()
             self._iterator = None
-            self._without_accept = 0
         if self.goal == "fast":
             self.stop_reason = (
-                "plateau" if "plateau" in self._stage_ends.values() else "search_exhausted"
+                "plateau" if "plateau" in self._progress.ends.values() else "search_exhausted"
             )
             return None
         if self._finalizer is None:
@@ -317,23 +268,7 @@ class StagedScheduler:
     def observe(self, attempt, feedback, accepted_model=None):
         self._state.record(attempt, feedback)
         if self._finalizer is None:
-            if attempt.stage != "cleanup":
-                if self._turn_pass != attempt.pass_index:
-                    self._turn_used = 0
-                    self._turn_budget = None
-                if self._turn_budget is None:
-                    self._turn_budget = self._quantum(attempt.pass_index)
-                self._pass_history.setdefault(attempt.pass_index, deque(maxlen=16)).append(
-                    feedback.status == "accepted"
-                )
-                self._turn_pass = attempt.pass_index
-                self._turn_used += 1
-                if self._turn_used >= self._turn_budget:
-                    self._turn_pass = (attempt.pass_index + 1) % max(1, len(self._state.passes))
-                    self._turn_used = 0
-                    self._turn_budget = None
-                key = (attempt.stage, attempt.pass_index)
-                self._pass_failures[key] = self._pass_failures.get(key, 0) + 1
+            self._rotation.observe(attempt, feedback, len(self._state.passes), self.pass_quantum)
             if self._history is not None:
                 self._history.observe(attempt, self._current_model, feedback)
             if attempt.direction in self._direction_stats:
@@ -343,8 +278,7 @@ class StagedScheduler:
         if self._finalizer is not None:
             self._finalizer.observe(feedback, accepted_model)
         if accepted_model is None:
-            if attempt.stage != "cleanup":
-                self._without_accept += 1
+            self._progress.rejected(attempt.stage)
             return
         if self._history is not None:
             # Undo lookahead for unexecuted fine attempts before discarding this
@@ -356,8 +290,7 @@ class StagedScheduler:
                     restored.add(pending.cursor_key)
             self._history.pending.clear()
         self._state.accept(accepted_model)
-        self._pass_failures.clear()
-        self._pass_states.clear()
+        self._rotation.accepted()
         for cursor in self._fine_cursors.values():
             cursor.accepted()
         if attempt.stage == "coarse" and self._state.passes:
@@ -378,12 +311,7 @@ class StagedScheduler:
             self._region_anchor = next(
                 (item for item in neighborhood if item in accepted_model.id_to_index), None
             )
-        deltas = self._stage_cost_delta.setdefault(
-            attempt.stage, dict.fromkeys(asdict(feedback.base_cost), 0)
-        )
-        for name, before in asdict(feedback.base_cost).items():
-            deltas[name] += before - getattr(feedback.candidate_cost, name)
-        self._without_accept = 0
+        self._progress.accepted(attempt.stage, feedback)
         self._iterator = None
         self._cleanup_iterator = None
         if self._finalizer is not None:
@@ -417,15 +345,15 @@ class StagedScheduler:
             }
             if self._history
             else None,
-            "stage": self.stage if self.goal == "complete" or self._stage_index < 3 else "done",
+            "stage": self.stage if self.goal == "complete" or self._progress.index < 3 else "done",
             "pass_quantum": self.pass_quantum,
             "max_pass_quantum": self.pass_quantum * 2,
             "deep_no_progress_limit": self.deep_no_progress_limit,
-            "pass_states": dict(self._pass_states),
+            "pass_states": dict(self._rotation.pass_states),
             "pass_state_model_version": self._state.model_version,
-            "stage_ends": dict(self._stage_ends),
+            "stage_ends": dict(self._progress.ends),
             "stage_accepted_cost_delta": {
-                key: dict(value) for key, value in self._stage_cost_delta.items()
+                key: dict(value) for key, value in self._progress.cost_delta.items()
             },
             "no_progress_limit": self.no_progress_limit,
             "cleanup_quantum": self.cleanup_quantum,

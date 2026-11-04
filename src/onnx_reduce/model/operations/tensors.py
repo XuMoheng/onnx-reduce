@@ -6,7 +6,6 @@ import numpy as np
 import onnx
 from onnx import numpy_helper
 
-from onnx_reduce.edits import Candidate, ShrinkDimension
 from onnx_reduce.model.operations.graphs import walk_graphs
 from onnx_reduce.types import EditApplicationError
 
@@ -49,23 +48,6 @@ def tensor_elements(proto):
             shape = value.type.tensor_type.shape
             total += math.prod(d.dim_value if d.HasField("dim_value") else 1 for d in shape.dim)
     return total
-
-
-def tensor_candidates(proto):
-    dimensions = set()
-    for _, graph in walk_graphs(proto):
-        for tensor in tensors(graph):
-            dimensions.update(d for d in tensor.dims if d > 1)
-        for value in graph.input:
-            dimensions.update(
-                d.dim_value
-                for d in value.type.tensor_type.shape.dim
-                if d.HasField("dim_value") and d.dim_value > 1
-            )
-    for old in sorted(dimensions, reverse=True):
-        for new in sorted({1, old // 2, old - 1}):
-            if 0 < new < old:
-                yield Candidate((ShrinkDimension(old, new),))
 
 
 def shrink_dimension(proto, old, new):

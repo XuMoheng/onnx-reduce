@@ -1,11 +1,8 @@
 """Explicit attribute-graph addresses and interface-preserving subgraph edits."""
 
-from dataclasses import replace
-
 import onnx
 
-from onnx_reduce.edits import Candidate, CleanupGraph, DeleteSubgraphNodes
-from onnx_reduce.passes.groups import deletion_groups
+from onnx_reduce.edits import CleanupGraph
 from onnx_reduce.types import EditApplicationError
 
 
@@ -83,21 +80,3 @@ def apply_graph_edit(proto, edit):
     kept = [v for v in graph.value_info if v.name in defined]
     del graph.value_info[:]
     graph.value_info.extend(kept)
-
-
-def subgraph_candidates(proto):
-    from onnx_reduce.model.operations.rewrites import rewrite_candidates
-
-    for path, graph in walk_graphs(proto):
-        if not path:
-            continue
-        # Reuse the main-graph candidate rules with this graph's local indices.
-        view = onnx.ModelProto()
-        view.graph.CopyFrom(graph)
-        view.opset_import.extend(proto.opset_import)
-        view.functions.extend(proto.functions)
-        for kind in ("bypass", "attributes"):
-            for candidate in rewrite_candidates(view, kind):
-                yield Candidate(tuple(replace(e, graph_path=path) for e in candidate.edits))
-        for indices in deletion_groups(tuple(range(len(graph.node)))):
-            yield Candidate((DeleteSubgraphNodes(path, indices),))

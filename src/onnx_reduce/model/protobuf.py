@@ -120,7 +120,7 @@ def _try_fast_delete_nodes(model: OnnxModel, indices):
         del result_graph.node[index]
     ids = tuple(node_id for i, node_id in enumerate(model.node_ids) if i not in seen)
     count("fast_edit_hits")
-    return type(model)._from_snapshot(proto, ids)
+    return type(model)._from_snapshot(proto, ids, edit_options=model.edit_options)
 
 
 def _proto_links(model: OnnxModel):

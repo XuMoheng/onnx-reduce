@@ -115,7 +115,7 @@ def test_package_version_matches_pyproject():
     import onnx_reduce
 
     pyproject = tomllib.loads(
-        (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
+        (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text(encoding="utf-8")
     )
     assert onnx_reduce.__version__ == pyproject["project"]["version"]
 

@@ -13,7 +13,7 @@ from onnx_reduce.model import OnnxModel
 from onnx_reduce.performance import collect_performance, measure
 from onnx_reduce.storage import atomic_write, write_text
 from tests.helpers import chain_model
-from tests.test_engine import NeverInteresting, ReluFailureCheck
+from tests.runtime.test_engine import NeverInteresting, ReluFailureCheck
 
 
 def test_nested_timers_count_exclusive_time_and_exceptions(monkeypatch):

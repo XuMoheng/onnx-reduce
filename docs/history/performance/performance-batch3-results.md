@@ -35,7 +35,7 @@
 
 规模 32、128、512 在两种预算下，最终完整成本和模型摘要全部一致。
 以下为规模 512、检查预算 100 的三次中位数，均达到固定点。
-initializer 和 output 场景的 size 分别指资源数、输出数，其余含义见[基准定义](performance-baseline.md)。
+initializer 和 output 场景的 size 分别指资源数、输出数，其余含义见[基准定义](../../performance/performance-baseline.md)。
 
 | 场景 | legacy / stateful 耗时 | 实际判定 | IR 克隆 | 共同最终成本 |
 | --- | ---: | ---: | ---: | --- |

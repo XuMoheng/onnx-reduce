@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import hashlib
 import os
 from collections.abc import Iterable
+from copy import copy
 from functools import cached_property
 from pathlib import Path
 from types import MappingProxyType
@@ -16,11 +16,13 @@ from onnxscript import ir
 from onnx_reduce.edits import (
     Candidate,
 )
-from onnx_reduce.model import candidates, editing, inference, protobuf, queries, validation
+from onnx_reduce.model import editing, inference, protobuf, queries, validation
 from onnx_reduce.model.queries import TensorLinks
+from onnx_reduce.model.snapshot import ModelSnapshot
 from onnx_reduce.performance import count, measured
 from onnx_reduce.storage import atomic_write
 from onnx_reduce.types import (
+    EditOptions,
     ModelArtifact,
     ModelCost,
     RegionGraph,
@@ -35,9 +37,16 @@ class OnnxModel:
     mutating it and its tensors; to_proto() returns an independent copy.
     """
 
-    def __init__(self, model: ir.Model, *, _node_ids: tuple[int, ...] | None = None):
+    def __init__(
+        self,
+        model: ir.Model,
+        *,
+        _node_ids: tuple[int, ...] | None = None,
+        edit_options: EditOptions | None = None,
+    ):
         """Take ownership of the IR model; callers must stop mutating it and its tensors."""
 
+        self.edit_options = edit_options or EditOptions()
         self._ir_model = model  # Owned IR; edits are applied only to fresh clones
         self._proto_snapshot = None
         ids = range(model.graph.num_nodes()) if _node_ids is None else _node_ids
@@ -57,23 +66,28 @@ class OnnxModel:
         return ir.from_proto(self._snapshot)
 
     @classmethod
-    def _from_snapshot(cls, proto, ids):
+    def _from_snapshot(cls, proto, ids, *, edit_options=None):
         obj = cls.__new__(cls)
+        obj.edit_options = edit_options or EditOptions()
         obj._ir_model = None
-        obj._proto_snapshot = proto
+        obj._proto_snapshot = ModelSnapshot(proto)
         obj._ordered_node_ids = ids
         obj._id_to_index = MappingProxyType({item: i for i, item in enumerate(ids)})
         return obj
 
+    @property
+    def _snapshot(self):
+        return self.snapshot.proto
+
     @cached_property
     @measured("export")
-    def _snapshot(self):
+    def snapshot(self):
         if self._proto_snapshot is not None:
             return self._proto_snapshot
         converted = ir.to_proto(self._model)
         if not isinstance(converted, onnx.ModelProto):
             raise TypeError("onnxscript IR did not convert to a ModelProto")
-        return converted
+        return ModelSnapshot(converted)
 
     def _refresh_node_indices(self) -> None:
         # Keep only live objects. Identity metadata never enters the ONNX payload.
@@ -128,7 +142,19 @@ class OnnxModel:
     def copy(self) -> OnnxModel:
         """Clone the IR for candidate edits while preserving the original model."""
 
-        return OnnxModel(self._model.clone(), _node_ids=self.node_ids)
+        return OnnxModel(
+            self._model.clone(), _node_ids=self.node_ids, edit_options=self.edit_options
+        )
+
+    def with_edit_options(self, options: EditOptions) -> OnnxModel:
+        """Return a policy view; model content and lineage remain unchanged."""
+        result = copy(self)
+        result.edit_options = options
+        return result
+
+    def candidate_snapshot(self):
+        """Return the shared read-only-by-contract ONNX view for pass queries."""
+        return self._snapshot
 
     def to_proto(self) -> onnx.ModelProto:
         """Export an independently mutable copy of the normalized snapshot."""
@@ -237,9 +263,6 @@ class OnnxModel:
     def apply_candidate(self, candidate: Candidate) -> OnnxModel:
         return editing.apply_candidate(self, candidate)
 
-    def rewrite_candidates(self, kind):
-        return candidates.rewrite_candidates(self, kind)
-
     def _delete_nodes(self, indices: Iterable[int], *, inference_source: OnnxModel) -> None:
         return editing._delete_nodes(self, indices, inference_source=inference_source)
 
@@ -269,18 +292,16 @@ class OnnxModel:
         return validation.validate(self, mode, use_cache=use_cache)
 
     @cached_property
-    @measured("serialization")
     def _payload(self) -> bytes:
         """Cache deterministic bytes on first access for cost, hashing, and file output."""
 
-        return self._snapshot.SerializeToString(deterministic=True)
+        return self.snapshot.payload
 
     @cached_property
-    @measured("hash")
     def _digest(self) -> str:
         """Cache the SHA-256 of serialized bytes as the exact content identity."""
 
-        return hashlib.sha256(self._payload).hexdigest()
+        return self.snapshot.digest
 
     def canonical_hash(self) -> str:
         """Return the exact serialized-content hash, without semantic canonicalization."""

@@ -1,13 +1,13 @@
 # 第三批：有状态搜索调度器方案
 
-> 本文保留该批次的设计和当时的源码位置。当前模块职责与路径见[架构说明](../architecture.md)。
+> 本文保留该批次的设计和当时的源码位置。当前模块职责与路径见[架构说明](../../architecture.md)。
 
 状态：已实现实验性 `stateful` 调度，默认保持 `legacy`。实现基于 `1012-perf` 的
 `perf/reduction-strategy` 分支、`e8203a3`，第二批实现已由 `09de684` 合入。
 2026-11-03 的设计、实现和对照均以完整第二批为基线；运行结果与退化样本见
 [第三批实测](../performance/performance-batch3-results.md)。
 
-相关依据：[四批性能计划](../performance/performance-todo.md)、[当前架构](../architecture.md)、
+相关依据：[四批性能计划](../performance/performance-todo.md)、[当前架构](../../architecture.md)、
 [第一批实测](../performance/performance-batch1-results.md)、[第二批实测](../performance/performance-batch2-results.md)。
 
 ## 目标与范围

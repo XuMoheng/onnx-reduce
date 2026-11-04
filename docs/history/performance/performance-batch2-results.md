@@ -93,7 +93,7 @@ Relu 位于索引 64。每个节点依次生成 `DeleteNodes((i,))`、`DeleteNod
 较小模型的额外缓存字段可能抵消模型文件写入的节省，不能保证所有场景累计写入都会下降。
 大权重模型的内存与外部数据共享不在本次实测范围。
 
-复现命令见[准备缓存基准](performance-baseline.md#准备缓存基准)。原始记录：
+复现命令见[准备缓存基准](../../performance/performance-baseline.md#准备缓存基准)。原始记录：
 
 - 修改前：`output/performance/batch2-preparation-original/20261103-113907/baseline.json`
 - 第二批开启：`output/performance/batch2-preparation-after/20261103-114023/baseline.json`

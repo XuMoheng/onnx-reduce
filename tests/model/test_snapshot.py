@@ -13,7 +13,7 @@ from onnx_reduce.model import OnnxModel
 from onnx_reduce.performance import collect_performance
 from onnx_reduce.preparation import preparation_caches
 from onnx_reduce.storage import checkpoint_artifact
-from onnx_reduce.types import EditApplicationError
+from onnx_reduce.types import EditApplicationError, EditOptions
 from tests.helpers import (
     chain_model,
     control_flow_model,
@@ -22,7 +22,11 @@ from tests.helpers import (
     qdq_model,
     tensor_value,
 )
-from tests.test_engine import ReluFailureCheck
+from tests.runtime.test_engine import ReluFailureCheck
+
+
+def configured_model(proto, mode):
+    return OnnxModel.from_proto(proto).with_edit_options(EditOptions(mode))
 
 
 def typed_chain():
@@ -48,8 +52,8 @@ def test_fast_and_ir_paths_match_bytes_queries_and_followup(fixture, indices):
     indices = tuple(i for i in indices if i < len(p.graph.node))
     models = []
     for mode in ("ir", "auto"):
-        with preparation_caches(model_edit_mode=mode):
-            base = OnnxModel.from_proto(p)
+        with preparation_caches():
+            base = configured_model(p, mode)
             before = base.canonical_hash()
             model = base.apply_candidate(Candidate((DeleteNodes(indices),)))
             state = (
@@ -78,8 +82,8 @@ def test_fast_and_ir_paths_match_bytes_queries_and_followup(fixture, indices):
 
 
 def test_snapshot_stays_lazy_and_public_proto_is_independent():
-    with preparation_caches(model_edit_mode="auto"), collect_performance(True) as stats:
-        parent = OnnxModel.from_proto(typed_chain())
+    with preparation_caches(), collect_performance(True) as stats:
+        parent = configured_model(typed_chain(), "auto")
         model = parent.apply_candidate(Candidate((DeleteNodes((2,)),)))
         assert model._ir_model is None
         model.cost(), model.region_graph(), model.tensor_index(), model.dead_node_indices()
@@ -114,12 +118,12 @@ def test_unsupported_capabilities_really_fall_back(kind):
         # The existing IR cloner itself rejects forward references. Auto must
         # decline, then preserve the same failure rather than silently reorder.
         for mode in ("ir", "auto"):
-            with preparation_caches(model_edit_mode=mode), pytest.raises(RuntimeError):
-                OnnxModel.from_proto(p).apply_candidate(Candidate((DeleteNodes((0,)),)))
-        assert not OnnxModel.from_proto(p)._fast_capability
+            with preparation_caches(), pytest.raises(RuntimeError):
+                configured_model(p, mode).apply_candidate(Candidate((DeleteNodes((0,)),)))
+        assert not configured_model(p, mode)._fast_capability
         return
-    with preparation_caches(model_edit_mode="auto"):
-        result = OnnxModel.from_proto(p).apply_candidate(Candidate((DeleteNodes((0,)),)))
+    with preparation_caches():
+        result = configured_model(p, "auto").apply_candidate(Candidate((DeleteNodes((0,)),)))
     assert result._ir_model is not None
 
 
@@ -129,8 +133,8 @@ def test_mixed_edits_use_current_state_and_do_not_change_parent():
     p.graph.output.append(tensor_value("v1"))
     results = []
     for mode in ("ir", "auto"):
-        with preparation_caches(model_edit_mode=mode):
-            base = OnnxModel.from_proto(p)
+        with preparation_caches():
+            base = configured_model(p, mode)
             changed = base.apply_candidate(
                 Candidate(
                     (
@@ -161,8 +165,8 @@ def test_external_weights_and_symbolic_shape_are_byte_identical(tmp_path):
                 info.type.tensor_type.shape.dim[0].dim_param = "batch"
         results = []
         for mode in ("ir", "auto"):
-            with preparation_caches(model_edit_mode=mode):
-                model = OnnxModel.from_proto(p).apply_candidate(Candidate((DeleteNodes((0,)),)))
+            with preparation_caches():
+                model = configured_model(p, mode).apply_candidate(Candidate((DeleteNodes((0,)),)))
                 results.append(
                     (model._payload, model.cost(), model.validate(), model.region_graph())
                 )
@@ -176,8 +180,8 @@ def test_inference_failure_keeps_partial_type_and_same_rejection(monkeypatch):
     monkeypatch.setattr(onnx.shape_inference, "infer_shapes", fail)
     results = []
     for mode in ("ir", "auto"):
-        with preparation_caches(model_edit_mode=mode):
-            model = OnnxModel.from_proto(chain_model()).apply_candidate(
+        with preparation_caches():
+            model = configured_model(chain_model(), mode).apply_candidate(
                 Candidate((DeleteNodes((0,)),))
             )
             results.append((model._payload, model.validate()))
@@ -218,8 +222,10 @@ def test_multi_output_boundaries_and_initializer_input_aliases():
     for p, indices in ((branching, (2, 0)), (alias, (0,))):
         results = []
         for mode in ("ir", "auto"):
-            with preparation_caches(model_edit_mode=mode):
-                model = OnnxModel.from_proto(p).apply_candidate(Candidate((DeleteNodes(indices),)))
+            with preparation_caches():
+                model = configured_model(p, mode).apply_candidate(
+                    Candidate((DeleteNodes(indices),))
+                )
                 results.append(
                     (
                         model._payload,
@@ -235,8 +241,8 @@ def test_multi_output_boundaries_and_initializer_input_aliases():
 @pytest.mark.parametrize("indices", [(-1,), (999,)])
 def test_fast_errors_match_ir_including_stale_base(indices):
     for mode in ("ir", "auto"):
-        with preparation_caches(model_edit_mode=mode):
-            model = OnnxModel.from_proto(typed_chain())
+        with preparation_caches():
+            model = configured_model(typed_chain(), mode)
             with pytest.raises(
                 EditApplicationError, match=f"node index {indices[0]} is out of range"
             ):
@@ -308,3 +314,20 @@ def test_edit_mode_preserves_engine_decisions_and_fixed_point(tmp_path, schedule
             == mode
         )
     assert results[0] == results[1]
+
+
+@pytest.mark.parametrize("enabled", [True, False])
+def test_explicit_edit_policy_survives_cache_context_and_followup_edits(enabled):
+    parent = OnnxModel.from_proto(typed_chain())
+    auto = parent.with_edit_options(EditOptions("auto"))
+    candidate = Candidate((DeleteNodes((2,)),))
+    with preparation_caches(enabled):
+        changed = auto.apply_candidate(candidate)
+    assert changed._ir_model is None
+    assert changed.edit_options == EditOptions("auto")
+    # Leaving the cache scope must not silently change the editor on the result.
+    followup = changed.apply_candidate(candidate)
+    assert followup._ir_model is None
+    assert parent.edit_options == EditOptions("ir")
+    assert parent.apply_candidate(candidate)._ir_model is not None
+    assert parent.node_count == 7

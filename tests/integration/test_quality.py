@@ -189,7 +189,7 @@ def test_real_manifest_benchmark_entrypoint(tmp_path):
     import sys
     from pathlib import Path
 
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     source = tmp_path / "source.onnx"
     onnx.save(
         model([h.make_node("Relu", ["x"], ["y"])], [value("x", (1,))], [value("y", (1,))]), source
@@ -238,7 +238,7 @@ def test_strategy_compare_runs_both_sources_with_equal_budgets(tmp_path):
     import sys
     from pathlib import Path
 
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     source = tmp_path / "source.onnx"
     onnx.save(model([h.make_node("Relu", ["x"], ["y"])], [value("x")], [value("y")]), source)
     manifest = tmp_path / "cases.json"

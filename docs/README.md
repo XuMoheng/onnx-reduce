@@ -11,8 +11,8 @@ docs/
 ├── usage.md            使用指南
 ├── architecture.md     架构说明
 ├── troubleshooting.md  排障指南
-├── design/             性能各批设计方案
-└── performance/        性能计划、基线方法与各批实测报告
+├── performance/        当前结论、可复现实验与重构对照
+└── history/            历史批次设计、计划、实测与证据摘要
 ```
 
 ## 按任务阅读
@@ -28,27 +28,14 @@ docs/
 
 首次接入建议按「README → 使用指南 → 排障指南」阅读；修改实现前再阅读架构说明。
 
-## 开发计划与性能资料
+## 性能资料
 
-性能工作按批次推进，计划、进度和验收结论集中在
-[性能优化计划](performance/performance-todo.md)。
+- 当前结论：[性能概览](performance/README.md)
+- 可复现实验：[性能基线方法](performance/performance-baseline.md)、[缩减质量验证](performance/reduction-quality.md)、[重构行为与性能对照](performance/refactor-verification.md)
+- 历史记录：[批次设计与实测索引](history/README.md)
 
-- 计划与进度：[性能优化计划](performance/performance-todo.md)
-- 缩减质量与组合搜索：[质量验证及真实故障接入](performance/reduction-quality.md)
-- 基线方法：[性能基线：采集与基准命令](performance/performance-baseline.md)
-- 各批实测：
-  [第一批（2026-11-02）](performance/performance-batch1-results.md)、
-  [第二批（2026-11-03）](performance/performance-batch2-results.md)、
-  [第三批（2026-11-03）](performance/performance-batch3-results.md)、
-  [第四批（2026-11-03）](performance/performance-batch4-results.md)、
-  [第五、六批（2026-11-03）](performance/performance-batch56-results.md)
-- 批次设计：
-  [第三批：有状态搜索调度器](design/stateful-search-design.md)、
-  [第四批：分阶段搜索和独立收尾](design/staged-search-design.md)、
-  [第五、六批：参考 free-try 的后续设计](design/free-try-followup-design.md)
-
-各批实测报告同目录的 `performance-batch*-evidence.json` 是对应的证据摘要；
-原始运行记录位于 Git 忽略的 `output/performance/`。
+历史报告描述各自提交上的实现与实验，不作为当前模块结构和默认行为的说明。
+原始运行记录位于 Git 忽略的 `output/performance/`；重构对照另存于 `output/refactor-verification/`。
 
 ## 命令与路径约定
 

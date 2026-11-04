@@ -72,7 +72,7 @@ uv run --locked python benchmarks/reduction.py \
 内容摘要与最终结果，不能要求包含命中字段的原始日志字节完全一致。
 采集开关的原有严格轨迹对照仍分别执行。
 
-### 第三批调度对照
+### 调度策略对照
 
 `--scheduler legacy|stateful` 选择单一策略；`--compare-schedulers` 在同一份源码、清理和
 缓存实现上比较两者，并交替执行顺序。`--compare-instrumentation` 可同时使用，固定检查预算
@@ -104,7 +104,7 @@ uv run --locked python benchmarks/reduction.py \
 每项保留环境、完整参数、源码 SHA-256、运行目录及最终完整成本。
 `comparisons` 逐次按 `(nodes, bytes, outputs, inputs, initializers)` 字典序记录 improved、equal、
 regressed，不能只看耗时平均值。stateful 的最终覆盖成本单列在 `scheduler.sources.coverage`。
-实测结果及退化记录见[第三批报告](performance-batch3-results.md)。
+实测结果及退化记录见[第三批报告](../history/performance/performance-batch3-results.md)。
 
 ## 对单次缩减采集
 
@@ -142,7 +142,8 @@ Python 接口对应 `EngineConfig(collect_performance=True)`。
 `export`、`serialization`、`validation`、`hash`、`write`、`external_check`、`checkpoint`。
 候选生成测量实际的惰性迭代，包括迭代结束；shape 推导仅在确实缺失边界信息时计数。
 ONNX checker 内部的 shape 检查包含在 `validation`，不与显式 `shape_inference` 混算。
-`serialization` 包含导出，`clone_and_edit` 包含克隆/推导，checkpoint 包含落盘，
+`export` 负责 IR 导出（快照结果可直接复用），`serialization` 负责确定性字节编码；
+`clone_and_edit` 包含克隆/推导，checkpoint 包含落盘，
 因此分析主要耗时应按 **exclusive_seconds** 排序，不能累加 inclusive_seconds。
 未进入的阶段不出现在字典中。
 
@@ -160,9 +161,9 @@ CLI 额外指定报告和后端自行写的文件，也不是磁盘物理写入�
 4. 单独记录真实后端验证状态；未提供模型与判定器时保留为待验证项。
 
 第一批建立测量基础；后续批量清理、准备缓存和有状态调度的独立结果分别见
-[第二批实测](performance-batch2-results.md)与[第三批实测](performance-batch3-results.md)。
+[第二批实测](../history/performance/performance-batch2-results.md)与[第三批实测](../history/performance/performance-batch3-results.md)。
 
-### 第四批阶段对照
+### 分阶段调度对照
 
 `--compare-staged` 在同一输入、缓存和预算下比较 legacy、stateful、staged-fast 和
 staged-complete；与 `--compare-instrumentation` 联用时检查固定调用预算的有序轨迹一致性。
@@ -184,7 +185,7 @@ uv run --locked python benchmarks/reduction.py \
 `scheduler.finalization`、`scheduler.coverage` 和 `artifact_recheck`，区分搜索工作、
 收尾工作及最终输出保证。
 
-### 第五、六批消融与复核
+### 快照编辑与续扫消融与复核
 
 `--case gated` 每三个原始节点有一个必须保留，暴露细分与重启放大；
 `--case one-stubborn-init` 要求保留中间编号的 initializer，检验批量失败后细分。
@@ -194,4 +195,4 @@ uv run --locked python benchmarks/reduction.py \
 `prepare_batch56_baseline.py` 冻结原 perf 源码并移入同一份基准定义；
 `batch56.py` 串行执行准备、搜索、完整收敛与采集开关消融；
 `audit_batch56.py` 从实际输出、成本、ONNX checker、首尾日志和当前源码重新核验记录。
-正式命令、714 次矩阵和边界说明见[第五、六批结果](performance-batch56-results.md)。
+正式命令、714 次矩阵和边界说明见[第五、六批结果](../history/performance/performance-batch56-results.md)。

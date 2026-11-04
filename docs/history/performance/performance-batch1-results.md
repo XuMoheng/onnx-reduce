@@ -5,7 +5,7 @@
 ## 输入模型与判定条件
 
 本报告的性能数据来自基准脚本人工生成的 ONNX 模型，生成逻辑见
-[benchmarks/reduction.py 的 `make_model()`](../../benchmarks/reduction.py)。没有使用实际业务网络或真实后端故障模型。
+[benchmarks/reduction.py 的 `make_model()`](../../../benchmarks/reduction.py)。没有使用实际业务网络或真实后端故障模型。
 所有模型均使用标准 ONNX 算子、默认 domain 的 opset 17，只包含主图，没有属性子图。
 图输入均为 `x`，类型为 `float32`、形状为 `[1]`。基准不生成输入数据，也不执行数值推理。
 
@@ -65,7 +65,7 @@ initializer 场景表示权重数量，链图表示节点数量，分支和多�
 - 以下耗时为中位数，不含输入模型构建和 Python 启动。所有最终成本包含主图节点、序列化字节、输出、输入和 initializer。
 - 512 场景原始记录：`output/performance/20261102-151240/baseline.json`。
 - 五类合成场景原始记录：`output/performance/20261102-151316/baseline.json`。
-- 原始记录位于被 Git 忽略的 `output/`，包含源码 SHA-256、环境、参数和逐次报告；完整口径见[性能基线](performance-baseline.md)。
+- 原始记录位于被 Git 忽略的 `output/`，包含源码 SHA-256、环境、参数和逐次报告；完整口径见[性能基线](../../performance/performance-baseline.md)。
 
 ```bash
 ../1012/.venv/bin/python benchmarks/reduction.py \

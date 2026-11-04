@@ -21,7 +21,6 @@ from onnx_reduce.edits import (
     ShrinkDimension,
 )
 from onnx_reduce.performance import count, measured
-from onnx_reduce.preparation import current_preparation
 from onnx_reduce.types import (
     EditApplicationError,
 )
@@ -40,10 +39,8 @@ def apply_candidate(model: OnnxModel, candidate: Candidate) -> OnnxModel:
 
     if candidate.base_digest is not None and candidate.base_digest != model.canonical_hash():
         raise EditApplicationError("candidate base digest does not match the model")
-    caches = current_preparation()
     if (
-        caches is not None
-        and caches.model_edit_mode == "auto"
+        model.edit_options.mode == "auto"
         and len(candidate.edits) == 1
         and isinstance(candidate.edits[0], DeleteNodes)
     ):
@@ -95,7 +92,9 @@ def apply_candidate(model: OnnxModel, candidate: Candidate) -> OnnxModel:
             if isinstance(edit, BypassNode) and not edit.graph_path:
                 ids = ids[: edit.index] + ids[edit.index + 1 :]
             try:
-                result = OnnxModel(ir.from_proto(proto), _node_ids=ids)
+                result = OnnxModel(
+                    ir.from_proto(proto), _node_ids=ids, edit_options=model.edit_options
+                )
             except (ir.serde.SerdeError, ValueError, TypeError) as exc:
                 raise EditApplicationError(f"cannot import rewritten graph: {exc}") from exc
         else:
@@ -171,8 +170,7 @@ def _delete_nodes(model: OnnxModel, indices: Iterable[int], *, inference_source:
         graph.inputs.append(replacement)
     # 5. Remove nodes and restore topological order; leave input/weight cleanup separate.
     graph.remove(selected)
-    caches = current_preparation()
-    if caches is not None and caches.model_edit_mode == "auto" and model._graph_ordered(graph):
+    if model.edit_options.mode == "auto" and model._graph_ordered(graph):
         count("sort_skips")
     else:
         graph.sort()

@@ -20,7 +20,7 @@
 
 补充分阶段计时和基准测试，明确时间花在哪里。
 
-采集开关、统计口径和基准命令见[性能基线](performance-baseline.md)。
+采集开关、统计口径和基准命令见[性能基线](../../performance/performance-baseline.md)。
 
 当前进度：采集和五类合成基准已实现；固定检查预算下的三轮开关对照通过，
 详见[2026-11-02 实测](performance-batch1-results.md)。真实后端故障尚待验证。

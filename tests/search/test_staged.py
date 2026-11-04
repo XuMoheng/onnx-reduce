@@ -23,8 +23,8 @@ from onnx_reduce.search.coverage import Finalizer
 from onnx_reduce.search.staged import StagedScheduler
 from onnx_reduce.search.types import CandidateFeedback
 from tests.helpers import chain_model, tensor_value
-from tests.test_engine import ReluFailureCheck
-from tests.test_scheduler import CountCheck, rows
+from tests.runtime.test_engine import ReluFailureCheck
+from tests.search.test_scheduler import CountCheck, rows
 
 
 def run(model, runner, workdir, *, passes=None, **config):
@@ -349,7 +349,7 @@ def test_invalid_goal_combinations(config):
 
 
 def test_cli_fast_then_independent_complete(tmp_path):
-    from tests.test_cli import write_failure_check
+    from tests.integration.test_cli import write_failure_check
 
     source = tmp_path / "input.onnx"
     fast = tmp_path / "fast.onnx"
@@ -486,7 +486,7 @@ def test_inconclusive_from_heuristic_is_retried_by_independent_finalizer(tmp_pat
 
 
 def test_module_keep_candidate_reduces_noncontiguous_coupled_nodes(tmp_path):
-    from tests.test_regions import annotated_chain
+    from tests.search.test_regions import annotated_chain
 
     class CoupledModule:
         def run(self, path):

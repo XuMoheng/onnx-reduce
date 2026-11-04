@@ -10,11 +10,17 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from onnx_reduce import __version__
-from onnx_reduce.config import EngineConfig
-from onnx_reduce.engine import ReductionEngine, ReductionError
+from onnx_reduce.config import (
+    CheckConfig,
+    EngineConfig,
+    ExecutionConfig,
+    ExperimentConfig,
+    SearchConfig,
+)
 from onnx_reduce.failure_check.contract import make_failure_check_config
 from onnx_reduce.failure_check.runner import FailureCheckError, FailureCheckRunner
 from onnx_reduce.model import OnnxModel
+from onnx_reduce.runtime.engine import ReductionEngine, ReductionError
 from onnx_reduce.storage import write_json
 
 
@@ -89,36 +95,37 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="RUN_DIR",
         help="finalize a verified previous output; restore its target and verify check configuration",
     )
-    parser.add_argument(
+    experiments = parser.add_argument_group("experimental comparisons")
+    experiments.add_argument(
         "--model-edit-mode",
         choices=("ir", "auto"),
         default="ir",
         help="candidate editing (auto enables conservative protobuf edits)",
     )
-    parser.add_argument(
+    experiments.add_argument(
         "--search-policy",
         choices=("restart", "cursor"),
         default="restart",
         help="staged heuristic continuation policy",
     )
-    parser.add_argument(
+    experiments.add_argument(
         "--history-order",
         choices=("off", "defer"),
         default="off",
         help="staged cursor: defer old rejections without skipping them",
     )
-    parser.add_argument(
+    experiments.add_argument(
         "--direction-order",
         choices=("fixed", "adaptive"),
         default="fixed",
         help="staged cursor: region delete/keep ordering",
     )
-    parser.add_argument(
+    experiments.add_argument(
         "--no-validation-cache",
         action="store_true",
         help="disable checker/domain metadata caches for comparisons",
     )
-    parser.add_argument(
+    experiments.add_argument(
         "--no-checkpoint-reuse",
         action="store_true",
         help="rewrite checkpoints, for storage comparisons",
@@ -173,25 +180,33 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         engine_config = EngineConfig(
-            objective=args.objective,
-            combination_depth=args.combination_depth,
-            combination_limit=args.combination_limit,
-            validation_mode=args.validation_mode,
-            max_candidate_check_calls=args.max_candidate_check_calls,
-            time_budget_seconds=args.time_budget_seconds,
-            cache_enabled=not args.no_cache,
-            collect_performance=args.performance,
-            target_mode=args.target_mode,
-            signature_regex=args.signature_regex,
-            scheduler=args.scheduler,
-            model_edit_mode=args.model_edit_mode,
-            search_policy=args.search_policy,
-            history_order=args.history_order,
-            direction_order=args.direction_order,
-            checkpoint_reuse=not args.no_checkpoint_reuse,
-            validation_cache_enabled=not args.no_validation_cache,
-            goal=args.goal,
-            finalize_from=str(args.finalize_from.resolve()) if args.finalize_from else None,
+            search=SearchConfig(
+                scheduler=args.scheduler,
+                combination_depth=args.combination_depth,
+                combination_limit=args.combination_limit,
+                goal=args.goal,
+                finalize_from=str(args.finalize_from.resolve()) if args.finalize_from else None,
+            ),
+            execution=ExecutionConfig(
+                objective=args.objective,
+                max_candidate_check_calls=args.max_candidate_check_calls,
+                time_budget_seconds=args.time_budget_seconds,
+                cache_enabled=not args.no_cache,
+                collect_performance=args.performance,
+            ),
+            checking=CheckConfig(
+                validation_mode=args.validation_mode,
+                target_mode=args.target_mode,
+                signature_regex=args.signature_regex,
+            ),
+            experiments=ExperimentConfig(
+                model_edit_mode=args.model_edit_mode,
+                search_policy=args.search_policy,
+                history_order=args.history_order,
+                direction_order=args.direction_order,
+                checkpoint_reuse=not args.no_checkpoint_reuse,
+                validation_cache_enabled=not args.no_validation_cache,
+            ),
         )
         if args.report:
             for model_path in (args.model, args.output):

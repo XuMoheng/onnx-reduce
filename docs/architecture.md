@@ -11,9 +11,11 @@
 src/onnx_reduce/
 ├── __main__.py          # python -m onnx_reduce 入口
 ├── cli.py               # 参数解析、模型与判定器创建、CLI 退出码
-├── config.py            # EngineConfig 与参数组合校验
-├── engine.py            # 初检、搜索循环、接受模型、覆盖核验与最终复检的编排
+├── config.py            # 搜索、执行、判定、实验配置及兼容 EngineConfig
+├── engine.py            # 兼容旧导入路径，转发 runtime.engine
 ├── runtime/             # 一次运行的执行与证据
+│   ├── engine.py        # 初检、循环、接受、覆盖核验与独立最终复检
+│   ├── result.py        # 候选执行事实，供搜索反馈和记录消费
 │   ├── candidate.py     # 单个候选的缓存查询、编辑、成本比较、校验与判定
 │   ├── budget.py        # 软时间预算和候选实际判定次数配额
 │   ├── reporting.py     # 候选、调度、接受记录及报告计数，不写执行缓存
@@ -25,7 +27,9 @@ src/onnx_reduce/
 │   ├── state.py         # 共享版本、覆盖记账与统计，不包含选择策略
 │   ├── legacy.py        # 固定 pass 顺序，接受后重启
 │   ├── stateful.py      # 有状态分区、尺度复用与轮转
-│   ├── staged.py        # coarse / regions / fine / deep 阶段与清理机会
+│   ├── staged.py        # 编排阶段、区域和清理机会
+│   ├── progress.py      # 阶段转换、停滞证据与接受成本
+│   ├── rotation.py      # pass 轮转、量子及跨接受的公平性状态
 │   ├── coverage.py      # 确定性覆盖枚举、独立 Finalizer 与版本失效
 │   ├── regions.py       # 模块、无分叉链与拓扑区域
 │   └── cursors.py       # 稳定身份游标与有界历史排序
@@ -33,21 +37,21 @@ src/onnx_reduce/
 ├── edits.py             # 候选及有序编辑的数据描述
 ├── model/               # ONNX 模型表示与操作
 │   ├── __init__.py      # 保留 OnnxModel、TensorLinks 导入入口
-│   ├── adapter.py       # 表示所有权、稳定 ID、序列化与对外接口
+│   ├── adapter.py       # 表示所有权、稳定 ID、按需 IR 与对外接口
 │   ├── queries.py       # 连接、区域、死节点和无用资源查询
 │   ├── editing.py       # 有序编辑、克隆、边界提升与身份维护
 │   ├── inference.py     # shape / type 推导摘要
 │   ├── validation.py    # 成本、domain 策略、模型和实际产物校验
-│   ├── candidates.py    # 基于只读快照提供 ONNX 专用候选
 │   ├── protobuf.py      # 保守快速删除与平坦图查询，无隐式混入继承
-│   ├── snapshot.py      # 按派生属性声明统一管理编辑后的缓存失效
+│   ├── snapshot.py      # 拥有 proto、确定性字节和摘要；统一编辑后失效
 │   └── operations/      # graphs、rewrites、tensors、local_tensors 的具体操作
 ├── passes/              # 内置候选生成规则和默认执行顺序
 │   ├── base.py          # pass 协议及可选节点、游标、阶段能力
 │   ├── drop_outputs.py
 │   ├── remove_unused.py
 │   ├── delete_nodes.py
-│   ├── rewrite.py       # 旁路、属性、张量和子图候选入口
+│   ├── rewrite.py       # 旁路、属性、张量和子图 pass
+│   ├── candidates.py    # ONNX 候选规则，按查询视图生成有序编辑
 │   ├── combinations.py  # 有界复合候选
 │   └── groups.py        # 资源分组规则
 ├── failure_check/
@@ -55,7 +59,7 @@ src/onnx_reduce/
 │   ├── runner.py        # 进程执行、超时清理与原始观察
 │   └── evaluator.py     # 故障身份匹配、内容缓存与判定证据
 ├── performance.py       # 可选的运行内计时、规模和资源统计
-├── preparation.py       # 有容量边界的元数据缓存及模型准备上下文
+├── preparation.py       # 有容量边界的元数据缓存；不携带编辑策略
 ├── report.py            # 统计项与 JSON schema version 7
 └── storage.py           # 临时文件、原子替换与 checkpoint 文件复用
 ```
@@ -72,8 +76,10 @@ engine 把反馈交回 scheduler，并在接受后切换当前模型、保存 ch
 
 候选执行器显式接收本次运行的缓存、预算、判定器和报告。确定性拒绝的缓存写入
 属于执行器；`runtime/reporting.py` 仅写证据、更新观察统计，停用候选日志不会改变
-缓存命中和判定调用次数。模型准备仍使用运行内上下文，以便现有 shape、校验及编辑
-后端共享设置。模型表示由 `model/adapter.py` 持有；查询、编辑、推导和校验通过
+缓存命中和判定调用次数。执行器返回结果后，engine 调用记录模块消费结果；
+调用预算使用 evaluator 的实际调用数，不依赖报告计数。shape 和校验缓存仍使用运行内上下文；
+编辑后端通过 `with_edit_options(EditOptions(...))` 显式绑定到模型视图，克隆与快速结果继续携带选项，
+退出缓存上下文不会改变编辑策略。模型表示由 `model/adapter.py` 持有；查询、编辑、推导和校验通过
 显式函数接收模型，模型接口负责委托，不再继承 protobuf 实现。
 复合编辑每步结束后调用统一失效入口，清除模型类及其父类声明的所有 `cached_property`；
 新增派生缓存会自动参与失效，不需修改编辑分发列表。失效属性名按模型类型有界缓存，
@@ -81,7 +87,7 @@ engine 把反馈交回 scheduler，并在接受后切换当前模型、保存 ch
 
 | 修改需求 | 主要入口 |
 |---|---|
-| 新增缩减候选 | `passes/`、`model/candidates.py` 和 `model/operations/` |
+| 新增缩减候选 | `passes/` 中的 pass 与候选规则 |
 | 调整候选顺序、阶段或游标 | `search/` 中对应策略 |
 | 调整接受条件或候选缓存 | `runtime/candidate.py` |
 | 修改图查询或编辑 | `model/queries.py`、`model/editing.py`、`model/operations/` |
@@ -169,14 +175,34 @@ engine 把反馈交回 scheduler，并在接受后切换当前模型、保存 ch
 不能证明新模型上可以跳过同一区域。每个启用节点搜索的 pass 最多保存 4096 个去重摘要，淘汰只影响效率；
 游标保证有限扫描。启发式耗尽后独立扫描配置 pass 的原候选及标准尺度的保留候选，
 该扫描不受启发式去重影响。覆盖接受后返回搜索；`--no-cache` 时也必须实际执行覆盖候选。
-完整设计与验收边界见[第三批设计](design/stateful-search-design.md)。
+历史设计与验收边界见[有状态搜索设计](history/design/stateful-search-design.md)。
 
 `staged` 增加 coarse、regions、fine 阶段及有额度限制的资源清理。complete 目标再经过 deep 阶段，随后进入
 独立 Finalizer，收尾接受后留在收尾阶段并重新扫描；fast 目标结束搜索后直接复检产物，
 始终不声明最小性。区域使用明确模块标注、无分叉链与拓扑回退，旧失败只影响尝试历史。
 可选的 RegionSearchModel 提供当前稳定 ID 下的图链接，包含控制流捕获；缺少该能力时
 仍可用节点身份执行拓扑分区。跨运行的 `--finalize-from` 恢复源目标并重新初检，
-不恢复旧游标或缓存。规则、范围和接口见[第四批设计](design/staged-search-design.md)。
+不恢复旧游标或缓存。历史规则、范围和接口见[分阶段搜索设计](history/design/staged-search-design.md)。
+
+## 配置与测试边界
+
+`EngineConfig` 组合 `SearchConfig`、`ExecutionConfig`、`CheckConfig`、`ExperimentConfig`。
+各组验证自身的值域，跨组限制集中在组合入口；候选执行器只接收执行配置与校验模式。
+CLI 的任务参数保持原名、默认值与语义；游标、历史排序、编辑后端、校验缓存和 checkpoint
+对照开关集中在 experimental comparisons 参数组。进程命令、退出码和超时配置继续由
+`failure_check/contract.py` 持有。
+
+已有 `EngineConfig(scheduler=..., ...)` 关键字、属性读取及 `dataclasses.replace` 继续可用；
+新代码优先显式构造四组配置。`asdict(config)` 展示分组结构，`config.to_dict()` 用于保留
+旧版平铺的 task.json 格式，因此目标恢复和报告 version 7 不变。
+
+ONNX pass 从 `candidate_snapshot()` 读取共享的只读约定视图，生成规则均位于 pass 层；
+编辑、校验和后端判定不在生成器中执行。公开 `to_proto()` 返回独立副本。第三方适配器已有的
+`rewrite_candidates()` 扩展仍由 pass 入口兼容，内置模型不再生成候选。
+
+测试按 `tests/model`、`tests/search`、`tests/runtime`、`tests/integration` 归类；公共模型
+构造位于 `tests/helpers.py`，已安装分发包的独立验证仍在 `tests/smoke_distribution.py`。
+重构对照方法和测量边界见[行为与性能回归](performance/refactor-verification.md)。
 
 ## 接受条件与最小性
 
@@ -286,7 +312,7 @@ checkpoint 是已接受模型的快照；正常收尾时还会记录最终状态
 staged/cursor 通过 CursorPass 可选能力读取当前 RemovalGroup，按稳定 ID 或资源名重绑定。
 coarse 重新恢复新规模，fine 延续粒度与下一存活身份；每个无接受尺度尝试 8 次后细分。
 接受会丢弃当前版本生成器，有历史预取时先回退未执行游标，最终收尾范围与版本规则不变。
-详细设计和证据见[第五、六批设计](design/free-try-followup-design.md)与[结果](performance/performance-batch56-results.md)。
+历史设计和证据见[续扫实验设计](history/design/free-try-followup-design.md)与[结果](history/performance/performance-batch56-results.md)。
 
 checkpoint 仅复用本次运行已发布的私有产物，复用前核验实际字节摘要，缺失/损坏则重新物化。
 不链接后端可写的候选文件；模型/资源完成后再原子替换 checkpoint.json。
