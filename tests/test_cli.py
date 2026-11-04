@@ -118,3 +118,47 @@ def test_package_version_matches_pyproject():
         (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text(encoding="utf-8")
     )
     assert onnx_reduce.__version__ == pyproject["project"]["version"]
+
+
+def test_cli_exposes_quality_objective_and_search_bounds(tmp_path):
+    from onnx import helper
+
+    from benchmarks.quality_cases import model, value
+
+    source, output = tmp_path / "source.onnx", tmp_path / "small.onnx"
+    report = tmp_path / "quality.json"
+    onnx.save_model(
+        model([helper.make_node("Relu", ["x"], ["y"])], [value("x")], [value("y")]), source
+    )
+    check = write_failure_check(tmp_path, "check.py", "raise SystemExit(0 if has_trigger else 1)")
+    assert (
+        main(
+            [
+                str(source),
+                "--test",
+                str(check),
+                "-o",
+                str(output),
+                "--report",
+                str(report),
+                "--objective",
+                "tensors",
+                "--combination-depth",
+                "3",
+                "--combination-limit",
+                "4",
+                "--scheduler",
+                "staged",
+                "--goal",
+                "complete",
+            ]
+        )
+        == 0
+    )
+    payload = json.loads(report.read_text())
+    assert payload["version"] == 7
+    assert payload["minimality"]["objective"] == "tensors"
+    assert payload["minimality"]["combination_depth"] == 3
+    assert payload["minimality"]["combination_limit"] == 4
+    assert payload["final"]["tensor_elements"] == 1
+    assert payload["minimality"]["status"] == "pass_fixed_point"
