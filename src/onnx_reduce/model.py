@@ -15,7 +15,18 @@ import onnx
 from google.protobuf.message import DecodeError
 from onnxscript import ir
 
-from onnx_reduce.edits import Candidate, DeleteNodes, DropInitializers, DropInputs, DropOutputs
+from onnx_reduce.edits import (
+    BypassNode,
+    Candidate,
+    CleanupGraph,
+    DeleteNodes,
+    DeleteSubgraphNodes,
+    DropInitializers,
+    DropInputs,
+    DropNodeAttribute,
+    DropOutputs,
+    ShrinkDimension,
+)
 from onnx_reduce.performance import count, measured
 from onnx_reduce.preparation import current_preparation, metadata_key, preparation_caches
 from onnx_reduce.snapshot import SnapshotModel
@@ -447,6 +458,30 @@ class OnnxModel(SnapshotModel):
                 result._drop_inputs(edit.names)
             elif isinstance(edit, DropInitializers):
                 result._drop_initializers(edit.names)
+            elif isinstance(
+                edit,
+                (BypassNode, DropNodeAttribute, ShrinkDimension, DeleteSubgraphNodes, CleanupGraph),
+            ):
+                from onnx_reduce.rewrites import apply_rewrite
+
+                proto = result.to_proto()
+                if isinstance(edit, ShrinkDimension):
+                    from onnx_reduce.tensors import shrink_dimension
+
+                    shrink_dimension(proto, edit.old, edit.new)
+                elif isinstance(edit, (DeleteSubgraphNodes, CleanupGraph)):
+                    from onnx_reduce.graphs import apply_graph_edit
+
+                    apply_graph_edit(proto, edit)
+                else:
+                    apply_rewrite(proto, edit)
+                ids = result.node_ids
+                if isinstance(edit, BypassNode) and not edit.graph_path:
+                    ids = ids[: edit.index] + ids[edit.index + 1 :]
+                try:
+                    result = OnnxModel(ir.from_proto(proto), _node_ids=ids)
+                except (ir.serde.SerdeError, ValueError, TypeError) as exc:
+                    raise EditApplicationError(f"cannot import rewritten graph: {exc}") from exc
             else:
                 raise EditApplicationError(f"unsupported edit: {type(edit).__name__}")
             # An intermediate edit may have acquired a serialized snapshot for
@@ -458,6 +493,21 @@ class OnnxModel(SnapshotModel):
             result.__dict__.pop("_digest", None)
             result.__dict__.pop("_region_graph", None)
         return result
+
+    def rewrite_candidates(self, kind):
+        """Offer ONNX-specific rewrites without exporting a copy for each pass."""
+        from onnx_reduce.rewrites import rewrite_candidates
+
+        if kind == "tensors":
+            from onnx_reduce.tensors import tensor_candidates
+
+            yield from tensor_candidates(self._snapshot)
+        elif kind == "subgraphs":
+            from onnx_reduce.graphs import subgraph_candidates
+
+            yield from subgraph_candidates(self._snapshot)
+        else:
+            yield from rewrite_candidates(self._snapshot, kind)
 
     def _delete_nodes(self, indices: Iterable[int], *, inference_source: OnnxModel) -> None:
         """Delete main-graph nodes and promote still-used boundary outputs to graph inputs."""
@@ -629,24 +679,19 @@ class OnnxModel(SnapshotModel):
     # ==========================================
 
     def cost(self) -> ModelCost:
-        """Build a lexicographic cost: nodes, bytes, outputs, inputs, and initializers."""
+        """Collect recursive structural and tensor costs; ModelCost.key selects priority."""
 
-        if self._ir_model is None:
-            graph = self._snapshot.graph
-            return ModelCost(
-                len(graph.node),
-                len(self._payload),
-                len(graph.output),
-                len(graph.input),
-                len(graph.initializer),
-            )
-        graph = self._model.graph
+        from onnx_reduce.graphs import walk_graphs
+        from onnx_reduce.tensors import tensor_elements
+
+        graphs = [graph for _, graph in walk_graphs(self._snapshot)]
         return ModelCost(
-            node_count=graph.num_nodes(),
+            node_count=sum(len(g.node) for g in graphs),
             byte_size=len(self._payload),
-            output_count=len(graph.outputs),
-            input_count=len(graph.inputs),
-            initializer_count=len(graph.initializers),
+            output_count=sum(len(g.output) for g in graphs),
+            input_count=sum(len(g.input) for g in graphs),
+            initializer_count=sum(len(g.initializer) for g in graphs),
+            tensor_elements=tensor_elements(self._snapshot),
         )
 
     @measured("validation")

@@ -72,6 +72,9 @@ class InitialNotInteresting(ReductionError):
 
 @dataclass(frozen=True)
 class EngineConfig:
+    objective: str = "nodes"
+    combination_depth: int = 2
+    combination_limit: int = 256
     validation_mode: str = "strict"
     max_candidate_check_calls: int | None = None
     time_budget_seconds: float | None = None
@@ -90,6 +93,10 @@ class EngineConfig:
     validation_cache_enabled: bool = True
 
     def __post_init__(self) -> None:
+        if self.objective not in {"nodes", "bytes", "tensors"}:
+            raise ValueError("unknown objective")
+        if not 1 <= self.combination_depth <= 3 or self.combination_limit < 0:
+            raise ValueError("combination depth must be 1..3 and limit nonnegative")
         for name, options in (
             ("model_edit_mode", {"ir", "auto"}),
             ("search_policy", {"restart", "cursor"}),
@@ -138,14 +145,17 @@ class ReductionEngine:
         config: EngineConfig | None = None,
         progress: ProgressCallback | None = None,
     ):
+        self.config = config or EngineConfig()
         if passes is None:
             from onnx_reduce.passes import default_passes
 
-            passes = default_passes()
+            passes = default_passes(
+                combination_depth=self.config.combination_depth,
+                combination_limit=self.config.combination_limit,
+            )
         self.passes = tuple(passes)
         if len({item.name for item in self.passes}) != len(self.passes):
             raise ValueError("pass names must be unique")
-        self.config = config or EngineConfig()
         self.progress = progress or (lambda message: None)
 
     def run(
@@ -370,6 +380,10 @@ class ReductionEngine:
             "passes": [item.name for item in self.passes],
             "sweep_inconclusive_candidate_count": coverage.inconclusive_candidate_count,
             "global_minimum": False,
+            "objective": self.config.objective,
+            "node_count_scope": "recursive attribute graphs; excludes function definitions",
+            "combination_depth": self.config.combination_depth,
+            "combination_limit": self.config.combination_limit,
         }
         self._checkpoint(current_model, report, run_dir, started, checkpoint_artifacts)
         write_json(run_dir / "report.json", report.to_dict())
@@ -434,7 +448,11 @@ class ReductionEngine:
             sample(
                 "candidate_selected_items",
                 sum(
-                    len(edit.indices) if hasattr(edit, "indices") else len(edit.names)
+                    len(edit.indices)
+                    if hasattr(edit, "indices")
+                    else len(edit.names)
+                    if hasattr(edit, "names")
+                    else 1
                     for edit in candidate.edits
                 ),
             )
@@ -483,7 +501,7 @@ class ReductionEngine:
         candidate_cost = candidate_model.cost()
         sample("candidate_nodes", candidate_cost.node_count)
         sample("candidate_bytes", candidate_cost.byte_size)
-        if candidate_cost >= base_cost:
+        if candidate_cost.key(self.config.objective) >= base_cost.key(self.config.objective):
             report.candidates_not_cheaper += 1
             stats.not_cheaper += 1
             self._record_candidate(run_dir, candidate, "not_cheaper", cost=asdict(candidate_cost))

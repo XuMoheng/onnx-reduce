@@ -31,6 +31,25 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-o", "--output", required=True, type=Path, help="path for the reduced model"
     )
+    parser.add_argument(
+        "--objective",
+        choices=("nodes", "bytes", "tensors"),
+        default="nodes",
+        help="minimize recursive nodes, serialized bytes, or tensor elements",
+    )
+    parser.add_argument(
+        "--combination-depth",
+        type=int,
+        default=2,
+        choices=(1, 2, 3),
+        help="maximum compound search depth (default: 2)",
+    )
+    parser.add_argument(
+        "--combination-limit",
+        type=int,
+        default=256,
+        help="maximum candidates per compound family per base; 0 disables",
+    )
     parser.add_argument("--report", type=Path, help="write a JSON summary to this path")
     parser.add_argument("--timeout", type=float, default=60.0, help="per-test timeout in seconds")
     parser.add_argument(
@@ -153,6 +172,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         engine_config = EngineConfig(
+            objective=args.objective,
+            combination_depth=args.combination_depth,
+            combination_limit=args.combination_limit,
             validation_mode=args.validation_mode,
             max_candidate_check_calls=args.max_candidate_check_calls,
             time_budget_seconds=args.time_budget_seconds,

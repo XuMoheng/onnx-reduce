@@ -33,7 +33,52 @@ class DropInitializers:
     names: tuple[str, ...]
 
 
-Edit = DeleteNodes | DropOutputs | DropInputs | DropInitializers
+@dataclass(frozen=True)
+class BypassNode:
+    """Replace a scoped node's single output with one of its inputs."""
+
+    index: int
+    input_index: int
+    graph_path: tuple[tuple[int, str, int], ...] = ()
+
+
+@dataclass(frozen=True)
+class DropNodeAttribute:
+    """Omit one schema-optional attribute at a scoped node."""
+
+    index: int
+    name: str
+    graph_path: tuple[tuple[int, str, int], ...] = ()
+
+
+@dataclass(frozen=True)
+class ShrinkDimension:
+    old: int
+    new: int
+
+
+@dataclass(frozen=True)
+class DeleteSubgraphNodes:
+    graph_path: tuple[tuple[int, str, int], ...]
+    indices: tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class CleanupGraph:
+    """Remove unused resources after a compound edit, gated as one candidate."""
+
+
+Edit = (
+    DeleteNodes
+    | DropOutputs
+    | DropInputs
+    | DropInitializers
+    | BypassNode
+    | DropNodeAttribute
+    | ShrinkDimension
+    | DeleteSubgraphNodes
+    | CleanupGraph
+)
 
 
 @dataclass(frozen=True)

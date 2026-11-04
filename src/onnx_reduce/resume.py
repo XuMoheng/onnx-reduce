@@ -21,6 +21,8 @@ def restore_target(run_directory, *, model_digest, config, failure_check_config,
         for key in ("target_mode", "signature_regex", "validation_mode"):
             if task["engine"][key] != getattr(config, key):
                 raise ValueError(f"{key} differs from the original run")
+        if task["engine"].get("objective", "nodes") != config.objective:
+            raise ValueError("objective differs from the original run")
         if (
             target["mode"] != config.target_mode
             or target["signature_regex"] != config.signature_regex

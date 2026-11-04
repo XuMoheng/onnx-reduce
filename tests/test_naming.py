@@ -96,7 +96,7 @@ def test_run_files_use_consistent_configuration_and_report_fields(tmp_path):
         "final_hash",
         "duration_seconds",
     }
-    assert payload["version"] == 6
+    assert payload["version"] == 7
     assert payload["requested_validation_mode"] == "strict"
     assert payload["effective_validation_modes"] == ["strict"]
     assert payload["failure_checks"] == {
@@ -113,6 +113,10 @@ def test_run_files_use_consistent_configuration_and_report_fields(tmp_path):
         "passes",
         "sweep_inconclusive_candidate_count",
         "global_minimum",
+        "objective",
+        "node_count_scope",
+        "combination_depth",
+        "combination_limit",
     }
     for stats in payload["passes"].values():
         assert set(stats) == {

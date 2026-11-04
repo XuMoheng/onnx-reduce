@@ -51,6 +51,7 @@ class ReductionReport:
         def cost_dict(cost: ModelCost) -> dict[str, int]:
             return {
                 "node_count": cost.node_count,
+                "tensor_elements": cost.tensor_elements,
                 "byte_size": cost.byte_size,
                 "input_count": cost.input_count,
                 "output_count": cost.output_count,
@@ -68,7 +69,7 @@ class ReductionReport:
         if self.original.byte_size:
             byte_rate = round(1 - self.final.byte_size / self.original.byte_size, 6)
         return {
-            "version": 6,
+            "version": 7,
             **({"performance": self.performance.to_dict()} if self.performance else {}),
             "work_directory": self.work_directory,
             "minimality": self.minimality,

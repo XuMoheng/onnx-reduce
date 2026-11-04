@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import total_ordering
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from onnx_reduce.edits import Candidate
 
 
-@dataclass(frozen=True, order=True)
+@total_ordering
+@dataclass(frozen=True)
 class ModelCost:
     """A deterministic lexicographic cost used to accept reductions."""
 
@@ -19,6 +21,42 @@ class ModelCost:
     output_count: int = 0
     input_count: int = 0
     initializer_count: int = 0
+    tensor_elements: int = 0
+
+    def __lt__(self, other):
+        if not isinstance(other, ModelCost):
+            return NotImplemented
+        return self.key() < other.key()
+
+    def key(self, objective="nodes"):
+        if objective not in {"nodes", "bytes", "tensors"}:
+            raise ValueError("unknown objective")
+        if objective == "bytes":
+            return (
+                self.byte_size,
+                self.node_count,
+                self.tensor_elements,
+                self.output_count,
+                self.input_count,
+                self.initializer_count,
+            )
+        if objective == "tensors":
+            return (
+                self.tensor_elements,
+                self.node_count,
+                self.byte_size,
+                self.output_count,
+                self.input_count,
+                self.initializer_count,
+            )
+        return (
+            self.node_count,
+            self.tensor_elements,
+            self.byte_size,
+            self.output_count,
+            self.input_count,
+            self.initializer_count,
+        )
 
 
 @dataclass(frozen=True)

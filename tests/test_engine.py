@@ -61,4 +61,13 @@ def test_report_serializes_all_contract_counters(tmp_path):
     assert payload["stop_reason"] == "fixed_point"
     assert payload["failure_checks"]["calls"] == report.failure_check_calls
     assert payload["candidates"]["generated"] == report.candidates_generated
-    assert set(payload["passes"]) == {"drop_outputs", "remove_unused", "delete_nodes"}
+    assert set(payload["passes"]) == {
+        "drop_outputs",
+        "remove_unused",
+        "delete_nodes",
+        "bypass_nodes",
+        "simplify_attributes",
+        "shrink_tensors",
+        "reduce_subgraphs",
+        "combinations",
+    }
