@@ -230,3 +230,51 @@ def test_real_manifest_benchmark_entrypoint(tmp_path):
         r["artifact_recheck"]["outcome"] == "interesting"
         for r in summary["cases"][0]["runs"].values()
     )
+
+
+def test_strategy_compare_runs_both_sources_with_equal_budgets(tmp_path):
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    source = tmp_path / "source.onnx"
+    onnx.save(model([h.make_node("Relu", ["x"], ["y"])], [value("x")], [value("y")]), source)
+    manifest = tmp_path / "cases.json"
+    manifest.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "demo",
+                    "model": "source.onnx",
+                    "test": [sys.executable, str(root / "examples/relu/check.py")],
+                }
+            ]
+        )
+    )
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(root / "benchmarks/strategy_compare.py"),
+            "--manifest",
+            str(manifest),
+            "--baseline-source",
+            str(root),
+            "--budgets",
+            "0.01",
+            "--out",
+            str(tmp_path / "compare"),
+        ],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        timeout=30,
+    )
+    assert completed.returncode == 0, completed.stderr
+    summary = json.loads((tmp_path / "compare/summary.json").read_text())
+    assert {run["source"] for run in summary["runs"]} == {"baseline", "current"}
+    assert all(run["budget_seconds"] == 0.01 for run in summary["runs"])
+    assert all(
+        run["result"]["artifact_recheck"]["outcome"] == "interesting" for run in summary["runs"]
+    )

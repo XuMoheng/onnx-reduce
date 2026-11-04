@@ -205,3 +205,12 @@ uv run --locked onnx-reduce "$checkpoint_model" \
 附上 CLI 命令、版本、操作系统、后端版本、终端错误、可共享的最小模型和判定脚本，
 以及相关 `report.json` 和日志片段。说明是否能在最终输出路径上重复复现。
 日志与配置可能包含本地路径或后端诊断，共享前检查其中内容。
+
+## 搜索策略后期收益低
+
+当前 staged 对 pass 分批轮转，fine 的无收益上限按 pass 单独计算，complete 会在独立收尾前
+增加 deep 阶段。检查 scheduler.pass_states 和 pass_state_model_version，确认所关心策略在
+当前模型版本上是 not_visited、no_candidates、exhausted 还是 plateau。
+接受后这些状态会重置；它们不能当作跨模型版本的失败证据。
+开启 --performance 后查看 progress.jsonl 和 scheduler.buckets，定位实际耗时及缩减来源。
+扩大组合上限仍只扩大有限采样范围，无法证明全局最小；deep 耗尽或预算停止也不等于固定点。

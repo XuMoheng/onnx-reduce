@@ -228,7 +228,7 @@ echo $?
 
 ## 分阶段搜索与独立收尾（实验）
 
-`--scheduler staged` 按粗分组、图区域、小组/单项搜索，然后独立验证固定点。
+`--scheduler staged` 按粗分组、图区域、小组/单项搜索；complete 再执行轮转深度搜索，最后独立验证固定点。
 默认目标为 `complete`；`--goal fast` 省略固定点扫描，无论模型多小都只报告最小性未证明。
 搜索和收尾共享现有总预算。完整目标若预算用尽，同样为 `unproven`。
 
@@ -336,3 +336,15 @@ PYTHONPATH="$PWD/src" .venv/bin/python -m onnx_reduce \
 任何预算停止都不会声明固定点；完整扫描的结论只覆盖配置范围，详见架构说明。
 JSON 报告版本为 7，可从 `minimality.objective` 和组合边界字段核对实际运行配置。
 从旧报告 finalize 时缺省目标视作 nodes，改变目标需新开一次缩减，避免误用旧保证。
+
+## 分析后期缩减收益
+
+启用 `--performance` 后，从报告的 `performance.progress` 查看最佳已接受模型随时间的
+节点数、张量元素数与字节数；完整采样保存在运行目录 `progress.jsonl`。
+若节点数未变但张量元素数下降，表示 shape / 权重仍在缩减。
+通过 `scheduler.buckets` 查看各 pass 的尝试、接受、拒绝原因及准备/判定耗时；
+通过 `performance.stages["generate/PASS_NAME"]` 查看候选生成耗时。
+这些统计用于区分“没有执行机会”“模型不合法”“故障消失”和“判定较慢”，不会改变判定结果。
+
+同一模型、相同预算下的修改前后对比命令见
+[策略对比方法](performance/reduction-quality.md#相同时间预算下比较两个源码版本)。

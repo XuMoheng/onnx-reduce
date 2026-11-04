@@ -13,7 +13,7 @@ src/onnx_reduce/
 ├── cli.py               # 参数解析、配置与判定器创建、输入加载、CLI 退出码
 ├── engine.py            # 初检、候选搜索、预算、接受决策、checkpoint 与最终复检
 ├── scheduler.py         # legacy / stateful 调度、结构化反馈与当前版本覆盖记账
-├── staged.py            # 实验性的 coarse / regions / fine 阶段与清理机会
+├── staged.py            # 实验性的 coarse / regions / fine / deep 阶段与清理机会
 ├── finalizer.py         # 覆盖候选枚举、独立收尾与版本失效
 ├── regions.py           # 模块、无分叉链与拓扑区域，边界排序
 ├── search_types.py      # 调度记录、反馈和覆盖摘要
@@ -53,7 +53,7 @@ src/onnx_reduce/
    只有匹配目标故障的 `interesting` 候选会被接受。
 6. engine 返回结构化结果给 scheduler；接受后更新当前模型与 checkpoint。
    legacy 从首个 pass 重启，stateful 延续阶段并使全部旧覆盖失效。
-   staged 依次执行粗、区域、细搜索，complete 目标再进入独立收尾。
+   staged 依次执行粗、区域、细搜索；complete 目标增加深度搜索后进入独立收尾。
    当前模型的声明范围完成扫描且没有接受时达到固定点；预算阻止继续时标记预算耗尽。
 7. 将当前模型写到实际输出路径，读取字节核对摘要、重新加载校验，再绕过缓存执行强制最终复检，
    写最终报告与复现配置。
@@ -115,7 +115,7 @@ src/onnx_reduce/
 该扫描不受启发式去重影响。覆盖接受后返回搜索；`--no-cache` 时也必须实际执行覆盖候选。
 完整设计与验收边界见[第三批设计](design/stateful-search-design.md)。
 
-`staged` 增加 coarse、regions、fine 阶段及有额度限制的资源清理。complete 目标随后进入
+`staged` 增加 coarse、regions、fine 阶段及有额度限制的资源清理。complete 目标再经过 deep 阶段，随后进入
 独立 Finalizer，收尾接受后留在收尾阶段并重新扫描；fast 目标结束搜索后直接复检产物，
 始终不声明最小性。区域使用明确模块标注、无分叉链与拓扑回退，旧失败只影响尝试历史。
 可选的 RegionSearchModel 提供当前稳定 ID 下的图链接，包含控制流捕获；缺少该能力时
@@ -237,7 +237,11 @@ checkpoint 仅复用本次运行已发布的私有产物，复用前核验实际
 
 ## 协调缩减与有界组合搜索
 
-张量 pass 按维度值在全模型范围做一致替换，并裁剪相关 dense 张量的前缀切片。
+张量 pass 先尝试边界上的局部算子约束：二维 MatMul/Gemm 协调收缩维度（含 transA/transB），
+Conv 协调输入通道或终端输出通道、权重、偏置并保留 group 整除约束，终端 Reshape 协调
+输入首维与正整数 shape 向量的元素数。源必须是图输入或 dense initializer，无法解析的中间生产者、
+符号维度、复杂广播和带 0/-1 的 Reshape 暂不生成局部候选，最终合法性仍由 checker 验证。
+随后按维度值在全模型范围做一致替换，并裁剪相关 dense 张量的前缀切片。
 直接连接 Reshape、Expand、ConstantOfShape 的整型 shape 向量同步替换维度值；
 由复杂计算生成的 shape、任意算子属性约束、符号维度求解仍不支持。
 同值维度并不一定属于同一语义维度，因此该变换可能被校验或目标判定拒绝。
@@ -250,7 +254,10 @@ checkpoint 仅复用本次运行已发布的私有产物，复用前核验实际
 `--combination-depth` 为 1..3，默认 2；1 关闭组合搜索。
 `--combination-limit` 默认 256，0 关闭；上限分别作用于四类候选：非连续删除并清理、
 多个旁路并清理、属性/张量与旁路并清理、属性/张量与删除并清理。
-每类按确定顺序最多输出上限数量，有限的旁路和配对编辑池也受此上限限制。
+每类最多输出上限数量，二元和三元深度交替输出，共享该类上限；拓扑关联候选与全图分散候选
+交替执行。分散顺序覆盖两端及逐步细分的中间区域，避免字典序前缀耗尽额度。
+旁路池按同样方式分散采样；属性与张量配对分别保有候选池，交替输出，不能相互挤掉。
+有限候选池也受此上限限制；采样不意味着穷举所有组合。
 多个旁路按节点索引降序执行，避免前序删除使后续地址失效。中间编辑不要求单独变小或复现，
 只有整体最终模型通过检查且降低选定成本才接受。这允许部分有界路径越过局部固定点，
 不维护无限的等成本状态，也不保证任意编辑组合可达。
@@ -258,3 +265,26 @@ checkpoint 仅复用本次运行已发布的私有产物，复用前核验实际
 所有新增 pass 都纳入标准完整扫描及 staged complete 最终扫描。预算耗尽或无法判定仍为
 `unproven`；`pass_fixed_point` 仅针对配置的有限候选集合，组合上限会影响覆盖范围。
 质量和真实故障接入方式见 [缩减质量验证](performance/reduction-quality.md)。
+
+## 搜索公平性与收益诊断
+
+coarse/fine/deep 的 pass 按批轮转，默认每轮 8 个尝试。最近 16 个执行中至少有 8 个历史样本、
+接受率至少 25% 的 pass 最多获得 16 个尝试，其余策略仍保留自己的轮次。
+轮次计数跨成功接受保留，模型变更后丢弃全部旧生成器并重新绑定地址，不能靠连续成功独占搜索。
+fine/coarse 的连续失败上限按 pass 分别统计为 64；deep 为 256。区域阶段仍有全局 64 次无收益上限。
+报告的 pass_states 在接受后失效并重置，pass_state_model_version 标记状态所属的当前模型版本；
+状态区分 not_visited、no_candidates、visited、exhausted 和 plateau。
+
+complete 的 deep 阶段在正式证明前轮转完整 pass 候选；对节点搜索 pass，优先补充最近删改区域附近的
+小区域删除和保留尝试。deep 受时间和调用预算约束，不产生固定点证明。
+一旦进入 finalization，仍在每次接受后重建当前模型的完整扫描，不复用旧模型的失败结论。
+`--finalize-from` 继续直接进入独立 finalization，不经过 deep；fast 也不执行 deep。
+
+`--performance` 的嵌套性能报告版本为 2，增加 progress 时间序列：记录初始、每次接受、
+约 5 秒间隔的搜索采样和最终结果，包含节点数、张量元素数、字节数及调用次数。
+长时间单次判定无法中途采样。报告内序列最多 2048 点，超出后抽稀并记录 progress_compactions，
+完整采样另存 progress.jsonl。每个接受的模型都降低选定的成本，但其他分量可能增加，
+不能把三项指标分别最低的数值拼成一个不存在的模型。
+
+各 pass 的准备/判定时间、接受成本变化及拒绝原因见 scheduler.buckets；生成耗时见
+performance.stages 中的 generate/PASS_NAME。计时和曲线只用于诊断，不参与候选顺序决策。
