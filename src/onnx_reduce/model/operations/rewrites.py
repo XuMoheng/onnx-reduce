@@ -7,7 +7,7 @@ The engine must check validity, cost and the target failure for every candidate.
 import onnx
 
 from onnx_reduce.edits import BypassNode, Candidate, DropNodeAttribute
-from onnx_reduce.graphs import graph_at
+from onnx_reduce.model.operations.graphs import graph_at
 from onnx_reduce.types import EditApplicationError
 
 

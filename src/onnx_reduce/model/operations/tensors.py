@@ -7,7 +7,7 @@ import onnx
 from onnx import numpy_helper
 
 from onnx_reduce.edits import Candidate, ShrinkDimension
-from onnx_reduce.graphs import walk_graphs
+from onnx_reduce.model.operations.graphs import walk_graphs
 from onnx_reduce.types import EditApplicationError
 
 

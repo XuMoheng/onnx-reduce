@@ -6,7 +6,7 @@ from onnx import helper as h
 from onnx import numpy_helper
 
 from onnx_reduce.failure_check.contract import FailureCheckResult
-from onnx_reduce.graphs import walk_graphs
+from onnx_reduce.model.operations.graphs import walk_graphs
 
 
 def value(name, shape=(4, 4), dtype=T.FLOAT):

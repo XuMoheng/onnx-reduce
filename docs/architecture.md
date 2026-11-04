@@ -31,8 +31,17 @@ src/onnx_reduce/
 │   └── cursors.py       # 稳定身份游标与有界历史排序
 ├── types.py             # 模型协议、成本、校验结果、落盘产物与图摘要
 ├── edits.py             # 候选及有序编辑的数据描述
-├── model.py             # ONNX IR 适配器、查询、编辑、校验与序列化
-├── snapshot.py          # 保守的 protobuf 删除与平坦图查询
+├── model/               # ONNX 模型表示与操作
+│   ├── __init__.py      # 保留 OnnxModel、TensorLinks 导入入口
+│   ├── adapter.py       # 表示所有权、稳定 ID、序列化与对外接口
+│   ├── queries.py       # 连接、区域、死节点和无用资源查询
+│   ├── editing.py       # 有序编辑、克隆、边界提升与身份维护
+│   ├── inference.py     # shape / type 推导摘要
+│   ├── validation.py    # 成本、domain 策略、模型和实际产物校验
+│   ├── candidates.py    # 基于只读快照提供 ONNX 专用候选
+│   ├── protobuf.py      # 保守快速删除与平坦图查询，无隐式混入继承
+│   ├── snapshot.py      # 按派生属性声明统一管理编辑后的缓存失效
+│   └── operations/      # graphs、rewrites、tensors、local_tensors 的具体操作
 ├── passes/              # 内置候选生成规则和默认执行顺序
 │   ├── base.py          # pass 协议及可选节点、游标、阶段能力
 │   ├── drop_outputs.py
@@ -41,10 +50,6 @@ src/onnx_reduce/
 │   ├── rewrite.py       # 旁路、属性、张量和子图候选入口
 │   ├── combinations.py  # 有界复合候选
 │   └── groups.py        # 资源分组规则
-├── rewrites.py          # schema 查询、连接重写与子图捕获处理
-├── graphs.py            # 子图定位、候选生成与清理编辑
-├── tensors.py           # 张量成本、全局维度候选与修改
-├── local_tensors.py     # 带算子约束的局部张量轴缩减
 ├── failure_check/
 │   ├── contract.py      # 判定配置、退出码与三态结果
 │   ├── runner.py        # 进程执行、超时清理与原始观察
@@ -68,13 +73,19 @@ engine 把反馈交回 scheduler，并在接受后切换当前模型、保存 ch
 候选执行器显式接收本次运行的缓存、预算、判定器和报告。确定性拒绝的缓存写入
 属于执行器；`runtime/reporting.py` 仅写证据、更新观察统计，停用候选日志不会改变
 缓存命中和判定调用次数。模型准备仍使用运行内上下文，以便现有 shape、校验及编辑
-后端共享设置；这部分与模型表示、编辑实现的拆分属于后续重构范围。
+后端共享设置。模型表示由 `model/adapter.py` 持有；查询、编辑、推导和校验通过
+显式函数接收模型，模型接口负责委托，不再继承 protobuf 实现。
+复合编辑每步结束后调用统一失效入口，清除模型类及其父类声明的所有 `cached_property`；
+新增派生缓存会自动参与失效，不需修改编辑分发列表。失效属性名按模型类型有界缓存，
+不保存模型、IR 或张量引用。
 
 | 修改需求 | 主要入口 |
 |---|---|
-| 新增缩减候选 | `passes/`，以及相应模型查询、编辑实现 |
+| 新增缩减候选 | `passes/`、`model/candidates.py` 和 `model/operations/` |
 | 调整候选顺序、阶段或游标 | `search/` 中对应策略 |
 | 调整接受条件或候选缓存 | `runtime/candidate.py` |
+| 修改图查询或编辑 | `model/queries.py`、`model/editing.py`、`model/operations/` |
+| 修改推导或校验 | `model/inference.py`、`model/validation.py` |
 | 调整预算 | `runtime/budget.py` |
 | 调整日志与计数 | `runtime/reporting.py`、`report.py` |
 | 调整 checkpoint 或跨运行核对 | `runtime/artifacts.py`、`runtime/resume.py` |

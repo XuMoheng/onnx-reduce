@@ -86,7 +86,7 @@ def apply_graph_edit(proto, edit):
 
 
 def subgraph_candidates(proto):
-    from onnx_reduce.rewrites import rewrite_candidates
+    from onnx_reduce.model.operations.rewrites import rewrite_candidates
 
     for path, graph in walk_graphs(proto):
         if not path:

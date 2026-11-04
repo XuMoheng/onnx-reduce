@@ -9,8 +9,8 @@ from onnx import numpy_helper
 from benchmarks.quality_cases import SimulatedFailure, model, quality_cases, value
 from onnx_reduce.edits import Candidate, ShrinkDimension
 from onnx_reduce.engine import EngineConfig, ReductionEngine
-from onnx_reduce.graphs import walk_graphs
 from onnx_reduce.model import OnnxModel
+from onnx_reduce.model.operations.graphs import walk_graphs
 from onnx_reduce.passes import default_passes
 from onnx_reduce.passes.combinations import CombinationsPass
 from onnx_reduce.search.coverage import Finalizer

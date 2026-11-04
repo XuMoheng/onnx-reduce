@@ -10,7 +10,7 @@ import numpy as np
 from onnx import numpy_helper
 
 from onnx_reduce.edits import Candidate, ResizeOperator
-from onnx_reduce.graphs import graph_at, walk_graphs
+from onnx_reduce.model.operations.graphs import graph_at, walk_graphs
 from onnx_reduce.types import EditApplicationError
 
 
