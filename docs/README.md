@@ -34,6 +34,7 @@ docs/
 [性能优化计划](performance/performance-todo.md)。
 
 - 计划与进度：[性能优化计划](performance/performance-todo.md)
+- 缩减质量与组合搜索：[质量验证及真实故障接入](performance/reduction-quality.md)
 - 基线方法：[性能基线：采集与基准命令](performance/performance-baseline.md)
 - 各批实测：
   [第一批（2026-11-02）](performance/performance-batch1-results.md)、

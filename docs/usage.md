@@ -277,3 +277,62 @@ uv run --locked onnx-reduce input.onnx --test '/absolute/path/check-backend' \
 它们可能改变紧预算下的结果质量；fast 永远不证明最小性，complete 仍需在总预算内完成独立扫描。
 独立 `--finalize-from` 可改变这些搜索选项，但判定命令与故障身份须保持一致。
 各项性能证据与已知退化见[第五、六批结果](performance/performance-batch56-results.md)。
+
+## 选择缩减目标及组合搜索边界
+
+### 执行较充分的缩减
+
+在当前源码仓库根目录执行以下命令，将模型路径和判定脚本路径替换为实际路径。
+本地工作区对应 `1012-perf/`；`PYTHONPATH` 确保加载该目录中的源码。
+
+```bash
+PYTHONPATH="$PWD/src" .venv/bin/python -m onnx_reduce \
+  /path/to/original.onnx \
+  --test '.venv/bin/python /path/to/check_bug.py' \
+  --scheduler staged \
+  --goal complete \
+  --objective nodes \
+  --combination-depth 3 \
+  --combination-limit 1024 \
+  -o reduced.onnx \
+  --report reduction-report.json
+```
+
+判定脚本接收模型路径作为最后一个参数：仍触发目标故障时返回 0，未触发返回 1，
+无法判定返回 125。脚本应识别同一个目标故障；若需要工具核对诊断签名，可增加
+`--signature-regex`，表达式应匹配实际脚本输出，参见[故障判定脚本](#编写故障判定脚本)。
+
+`staged` 执行分阶段搜索，`complete` 在最后进行独立固定点扫描。
+深度 3 与每类 1024 个组合候选扩大了默认搜索范围，也可能明显增加判定次数和耗时。
+命令未设置总时间或候选调用预算，会持续搜索到配置范围内的固定点，或遇到错误/中断；
+单次判定仍受默认 60 秒超时约束，可按后端实际运行时间调整 `--timeout`。
+
+根据目的选择 `--objective`：
+
+| 目标 | 选择方式 |
+|---|---|
+| 优先递归节点最少，其次张量元素最少 | `--objective nodes` |
+| 优先序列化文件最小 | `--objective bytes` |
+| 优先张量元素最少 | `--objective tensors` |
+
+完成后检查 `reduction-report.json`：`stop_reason` 应为 `fixed_point`，
+`minimality.status` 应为 `pass_fixed_point`，并确认 `artifact_recheck.outcome` 为
+`interesting`。仅凭 CLI 退出码 0 不能确认达到固定点。
+
+这些结果表示配置的有限候选范围内无法继续缩减，**不保证全局最小**。
+增大 `--combination-limit` 可以扩大组合覆盖范围，但不能将固定点变成全局最小的证明。
+
+### 目标与边界说明
+
+`--objective nodes`（默认）优先递归节点数，再比较张量元素数与序列化字节数。
+`--objective bytes` 优先文件大小；`--objective tensors` 优先张量元素数。
+例如结构已经很小但张量很大时，可在原有缩减命令上增加 `--objective tensors`。
+候选仍必须合法且复现相同目标，数值正确性不属于当前故障契约。
+
+默认启用具体维度与权重协调裁剪，以及 If/Loop/Scan 属性子图内部缩减。
+子图输入输出槽位保留；符号维度求解、复杂 shape 计算及稀疏权重不在支持范围。
+`--combination-depth 1` 或 `--combination-limit 0` 关闭组合搜索；默认深度 2，
+每类上限 256。深度最大 3。扩大边界可能显著增加判定次数，建议配合调用和时间预算。
+任何预算停止都不会声明固定点；完整扫描的结论只覆盖配置范围，详见架构说明。
+JSON 报告版本为 7，可从 `minimality.objective` 和组合边界字段核对实际运行配置。
+从旧报告 finalize 时缺省目标视作 nodes，改变目标需新开一次缩减，避免误用旧保证。

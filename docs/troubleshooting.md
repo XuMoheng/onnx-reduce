@@ -17,7 +17,8 @@
 正常收尾时，运行目录总会有 `report.json`；`--report` 额外导出一份相同报告。
 初检失败、加载失败或中断时可能没有最终报告。
 
-当前 JSON schema 的版本字段为 `version: 6`，保留实际产物的 `artifact_recheck`，增加优化配置 `optimizations`，
+节点成本自版本 7 起统计递归属性子图，并增加 `tensor_elements`；主图搜索索引不变。
+当前 JSON schema 的版本字段为 `version: 7`，保留实际产物的 `artifact_recheck`，增加优化配置 `optimizations`，
 staged 还会扩展 scheduler 中的阶段和收尾信息。主要字段如下：
 
 | 字段 | 读法 |
