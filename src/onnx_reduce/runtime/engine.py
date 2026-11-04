@@ -6,6 +6,7 @@ import tempfile
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import asdict, replace
+from inspect import getattr_static
 from pathlib import Path
 
 from onnx_reduce.config import EngineConfig as EngineConfig
@@ -93,7 +94,12 @@ class ReductionEngine:
         *,
         output_path: str | Path | None = None,
     ) -> tuple[ModelAdapter, ReductionReport]:
-        if isinstance(model, ConfigurableEditingModel):
+        # Python 3.11's protocol check follows __getattr__. A forwarded editor
+        # can return the inner model and discard the adapter's capabilities.
+        # Require an explicit implementation, as protocol checks do on 3.12+.
+        if getattr_static(model, "with_edit_options", None) is not None and isinstance(
+            model, ConfigurableEditingModel
+        ):
             model = model.with_edit_options(EditOptions(self.config.experiments.model_edit_mode))
         with (
             collect_performance(self.config.execution.collect_performance) as performance,

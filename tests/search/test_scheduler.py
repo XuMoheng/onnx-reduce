@@ -402,15 +402,16 @@ def test_node_capability_error_precedes_initial_backend_call(tmp_path):
 
 
 def test_same_named_custom_pass_stays_generic_without_node_capability(tmp_path):
+    source = OpaqueModel(OnnxModel.from_proto(chain_model()))
+
     class Custom:
         name = "delete_nodes"
 
         def generate(self, model):
+            assert model is source  # Configuring editing must not unwrap adapters.
             yield Candidate(())
 
-    _, report = run(
-        OpaqueModel(OnnxModel.from_proto(chain_model())), Always(), tmp_path, passes=[Custom()]
-    )
+    _, report = run(source, Always(), tmp_path, passes=[Custom()])
     assert report.candidates_generated == 2
     assert {row["direction"] for row in rows(report)} == {"pass"}
     assert "keep-region" not in report.minimality["scope"]
