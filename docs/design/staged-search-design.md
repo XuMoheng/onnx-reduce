@@ -1,7 +1,7 @@
 # 第四批：分阶段搜索和独立收尾
 
 2026-11-03：新增实验性 `--scheduler staged`，默认继续使用 `legacy`。
-现有 `stateful` 的候选顺序和接受后行为保留。实测见[第四批结果](performance-batch4-results.md)。
+现有 `stateful` 的候选顺序和接受后行为保留。实测见[第四批结果](../performance/performance-batch4-results.md)。
 
 ## 流程与职责
 

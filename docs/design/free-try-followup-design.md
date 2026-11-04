@@ -1,6 +1,6 @@
 # 第五、六批：参考 free-try 的后续性能设计
 
-日期：2026-11-03。状态：已实现实验入口；性能与推广结论见[第五、六批实测](performance-batch56-results.md)。
+日期：2026-11-03。状态：已实现实验入口；性能与推广结论见[第五、六批实测](../performance/performance-batch56-results.md)。
 
 参考提交为 `perf/free-try` 的
 [`666fc9b545596c61893d5afc882e3e9bae7299f7`](https://github.com/XuMoheng/onnx-reduce/commit/666fc9b545596c61893d5afc882e3e9bae7299f7)，
@@ -15,7 +15,7 @@
 
 free-try 相对 main 的 126x、185x 是该提交报告的结果，不是相对当前 perf 的增量收益。
 perf 已有批量清理、shape 摘要缓存、编辑缓存、内容缓存前移、稳定节点 ID、区域搜索和独立收尾。
-[第四批实测](performance-batch4-results.md)显示，512 initializer 已只需 4 次实际判定；
+[第四批实测](../performance/performance-batch4-results.md)显示，512 initializer 已只需 4 次实际判定；
 同一场景无法再次获得“515 → 4”的策略收益。
 
 | free-try 机制 | perf 当前状态与代码入口 | 后续决定 |
@@ -324,5 +324,5 @@ uv run --locked python benchmarks/reduction.py \
 大权重共享存储仍需解决实际权重内容身份和最终独立打包；protobuf CopyFrom 不会自动共享权重。
 暂不省略 checker，不把增量校验当作已证明安全的行为保持优化，也不同时引入并行判定。
 
-第五、六批实现与设计对应关系、实测收益及退化样本见[本批结果](performance-batch56-results.md)。
+第五、六批实现与设计对应关系、实测收益及退化样本见[本批结果](../performance/performance-batch56-results.md)。
 本批结果不替换原有四批证据，也不支持宣称真实后端普遍加速。

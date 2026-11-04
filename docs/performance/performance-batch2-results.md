@@ -5,7 +5,7 @@
 
 ## 环境与对照方法
 
-- 与[第一批](performance-results.md)相同的 Linux、Python 3.11.17、ONNX 1.23.2、onnxscript 0.7.2。
+- 与[第一批](performance-batch1-results.md)相同的 Linux、Python 3.11.17、ONNX 1.23.2、onnxscript 0.7.2。
 - 从 `1012-perf/` 使用相邻 `../1012/.venv/bin/python` 加载本目录源码；没有修改相邻项目。
 - 每组重复三次，每次新进程、独立运行目录，采集开关交替执行，基准不并发采样。
 - 表中耗时是缩减墙钟中位数，不含模型构建与 Python 启动；次数是每次实际计数。

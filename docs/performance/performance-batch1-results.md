@@ -5,7 +5,7 @@
 ## 输入模型与判定条件
 
 本报告的性能数据来自基准脚本人工生成的 ONNX 模型，生成逻辑见
-[benchmarks/reduction.py 的 `make_model()`](../benchmarks/reduction.py)。没有使用实际业务网络或真实后端故障模型。
+[benchmarks/reduction.py 的 `make_model()`](../../benchmarks/reduction.py)。没有使用实际业务网络或真实后端故障模型。
 所有模型均使用标准 ONNX 算子、默认 domain 的 opset 17，只包含主图，没有属性子图。
 图输入均为 `x`，类型为 `float32`、形状为 `[1]`。基准不生成输入数据，也不执行数值推理。
 

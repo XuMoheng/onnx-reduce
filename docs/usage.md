@@ -158,7 +158,7 @@ uv run --locked onnx-reduce cases/original.onnx \
 
 stateful 当前为实验选项，不保证每个模型更快，也可能在相同预算下留下更大的模型。
 对照时保持输入、判定器、缓存和预算一致，只切换该参数；结果见
-[第三批实测](performance-batch3-results.md)。
+[第三批实测](performance/performance-batch3-results.md)。
 
 stateful 的启发式搜索结束后，还会在当前模型上扫描全部配置 pass 及标准分区的保留候选。
 扫描中接受编辑就重新开始新版本的搜索与覆盖。预算停止或最终扫描有无法判定候选时，
@@ -258,8 +258,8 @@ uv run --locked onnx-reduce results/fast.onnx \
 
 区域首先读取显式 `onnx_reduce.module` 节点标注，再使用无分叉链，最后回退拓扑分区。
 未标注模型无需额外准备。边界缺类型会影响排序，不会永久跳过该区域。
-当前标注格式、范围保证和内部额度见[第四批设计](staged-search-design.md)，
-质量与成本对照见[第四批实测](performance-batch4-results.md)。
+当前标注格式、范围保证和内部额度见[第四批设计](design/staged-search-design.md)，
+质量与成本对照见[第四批实测](performance/performance-batch4-results.md)。
 
 ### 第五、六批实验优化
 
@@ -276,4 +276,4 @@ uv run --locked onnx-reduce input.onnx --test '/absolute/path/check-backend' \
 `--direction-order adaptive`、`--history-order defer` 是进一步的排序实验，默认关闭。
 它们可能改变紧预算下的结果质量；fast 永远不证明最小性，complete 仍需在总预算内完成独立扫描。
 独立 `--finalize-from` 可改变这些搜索选项，但判定命令与故障身份须保持一致。
-各项性能证据与已知退化见[第五、六批结果](performance-batch56-results.md)。
+各项性能证据与已知退化见[第五、六批结果](performance/performance-batch56-results.md)。

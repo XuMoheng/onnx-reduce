@@ -3,7 +3,7 @@
 第五批准备优化和第六批 staged 续扫已实现，默认继续使用 `legacy` / `model_edit_mode=ir`。
 显式启用 `--model-edit-mode auto` 获得准备加速；增加
 `--scheduler staged --search-policy cursor` 试验接受后续扫。设计与边界见
-[第五、六批设计](free-try-followup-design.md)。
+[第五、六批设计](../design/free-try-followup-design.md)。
 
 本批实测的主要收益是快速编辑与 fine 游标。方向排序和拒绝历史没有显示额外的稳定收益，
 仅保留显式实验/消融入口，默认分别为 fixed、off，不推荐作为常规配置。

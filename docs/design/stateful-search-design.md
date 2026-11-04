@@ -3,10 +3,10 @@
 状态：已实现实验性 `stateful` 调度，默认保持 `legacy`。实现基于 `1012-perf` 的
 `perf/reduction-strategy` 分支、`e8203a3`，第二批实现已由 `09de684` 合入。
 2026-11-03 的设计、实现和对照均以完整第二批为基线；运行结果与退化样本见
-[第三批实测](performance-batch3-results.md)。
+[第三批实测](../performance/performance-batch3-results.md)。
 
-相关依据：[四批性能计划](performance-todo.md)、[当前架构](architecture.md)、
-[第一批实测](performance-results.md)、[第二批实测](performance-batch2-results.md)。
+相关依据：[四批性能计划](../performance/performance-todo.md)、[当前架构](../architecture.md)、
+[第一批实测](../performance/performance-batch1-results.md)、[第二批实测](../performance/performance-batch2-results.md)。
 
 ## 目标与范围
 
@@ -149,6 +149,8 @@ scheduler 保存的是 `NodeRegion(ids)`，而不是可直接执行的旧 `Candi
 两者都沿用现有边界提升语义。仅保留区域并不意味着保留其依赖闭包，也不隐式删除
 输出或资源；“仅保留”只描述主图节点集合。输出数量规则及模型校验仍然生效。
 空补集跳过；同一基准上相同实际编辑可去重，例如二分时互为等价的删除/保留候选。
+删除/保留双向任务与标准 ddmin 的子集、补集测试同源，粒度调整规则可对照
+[ddmin 原论文](https://www.st.cs.uni-saarland.de/publications/files/zeller-tse-2002.pdf)。
 `N=0` 无节点任务，`N=1` 仍尝试删除最后一个节点，不能要求至少留下一个节点。
 
 一次接受后保留成功的方向、目标块大小和下一存活区域锚点，把块大小限制到新节点数。

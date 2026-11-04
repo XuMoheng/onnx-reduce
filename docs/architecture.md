@@ -99,14 +99,14 @@ src/onnx_reduce/
 不能证明新模型上可以跳过同一区域。每个启用节点搜索的 pass 最多保存 4096 个去重摘要，淘汰只影响效率；
 游标保证有限扫描。启发式耗尽后独立扫描配置 pass 的原候选及标准尺度的保留候选，
 该扫描不受启发式去重影响。覆盖接受后返回搜索；`--no-cache` 时也必须实际执行覆盖候选。
-完整设计与验收边界见[第三批设计](stateful-search-design.md)。
+完整设计与验收边界见[第三批设计](design/stateful-search-design.md)。
 
 `staged` 增加 coarse、regions、fine 阶段及有额度限制的资源清理。complete 目标随后进入
 独立 Finalizer，收尾接受后留在收尾阶段并重新扫描；fast 目标结束搜索后直接复检产物，
 始终不声明最小性。区域使用明确模块标注、无分叉链与拓扑回退，旧失败只影响尝试历史。
 可选的 RegionSearchModel 提供当前稳定 ID 下的图链接，包含控制流捕获；缺少该能力时
 仍可用节点身份执行拓扑分区。跨运行的 `--finalize-from` 恢复源目标并重新初检，
-不恢复旧游标或缓存。规则、范围和接口见[第四批设计](staged-search-design.md)。
+不恢复旧游标或缓存。规则、范围和接口见[第四批设计](design/staged-search-design.md)。
 
 ## 接受条件与最小性
 
@@ -209,7 +209,7 @@ checkpoint 是已接受模型的快照；正常收尾时还会记录最终状态
 staged/cursor 通过 CursorPass 可选能力读取当前 RemovalGroup，按稳定 ID 或资源名重绑定。
 coarse 重新恢复新规模，fine 延续粒度与下一存活身份；每个无接受尺度尝试 8 次后细分。
 接受会丢弃当前版本生成器，有历史预取时先回退未执行游标，最终收尾范围与版本规则不变。
-详细设计和证据见[第五、六批设计](free-try-followup-design.md)与[结果](performance-batch56-results.md)。
+详细设计和证据见[第五、六批设计](design/free-try-followup-design.md)与[结果](performance/performance-batch56-results.md)。
 
 checkpoint 仅复用本次运行已发布的私有产物，复用前核验实际字节摘要，缺失/损坏则重新物化。
 不链接后端可写的候选文件；模型/资源完成后再原子替换 checkpoint.json。

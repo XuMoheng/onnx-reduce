@@ -174,12 +174,11 @@ minimality.status: pass_fixed_point
 
 | 你要完成的任务 | 阅读入口 |
 |---|---|
-| 安装并跑通第一个示例 | [项目 README](../README.md) |
-| 为自己的后端编写判定脚本、设置预算、确认结果 | [使用指南](usage.md) |
-| 理解候选如何生成、校验和接受，定位相关源码 | [架构说明](architecture.md) |
-| 排查无法启动、判定异常、最终复检失败或中断 | [排障指南](troubleshooting.md) |
-| 搭建开发环境、运行验证、提交贡献 | [贡献指南](../CONTRIBUTING.md) |
-| 查看当前版本与接口变化 | [变更记录](../CHANGELOG.md) |
+| 查看全部文档，包括设计与性能资料 | [文档导航](docs/README.md) |
+| 为自己的后端编写判定脚本、设置预算、确认结果 | [使用指南](docs/usage.md) |
+| 理解候选如何生成、校验和接受，定位相关源码 | [架构说明](docs/architecture.md) |
+| 排查无法启动、判定异常、最终复检失败或中断 | [排障指南](docs/troubleshooting.md) |
+| 搭建开发环境、运行验证、提交贡献 | [贡献指南](CONTRIBUTING.md) |
 
 首次接入建议按「README → 使用指南 → 排障指南」阅读；修改实现前再阅读架构说明。
 
