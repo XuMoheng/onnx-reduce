@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -171,3 +172,35 @@ def test_shape_inference_failure_is_counted_and_preserves_decisions(tmp_path, mo
             assert report.performance.counters["shape_inference_failures"] > 0
             assert report.performance.counters["candidate_status.invalid"] > 0
     assert traces[0] == traces[1]
+
+
+def test_progress_tracks_initial_accepted_and_final_without_changing_outcome(tmp_path):
+    reduced, report = ReductionEngine(
+        config=EngineConfig(scheduler="staged", collect_performance=True)
+    ).run(OnnxModel.from_proto(chain_model(12, 6)), ReluFailureCheck(), tmp_path)
+    progress = report.to_dict()["performance"]["progress"]
+    assert progress[0]["reason"] == "initial"
+    assert progress[-1]["stage"] == "final"
+    assert progress[-1]["cost"]["node_count"] == reduced.cost().node_count
+    assert all(a["elapsed_seconds"] <= b["elapsed_seconds"] for a, b in pairwise(progress))
+    assert len(progress) == report.candidates_accepted + 2
+    logged = [
+        json.loads(line)
+        for line in (Path(report.work_directory) / "progress.jsonl").read_text().splitlines()
+    ]
+    assert logged == progress
+    assert report.minimality["status"] == "pass_fixed_point"
+
+
+def test_progress_compaction_preserves_endpoints_and_bounds_memory():
+    from onnx_reduce.types import ModelCost
+
+    stats = performance.PerformanceStats()
+    for i in range(3000):
+        stats.record_progress(
+            ModelCost(3000 - i, 1), stage="fine", reason="accepted", checks=i, force=True
+        )
+    assert len(stats.progress) <= 2048
+    assert stats.progress[0]["cost"]["node_count"] == 3000
+    assert stats.progress[-1]["cost"]["node_count"] == 1
+    assert stats.progress_compactions > 0

@@ -8,7 +8,7 @@ from collections import Counter
 from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from functools import wraps
 from time import perf_counter
 
@@ -20,10 +20,29 @@ class PerformanceStats:
     stages: dict[str, dict] = field(default_factory=dict)
     counters: Counter = field(default_factory=Counter)
     samples: dict[str, dict] = field(default_factory=dict)
+    progress: list[dict] = field(default_factory=list)
+    progress_compactions: int = 0
     _stack: list = field(default_factory=list)
     _started: float = field(default_factory=lambda: perf_counter())
     _elapsed: float | None = None
     _peak_rss: int | None = None
+
+    def record_progress(self, cost, *, stage, reason, checks, force=False):
+        elapsed = perf_counter() - self._started
+        if not force and self.progress and elapsed - self.progress[-1]["elapsed_seconds"] < 5:
+            return None
+        point = {
+            "elapsed_seconds": elapsed,
+            "stage": stage,
+            "reason": reason,
+            "failure_check_calls": checks,
+            "cost": asdict(cost),
+        }
+        if len(self.progress) >= 2048:
+            self.progress = self.progress[:1] + self.progress[2::2]
+            self.progress_compactions += 1
+        self.progress.append(point)
+        return point
 
     def finish(self) -> None:
         self._elapsed = perf_counter() - self._started
@@ -38,7 +57,9 @@ class PerformanceStats:
 
     def to_dict(self) -> dict:
         return {
-            "version": 1,
+            "version": 2,
+            "progress": list(self.progress),
+            "progress_compactions": self.progress_compactions,
             "elapsed_seconds": self._elapsed
             if self._elapsed is not None
             else perf_counter() - self._started,
@@ -123,10 +144,10 @@ def timed_candidates(reduction_pass, model):
         yield from reduction_pass.generate(model)
         return
     # Time actual lazy iteration, including setup and exhausted generators.
-    with measure("candidate_generation"):
+    with measure("candidate_generation"), measure(f"generate/{reduction_pass.name}"):
         candidates = iter(reduction_pass.generate(model))
     while True:
-        with measure("candidate_generation"):
+        with measure("candidate_generation"), measure(f"generate/{reduction_pass.name}"):
             try:
                 candidate = next(candidates)
             except StopIteration:

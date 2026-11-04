@@ -290,6 +290,7 @@ class ReductionEngine:
         }
         self._checkpoint(current_model, report, run_dir, started, checkpoint_artifacts)
         self.progress(f"initial model is interesting ({report.original.node_count} nodes)")
+        self._record_progress(current_model, report, run_dir, "initial", "initial", force=True)
         candidate_sequence_number = 0
         while True:
             attempt = scheduler.next_attempt(current_model)
@@ -329,6 +330,14 @@ class ReductionEngine:
                 break
             self._record_schedule(run_dir, attempt, candidate, outcome.feedback)
             scheduler.observe(attempt, outcome.feedback, outcome.accepted_model)
+            self._record_progress(
+                outcome.accepted_model or current_model,
+                report,
+                run_dir,
+                attempt.stage or attempt.source,
+                outcome.feedback.status,
+                force=outcome.accepted_model is not None,
+            )
             if outcome.accepted_model is not None:
                 current_model = outcome.accepted_model
                 report.scheduler = scheduler.to_dict()
@@ -370,6 +379,9 @@ class ReductionEngine:
             self.progress(
                 f"final independent recheck is interesting ({current_model.cost().node_count} nodes)"
             )
+        self._record_progress(
+            current_model, report, run_dir, "final", report.stop_reason, force=True
+        )
         report.minimality = {
             "status": (
                 "pass_fixed_point"
@@ -608,6 +620,24 @@ class ReductionEngine:
             cache_source="content" if result.cache_hit else None,
             failure_check_calls=int(not result.cache_hit),
         )
+
+    @staticmethod
+    def _record_progress(model, report, run_dir, stage, reason, *, force=False):
+        profile = current_performance()
+        if profile is not None:
+            point = profile.record_progress(
+                model.cost(),
+                stage=stage,
+                reason=reason,
+                checks=report.failure_check_calls,
+                force=force,
+            )
+            if point is not None:
+                write_text(
+                    run_dir / "progress.jsonl",
+                    json.dumps(point, sort_keys=True) + "\n",
+                    append=True,
+                )
 
     @staticmethod
     def _record_schedule(
