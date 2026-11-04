@@ -1,0 +1,462 @@
+{
+  "condition_source": "simulated",
+  "baseline": "original three passes under the same engine, metrics and budgets",
+  "config": {
+    "objective": "nodes",
+    "max_candidate_check_calls": 500,
+    "time_budget_seconds": 60,
+    "combination_limit": 32
+  },
+  "cases": [
+    {
+      "name": "matmul",
+      "runs": {
+        "original_passes": {
+          "original": {
+            "node_count": 1,
+            "tensor_elements": 32,
+            "byte_size": 179,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 32,
+            "byte_size": 179,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "failure_checks": {
+            "calls": 3,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 1,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.004359,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/matmul/original_passes/run-yh6ud_gg/final/model.onnx",
+            "digest": "93c256cff10097cc78cad461d55da699905d351a652d1303e3e810d3ff2da0ee",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "extended": {
+          "original": {
+            "node_count": 1,
+            "tensor_elements": 32,
+            "byte_size": 179,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 120,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "failure_checks": {
+            "calls": 9,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 6,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.009485,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/matmul/extended/run-_tzz3bbi/final/model.onnx",
+            "digest": "d8514a2802230d2628c44699dcf353f729c32982cfdece8d8f7aa5addbe3e76d",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "name": "reshape",
+      "runs": {
+        "original_passes": {
+          "original": {
+            "node_count": 1,
+            "tensor_elements": 18,
+            "byte_size": 137,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 18,
+            "byte_size": 137,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "failure_checks": {
+            "calls": 3,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 1,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.002878,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/reshape/original_passes/run-bcu_raww/final/model.onnx",
+            "digest": "0ee1780c7a3fcf6198622c735174e46b34ee4bc79ddbf5787da66615b0d2083d",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "extended": {
+          "original": {
+            "node_count": 1,
+            "tensor_elements": 18,
+            "byte_size": 137,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 3,
+            "byte_size": 140,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 1
+          },
+          "failure_checks": {
+            "calls": 9,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 6,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.012038,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/reshape/extended/run-67v9btlk/final/model.onnx",
+            "digest": "9e5504dbe3b9db03b25f5ebd37251408197f29222c7b0453203b8aa3af855f97",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "name": "if",
+      "runs": {
+        "original_passes": {
+          "original": {
+            "node_count": 5,
+            "tensor_elements": 17,
+            "byte_size": 262,
+            "input_count": 2,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 5,
+            "tensor_elements": 17,
+            "byte_size": 262,
+            "input_count": 2,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 3,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 1,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.006415,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/if/original_passes/run-octg2l1z/final/model.onnx",
+            "digest": "c5d991090fb1076fc13b19fcfdcfd7fa80ad9f72103aeb0d5f215a0f8217cc21",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "extended": {
+          "original": {
+            "node_count": 5,
+            "tensor_elements": 17,
+            "byte_size": 262,
+            "input_count": 2,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 3,
+            "tensor_elements": 2,
+            "byte_size": 228,
+            "input_count": 2,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 9,
+            "cache_hits": 4,
+            "target_identity_mismatches": 0,
+            "interesting": 5,
+            "not_interesting": 4,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.021072,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/if/extended/run-gqj1b95l/final/model.onnx",
+            "digest": "224af174d1574c0886fc161a3d1c5b7e173668f82f7e41180957d5d69ba34e8a",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "name": "loop",
+      "runs": {
+        "original_passes": {
+          "original": {
+            "node_count": 4,
+            "tensor_elements": 36,
+            "byte_size": 325,
+            "input_count": 6,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 4,
+            "tensor_elements": 36,
+            "byte_size": 325,
+            "input_count": 6,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 3,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 1,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.00332,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/loop/original_passes/run-do2ge_zf/final/model.onnx",
+            "digest": "b3f0fbb42b86e47f0ed561adb6046166270c101eac4cb4fc2b4e2e65afd26f87",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "extended": {
+          "original": {
+            "node_count": 4,
+            "tensor_elements": 36,
+            "byte_size": 325,
+            "input_count": 6,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 2,
+            "tensor_elements": 6,
+            "byte_size": 276,
+            "input_count": 6,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 14,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 5,
+            "not_interesting": 9,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.024219,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/loop/extended/run-vgfdd2y9/final/model.onnx",
+            "digest": "dcc3801c595c32c29ff009328a37ee2f49f5fde702ef7020ecfa67f9211e3357",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "name": "scan",
+      "runs": {
+        "original_passes": {
+          "original": {
+            "node_count": 4,
+            "tensor_elements": 96,
+            "byte_size": 371,
+            "input_count": 4,
+            "output_count": 4,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 4,
+            "tensor_elements": 96,
+            "byte_size": 371,
+            "input_count": 4,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 4,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 1,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.005243,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/scan/original_passes/run-ch9qpmxk/final/model.onnx",
+            "digest": "45f3e1b2fcff3a69f7278eb4e864708e7b4f821b2236a23cd5587ad2593d8577",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "extended": {
+          "original": {
+            "node_count": 4,
+            "tensor_elements": 96,
+            "byte_size": 371,
+            "input_count": 4,
+            "output_count": 4,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 2,
+            "tensor_elements": 4,
+            "byte_size": 319,
+            "input_count": 4,
+            "output_count": 3,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 11,
+            "cache_hits": 2,
+            "target_identity_mismatches": 0,
+            "interesting": 7,
+            "not_interesting": 4,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.017905,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/scan/extended/run-si9zzmzk/final/model.onnx",
+            "digest": "214d53109f510bd9f2f2bcd902636ddb7f331871be7a7aa175f4b2da29d570f6",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "name": "paired_bypass",
+      "runs": {
+        "original_passes": {
+          "original": {
+            "node_count": 4,
+            "tensor_elements": 16,
+            "byte_size": 118,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 4,
+            "tensor_elements": 16,
+            "byte_size": 118,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 8,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 6,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.007947,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/paired_bypass/original_passes/run-iv8uo1y6/final/model.onnx",
+            "digest": "5991bec2f5707fd82e8378a5caf94aa2d5fc49ce90c25bc2ccd8dd01ac33fd56",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "extended": {
+          "original": {
+            "node_count": 4,
+            "tensor_elements": 16,
+            "byte_size": 118,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 2,
+            "tensor_elements": 1,
+            "byte_size": 92,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "failure_checks": {
+            "calls": 36,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 4,
+            "not_interesting": 32,
+            "inconclusive": 0
+          },
+          "duration_seconds": 0.037965,
+          "stop_reason": "fixed_point",
+          "artifact_recheck": {
+            "model": "/tmp/onnx-reduce-quality-remaining/paired_bypass/extended/run-raub0uc4/final/model.onnx",
+            "digest": "0e5388d67f2136f833267f43635d55b2de5ad627d8d0c22268c506fc52672b44",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    }
+  ]
+}
