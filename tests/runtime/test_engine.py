@@ -50,7 +50,8 @@ def test_max_candidate_check_calls_budget_is_reported(tmp_path):
         model, ReluFailureCheck(), tmp_path, max_candidate_check_calls=1
     )
     assert report.stop_reason == "budget_exhausted"
-    assert report.final.node_count == report.original.node_count
+    assert report.final.node_count == 1
+    assert report.failure_check_calls == 3
     assert "Relu" in reduced.op_types
 
 
@@ -62,6 +63,8 @@ def test_report_serializes_all_contract_counters(tmp_path):
     assert payload["failure_checks"]["calls"] == report.failure_check_calls
     assert payload["candidates"]["generated"] == report.candidates_generated
     assert set(payload["passes"]) == {
+        "probe_fragments",
+        "extract_nodes",
         "drop_outputs",
         "remove_unused",
         "delete_nodes",

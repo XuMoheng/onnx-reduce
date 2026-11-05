@@ -278,6 +278,31 @@ uv run --locked onnx-reduce input.onnx --test '/absolute/path/check-backend' \
 独立 `--finalize-from` 可改变这些搜索选项，但判定命令与故障身份须保持一致。
 各项性能证据与已知退化见[第五、六批结果](history/performance/performance-batch56-results.md)。
 
+## 大图缩减停滞时
+
+当前默认启用活跃子图提取：先进行最多 16 次快速候选探测，再执行原有删除、旁路等策略，
+之后补充完整提取扫描。它能直接尝试单个活跃算子及较小分区，同时重建输入输出，
+避免故障节点因尾部被删除而变成死代码。无需新增命令开关，原来的缩减命令即可使用。
+
+提取会同时尝试新的图接口和保留原输入输出接口的变体。后者严格匹配类型与 shape，
+保持名字、顺序和原有未使用输入，支持仍按固定接口运行的判定器；不匹配时拒绝该变体。
+判定脚本若能读取候选的实际接口，可覆盖更多变换。如果变化使目标故障不再复现，
+候选会被正常拒绝；不会放宽 checker 或目标身份匹配。
+
+```bash
+uv run --locked onnx-reduce /path/to/original.onnx \
+  --test '/absolute/path/check-backend' -o /path/to/reduced.onnx \
+  --time-budget-seconds 120 --performance --report /path/to/report.json
+```
+
+若已有 360 节点结果，也可把它作为新输入继续缩减。原模型与该结果应使用同一故障判定条件；
+需要延续原故障身份时，沿用签名匹配或 staged 的已验证目标恢复。
+报告中的 `probe_fragments` 和 `extract_nodes` 记录提取收益。若大部分候选 `invalid`，
+查看 candidates.jsonl 中具体的类型/校验失败；若主要为 `not_interesting`，则查看独立判定日志，
+确认是目标故障消失还是目标签名变化。`budget_exhausted` 不代表已达到最小。
+
+完整的 1500 节点复现方法、性能对照和真实后端验证状态见[活跃子图缩减](performance/live-fragments.md)。
+
 ## 选择缩减目标及组合搜索边界
 
 ### 执行较充分的缩减

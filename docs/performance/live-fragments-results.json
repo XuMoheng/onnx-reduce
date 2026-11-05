@@ -1,0 +1,4254 @@
+{
+  "date": "2026-11-05",
+  "condition_source": "simulated live graph traversal",
+  "baseline_commit": "ea6820e",
+  "raw_summary": "output/live-fragments-ir-v2/summary.json",
+  "environment": {
+    "python": "3.13.17 (main, Oct 21 2026, 17:49:22) [Clang 23.1.3 ]",
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+    "onnx": "1.23.2",
+    "onnxscript": "0.7.2"
+  },
+  "source_hash_method": "sorted src/**/*.py relative paths + NUL + file bytes",
+  "source_hashes": {
+    "baseline": "4e1a81d153ffcaccef29f90ef7f149d206e69d6fb2761f60cfe22bda8261b5a7",
+    "current": "e9dfd4a673a48e0e6f8b68ceabab3d4d2f297341934b751424f827793243a66c"
+  },
+  "benchmark_sha256": "65d6e82a88aa5b2457df1492a687b4a0154ceb3ac54888ffec434ed456c2eb4e",
+  "pair_count": 54,
+  "model_nodes": 1500,
+  "trigger_index": 1140,
+  "candidate_check_budget": 128,
+  "time_budget_seconds": 1,
+  "repeat": 3,
+  "model_edit_mode": "ir",
+  "runs": [
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 19700,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.860885,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 122,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.057746,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.057569,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 19700,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.876641,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 122,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 19700,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.881004,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 122,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.056759,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 19700,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.019873,
+          "failure_checks": {
+            "calls": 68,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 60,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.057264,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.057895,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 19700,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.025853,
+          "failure_checks": {
+            "calls": 67,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 59,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 19700,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.022995,
+          "failure_checks": {
+            "calls": 68,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 60,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "324af7159ed4143f86d9d6f10b225ff23a73ae91f94504abec8483d2cd79f5c0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.058143,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 345,
+            "tensor_elements": 1,
+            "byte_size": 18674,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "18f60ad2c63cb4863943b32c524e91deeb094aa207eb81932ead63155213ed4e",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.611195,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 31,
+            "not_interesting": 99,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "18f60ad2c63cb4863943b32c524e91deeb094aa207eb81932ead63155213ed4e",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.059019,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 2,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.058638,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 2,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 345,
+            "tensor_elements": 1,
+            "byte_size": 18674,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "18f60ad2c63cb4863943b32c524e91deeb094aa207eb81932ead63155213ed4e",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.623712,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 31,
+            "not_interesting": 99,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "18f60ad2c63cb4863943b32c524e91deeb094aa207eb81932ead63155213ed4e",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 345,
+            "tensor_elements": 1,
+            "byte_size": 18674,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "18f60ad2c63cb4863943b32c524e91deeb094aa207eb81932ead63155213ed4e",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.624745,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 31,
+            "not_interesting": 99,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "18f60ad2c63cb4863943b32c524e91deeb094aa207eb81932ead63155213ed4e",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.059301,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 2,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 357,
+            "tensor_elements": 1,
+            "byte_size": 19322,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "d7849ac7754a388e523e7813944746a3c735c6490effde2cdcf5fe1df66d5293",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.030874,
+          "failure_checks": {
+            "calls": 47,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 19,
+            "not_interesting": 28,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "d7849ac7754a388e523e7813944746a3c735c6490effde2cdcf5fe1df66d5293",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.058786,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 2,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.059659,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 2,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 357,
+            "tensor_elements": 1,
+            "byte_size": 19322,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "d7849ac7754a388e523e7813944746a3c735c6490effde2cdcf5fe1df66d5293",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.021536,
+          "failure_checks": {
+            "calls": 46,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 19,
+            "not_interesting": 27,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "d7849ac7754a388e523e7813944746a3c735c6490effde2cdcf5fe1df66d5293",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 357,
+            "tensor_elements": 1,
+            "byte_size": 19322,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "d7849ac7754a388e523e7813944746a3c735c6490effde2cdcf5fe1df66d5293",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.013677,
+          "failure_checks": {
+            "calls": 46,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 19,
+            "not_interesting": 27,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "d7849ac7754a388e523e7813944746a3c735c6490effde2cdcf5fe1df66d5293",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.058819,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 2,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 353,
+            "tensor_elements": 1,
+            "byte_size": 19106,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "14652785f13ada41fe628ce7ddee22f8c756f9b1e4973b63ad9ae92351a34482",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.277847,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 25,
+            "not_interesting": 105,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "14652785f13ada41fe628ce7ddee22f8c756f9b1e4973b63ad9ae92351a34482",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.062142,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.062767,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 353,
+            "tensor_elements": 1,
+            "byte_size": 19106,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "14652785f13ada41fe628ce7ddee22f8c756f9b1e4973b63ad9ae92351a34482",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.263947,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 25,
+            "not_interesting": 105,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "14652785f13ada41fe628ce7ddee22f8c756f9b1e4973b63ad9ae92351a34482",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 353,
+            "tensor_elements": 1,
+            "byte_size": 19106,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "14652785f13ada41fe628ce7ddee22f8c756f9b1e4973b63ad9ae92351a34482",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.272444,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 25,
+            "not_interesting": 105,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "14652785f13ada41fe628ce7ddee22f8c756f9b1e4973b63ad9ae92351a34482",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.062489,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 371,
+            "tensor_elements": 1,
+            "byte_size": 20078,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7f4cd936bf73e47ad141f8a34e1bbfe0e3e7e472887d8f8efa62cf5240f25373",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.019674,
+          "failure_checks": {
+            "calls": 74,
+            "cache_hits": 6,
+            "target_identity_mismatches": 0,
+            "interesting": 10,
+            "not_interesting": 64,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7f4cd936bf73e47ad141f8a34e1bbfe0e3e7e472887d8f8efa62cf5240f25373",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.062235,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.063316,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 371,
+            "tensor_elements": 1,
+            "byte_size": 20078,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7f4cd936bf73e47ad141f8a34e1bbfe0e3e7e472887d8f8efa62cf5240f25373",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.025974,
+          "failure_checks": {
+            "calls": 74,
+            "cache_hits": 6,
+            "target_identity_mismatches": 0,
+            "interesting": 10,
+            "not_interesting": 64,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7f4cd936bf73e47ad141f8a34e1bbfe0e3e7e472887d8f8efa62cf5240f25373",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 371,
+            "tensor_elements": 1,
+            "byte_size": 20078,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7f4cd936bf73e47ad141f8a34e1bbfe0e3e7e472887d8f8efa62cf5240f25373",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.027582,
+          "failure_checks": {
+            "calls": 74,
+            "cache_hits": 6,
+            "target_identity_mismatches": 0,
+            "interesting": 10,
+            "not_interesting": 64,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7f4cd936bf73e47ad141f8a34e1bbfe0e3e7e472887d8f8efa62cf5240f25373",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.062126,
+          "failure_checks": {
+            "calls": 5,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 3,
+            "not_interesting": 2,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 18248,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.884793,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 122,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.239433,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 5,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 11,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.226819,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 5,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 11,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 18248,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.015064,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 122,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 18248,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.924258,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 122,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.220458,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 5,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 11,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 18248,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.019857,
+          "failure_checks": {
+            "calls": 67,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 59,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.221273,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 5,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 11,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.222816,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 5,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 11,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 18248,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.020617,
+          "failure_checks": {
+            "calls": 67,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 59,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 1,
+            "byte_size": 18248,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.022997,
+          "failure_checks": {
+            "calls": 65,
+            "cache_hits": 1,
+            "target_identity_mismatches": 0,
+            "interesting": 8,
+            "not_interesting": 57,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f32b767e96ceb7d69b0012614ae213ebe86f8f670ecacb427a8933c191356acf",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.220921,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 5,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 11,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 345,
+            "tensor_elements": 1,
+            "byte_size": 17298,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f2301f4b8222fe22bd267ceb7a9d14e91884bb4c0c142abbd4a317c0665487f0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.62341,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 31,
+            "not_interesting": 99,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f2301f4b8222fe22bd267ceb7a9d14e91884bb4c0c142abbd4a317c0665487f0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.503114,
+          "failure_checks": {
+            "calls": 44,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 23,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.504475,
+          "failure_checks": {
+            "calls": 44,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 23,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 345,
+            "tensor_elements": 1,
+            "byte_size": 17298,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f2301f4b8222fe22bd267ceb7a9d14e91884bb4c0c142abbd4a317c0665487f0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.650286,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 31,
+            "not_interesting": 99,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f2301f4b8222fe22bd267ceb7a9d14e91884bb4c0c142abbd4a317c0665487f0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 345,
+            "tensor_elements": 1,
+            "byte_size": 17298,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "f2301f4b8222fe22bd267ceb7a9d14e91884bb4c0c142abbd4a317c0665487f0",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.617578,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 31,
+            "not_interesting": 99,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "f2301f4b8222fe22bd267ceb7a9d14e91884bb4c0c142abbd4a317c0665487f0",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.502284,
+          "failure_checks": {
+            "calls": 44,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 23,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 357,
+            "tensor_elements": 1,
+            "byte_size": 17898,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7506dec2987c9c50441f39a6d6377509bee4285e7b7f9ad10855caf9483b80c1",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.02713,
+          "failure_checks": {
+            "calls": 46,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 19,
+            "not_interesting": 27,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7506dec2987c9c50441f39a6d6377509bee4285e7b7f9ad10855caf9483b80c1",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.503721,
+          "failure_checks": {
+            "calls": 44,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 23,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.502221,
+          "failure_checks": {
+            "calls": 44,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 23,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 357,
+            "tensor_elements": 1,
+            "byte_size": 17898,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7506dec2987c9c50441f39a6d6377509bee4285e7b7f9ad10855caf9483b80c1",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.032813,
+          "failure_checks": {
+            "calls": 46,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 19,
+            "not_interesting": 27,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7506dec2987c9c50441f39a6d6377509bee4285e7b7f9ad10855caf9483b80c1",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 357,
+            "tensor_elements": 1,
+            "byte_size": 17898,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7506dec2987c9c50441f39a6d6377509bee4285e7b7f9ad10855caf9483b80c1",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.028063,
+          "failure_checks": {
+            "calls": 46,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 19,
+            "not_interesting": 27,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7506dec2987c9c50441f39a6d6377509bee4285e7b7f9ad10855caf9483b80c1",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.504977,
+          "failure_checks": {
+            "calls": 44,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 23,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 353,
+            "tensor_elements": 1,
+            "byte_size": 17698,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "8520b437515f2281558bc9c593ddaf508fbb7661cf3dd9afd4c68c42abec36c1",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.284476,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 25,
+            "not_interesting": 105,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "8520b437515f2281558bc9c593ddaf508fbb7661cf3dd9afd4c68c42abec36c1",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.304661,
+          "failure_checks": {
+            "calls": 28,
+            "cache_hits": 15,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 17,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.300596,
+          "failure_checks": {
+            "calls": 28,
+            "cache_hits": 15,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 17,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 353,
+            "tensor_elements": 1,
+            "byte_size": 17698,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "8520b437515f2281558bc9c593ddaf508fbb7661cf3dd9afd4c68c42abec36c1",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.262302,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 25,
+            "not_interesting": 105,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "8520b437515f2281558bc9c593ddaf508fbb7661cf3dd9afd4c68c42abec36c1",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 353,
+            "tensor_elements": 1,
+            "byte_size": 17698,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "8520b437515f2281558bc9c593ddaf508fbb7661cf3dd9afd4c68c42abec36c1",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 2.262522,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 25,
+            "not_interesting": 105,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "8520b437515f2281558bc9c593ddaf508fbb7661cf3dd9afd4c68c42abec36c1",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.299989,
+          "failure_checks": {
+            "calls": 28,
+            "cache_hits": 15,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 17,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 372,
+            "tensor_elements": 1,
+            "byte_size": 18648,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7eca95b5f85ce2e375c827cac4cdffb685f77f2d7dc0a950a13d7066de039835",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.016352,
+          "failure_checks": {
+            "calls": 73,
+            "cache_hits": 6,
+            "target_identity_mismatches": 0,
+            "interesting": 9,
+            "not_interesting": 64,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7eca95b5f85ce2e375c827cac4cdffb685f77f2d7dc0a950a13d7066de039835",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.301612,
+          "failure_checks": {
+            "calls": 28,
+            "cache_hits": 15,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 17,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.30115,
+          "failure_checks": {
+            "calls": 28,
+            "cache_hits": 15,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 17,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 372,
+            "tensor_elements": 1,
+            "byte_size": 18648,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7eca95b5f85ce2e375c827cac4cdffb685f77f2d7dc0a950a13d7066de039835",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.021076,
+          "failure_checks": {
+            "calls": 73,
+            "cache_hits": 6,
+            "target_identity_mismatches": 0,
+            "interesting": 9,
+            "not_interesting": 64,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7eca95b5f85ce2e375c827cac4cdffb685f77f2d7dc0a950a13d7066de039835",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 372,
+            "tensor_elements": 1,
+            "byte_size": 18648,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7eca95b5f85ce2e375c827cac4cdffb685f77f2d7dc0a950a13d7066de039835",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.022152,
+          "failure_checks": {
+            "calls": 73,
+            "cache_hits": 6,
+            "target_identity_mismatches": 0,
+            "interesting": 9,
+            "not_interesting": 64,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "7eca95b5f85ce2e375c827cac4cdffb685f77f2d7dc0a950a13d7066de039835",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 70600,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "stop_reason": "fixed_point",
+          "duration_seconds": 0.304241,
+          "failure_checks": {
+            "calls": 28,
+            "cache_hits": 15,
+            "target_identity_mismatches": 0,
+            "interesting": 11,
+            "not_interesting": 17,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 7.499112,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 6.838301,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 6.886407,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 7.422657,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 7.481731,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 6.851583,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.068157,
+          "failure_checks": {
+            "calls": 20,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 18,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.094842,
+          "failure_checks": {
+            "calls": 31,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 29,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.087939,
+          "failure_checks": {
+            "calls": 31,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 29,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.063666,
+          "failure_checks": {
+            "calls": 20,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 18,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.089712,
+          "failure_checks": {
+            "calls": 20,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 18,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.09317,
+          "failure_checks": {
+            "calls": 31,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 29,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 11.902253,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 10.218137,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 16,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 10.182536,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 16,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 11.905164,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 11.897869,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 10.150995,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 16,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.16568,
+          "failure_checks": {
+            "calls": 16,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 14,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.070771,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 20,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.082529,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 20,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.198136,
+          "failure_checks": {
+            "calls": 16,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 14,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.150129,
+          "failure_checks": {
+            "calls": 16,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 14,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.073354,
+          "failure_checks": {
+            "calls": 22,
+            "cache_hits": 0,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 20,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 11.201019,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 34,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 3.430635,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 16,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 3.369597,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 16,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 11.199032,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 34,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 11.254568,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 34,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 3.344678,
+          "failure_checks": {
+            "calls": 130,
+            "cache_hits": 16,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 128,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.075605,
+          "failure_checks": {
+            "calls": 23,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.072568,
+          "failure_checks": {
+            "calls": 80,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 78,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.076692,
+          "failure_checks": {
+            "calls": 80,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 78,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.094572,
+          "failure_checks": {
+            "calls": 23,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.054573,
+          "failure_checks": {
+            "calls": 23,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 21,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        },
+        "current": {
+          "original": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "stop_reason": "budget_exhausted",
+          "duration_seconds": 1.087453,
+          "failure_checks": {
+            "calls": 80,
+            "cache_hits": 8,
+            "target_identity_mismatches": 0,
+            "interesting": 2,
+            "not_interesting": 78,
+            "inconclusive": 0
+          },
+          "artifact_recheck": {
+            "digest": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+            "read_back_validated": true,
+            "outcome": "interesting",
+            "cache_hit": false
+          }
+        }
+      }
+    }
+  ],
+  "validation": {
+    "python_3_11_tests": 465,
+    "python_3_12_tests": 465,
+    "python_3_13_tests": 465,
+    "python_3_11_sdist_tests": 465,
+    "lint_and_format": "passed",
+    "installed_wheel_live_op": {
+      "original_nodes": 1500,
+      "final_nodes": 1,
+      "failure_check_calls": 5,
+      "stop_reason": "fixed_point",
+      "artifact_recheck": "interesting"
+    },
+    "real_internal_model": "not available; not verified"
+  }
+}

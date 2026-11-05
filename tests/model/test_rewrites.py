@@ -12,6 +12,7 @@ from onnx_reduce.passes.candidates import rewrite_candidates
 from onnx_reduce.passes.delete_nodes import DeleteNodesPass
 from onnx_reduce.passes.drop_outputs import DropOutputsPass
 from onnx_reduce.passes.remove_unused import RemoveUnusedPass
+from onnx_reduce.passes.rewrite import BypassNodesPass
 from onnx_reduce.types import EditApplicationError
 from tests.helpers import tensor_value
 
@@ -52,7 +53,7 @@ def test_bypass_escapes_deletion_fixed_point(tmp_path, scheduler):
     )
     assert old_report.stop_reason == "fixed_point"
     assert old.node_count == 2
-    reduced, report = ReductionEngine(config=config).run(
+    reduced, report = ReductionEngine(passes=(*old_passes, BypassNodesPass()), config=config).run(
         model, ReluWithNegCheck(), tmp_path / "new"
     )
     assert reduced.op_types == ("Relu",)

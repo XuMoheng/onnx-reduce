@@ -82,7 +82,7 @@ def test_threshold_failure_refines_partitions_to_exact_threshold(tmp_path, cache
     assert report.scheduler["model_version"] == report.candidates_accepted
 
 
-def test_keep_direction_finds_non_monotonic_reduction_legacy_misses(tmp_path):
+def test_fragment_extraction_finds_non_monotonic_reduction_for_both_strategies(tmp_path):
     results = {}
     for strategy in ("legacy", "stateful"):
         reduced, report = ReductionEngine(config=EngineConfig(scheduler=strategy)).run(
@@ -92,12 +92,15 @@ def test_keep_direction_finds_non_monotonic_reduction_legacy_misses(tmp_path):
         )
         results[strategy] = reduced.node_count
         assert report.minimality["status"] == "pass_fixed_point"
-    assert results == {"legacy": 8, "stateful": 2}
+    assert results == {"legacy": 2, "stateful": 2}
 
 
 def test_cover_acceptance_invalidates_sweep_and_covers_new_model(tmp_path):
     reduced, report = run(
-        OnnxModel.from_proto(chain_model(16, 8)), CountCheck(lambda n: n in {16, 12, 6}), tmp_path
+        OnnxModel.from_proto(chain_model(16, 8)),
+        CountCheck(lambda n: n in {16, 12, 6}),
+        tmp_path,
+        passes=[DeleteNodesPass()],
     )
     assert reduced.node_count == 6
     assert report.scheduler["sources"]["coverage"]["accepted"] >= 1
@@ -244,7 +247,7 @@ def test_check_budgets_and_final_independent_recheck(tmp_path, budget, cache_ena
         )
     ).run(
         OnnxModel.from_proto(chain_model(12, 6)),
-        ReluFailureCheck(),
+        CountCheck(lambda n: n == 12),
         tmp_path / "work",
         output_path=output,
     )

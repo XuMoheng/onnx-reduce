@@ -117,7 +117,7 @@ def test_cursor_budget_goals_and_actual_output_recheck(tmp_path, cache, goal, bu
         assert report.failure_check_calls <= budget + 2
     assert report.artifact_recheck["read_back_validated"]
     assert not report.artifact_recheck["cache_hit"]
-    if goal == "fast" or budget is not None:
+    if goal == "fast" or report.stop_reason != "fixed_point":
         assert report.minimality["status"] == "unproven"
     else:
         assert report.minimality["status"] == "pass_fixed_point"

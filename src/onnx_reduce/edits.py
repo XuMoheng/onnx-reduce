@@ -17,6 +17,15 @@ class DeleteNodes:
 
 
 @dataclass(frozen=True)
+class ExtractNodes:
+    """Keep main-graph nodes and rebuild their live input/output boundary."""
+
+    indices: tuple[int, ...]
+    outputs: tuple[str, ...] | None = None
+    preserve_interface: bool = False
+
+
+@dataclass(frozen=True)
 class DropOutputs:
     """Remove named graph outputs without deleting their producers."""
 
@@ -78,6 +87,7 @@ class CleanupGraph:
 
 Edit = (
     DeleteNodes
+    | ExtractNodes
     | DropOutputs
     | DropInputs
     | DropInitializers

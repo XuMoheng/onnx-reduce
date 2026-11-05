@@ -218,6 +218,10 @@ class OnnxModel:
         return queries.tensor_index(self)
 
     @cached_property
+    def _extraction_view(self):
+        return queries.extraction_view(self)
+
+    @cached_property
     def _region_graph(self) -> RegionGraph:
         return queries._region_graph(self)
 

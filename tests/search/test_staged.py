@@ -19,6 +19,7 @@ from onnx_reduce.failure_check.runner import FailureCheckObservation
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.passes import default_passes
 from onnx_reduce.passes.delete_nodes import DeleteNodesPass
+from onnx_reduce.passes.remove_unused import RemoveUnusedPass
 from onnx_reduce.search.coverage import Finalizer
 from onnx_reduce.search.staged import StagedScheduler
 from onnx_reduce.search.types import CandidateFeedback
@@ -125,7 +126,7 @@ def test_independent_finalizer_rejects_unobserved_base_change():
 def test_global_call_budget_includes_search_and_finalization(tmp_path, cache, budget, goal):
     _, report = run(
         OnnxModel.from_proto(chain_model(32, 16)),
-        ReluFailureCheck(),
+        CountCheck(lambda n: n == 32),
         tmp_path,
         cache_enabled=cache,
         max_candidate_check_calls=budget,
@@ -166,6 +167,7 @@ def test_cleanups_run_after_node_acceptance_with_bounded_quota(tmp_path):
         OnnxModel.from_proto(chain_model(32, 16)),
         ReluFailureCheck(),
         tmp_path,
+        passes=[RemoveUnusedPass(), DeleteNodesPass()],
         max_candidate_check_calls=4,
         goal="fast",
     )

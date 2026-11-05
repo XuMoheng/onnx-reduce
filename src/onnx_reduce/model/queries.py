@@ -6,6 +6,8 @@ import json
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
+import onnx
+
 from onnx_reduce.types import (
     RegionGraph,
     RegionValue,
@@ -27,6 +29,55 @@ class TensorLinks:
     is_graph_input: bool
     is_graph_output: bool
     is_initializer: bool
+
+
+@dataclass(frozen=True)
+class ExtractionView:
+    """Boundary lookups shared by every extraction on one immutable base."""
+
+    links: dict[str, TensorLinks]
+    dependencies: tuple[tuple[str, ...], ...]
+    infos: dict[str, onnx.ValueInfoProto]
+    weights: dict[str, onnx.TensorProto]
+    sparse_weights: dict[str, onnx.SparseTensorProto]
+
+
+def extraction_view(model: OnnxModel) -> ExtractionView:
+    graph = model._snapshot.graph
+    links = model.tensor_index()
+    dependencies = [[] for _ in graph.node]
+    for name, link in links.items():
+        for index in link.consumers:
+            dependencies[index].append(name)
+    infos = dict(model._proto_infos)
+    weights = {tensor.name: tensor for tensor in graph.initializer}
+    sparse = {tensor.values.name: tensor for tensor in graph.sparse_initializer}
+    for name, tensor in sparse.items():
+        infos.setdefault(
+            name, onnx.helper.make_tensor_value_info(name, tensor.values.data_type, tensor.dims)
+        )
+    # Preserve constant input data when cutting its producer from a fragment.
+    # Other producer computations are left to separate checked candidates.
+    for node in graph.node:
+        if node.domain not in {"", "ai.onnx"} or node.op_type != "Constant":
+            continue
+        if len(node.output) != 1 or not node.output[0]:
+            continue
+        tensor = next(
+            (
+                a.t
+                for a in node.attribute
+                if a.name == "value" and a.type == onnx.AttributeProto.TENSOR
+            ),
+            None,
+        )
+        if tensor is not None:
+            name = node.output[0]
+            weights[name] = tensor
+            infos.setdefault(
+                name, onnx.helper.make_tensor_value_info(name, tensor.data_type, tensor.dims)
+            )
+    return ExtractionView(links, tuple(map(tuple, dependencies)), infos, weights, sparse)
 
 
 def tensor_index(model: OnnxModel) -> dict[str, TensorLinks]:

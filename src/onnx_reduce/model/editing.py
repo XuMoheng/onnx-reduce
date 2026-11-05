@@ -17,6 +17,7 @@ from onnx_reduce.edits import (
     DropInputs,
     DropNodeAttribute,
     DropOutputs,
+    ExtractNodes,
     ResizeOperator,
     ShrinkDimension,
 )
@@ -39,6 +40,8 @@ def apply_candidate(model: OnnxModel, candidate: Candidate) -> OnnxModel:
 
     if candidate.base_digest is not None and candidate.base_digest != model.canonical_hash():
         raise EditApplicationError("candidate base digest does not match the model")
+    if len(candidate.edits) == 1 and isinstance(candidate.edits[0], ExtractNodes):
+        return _extract(model, candidate.edits[0])
     if (
         model.edit_options.mode == "auto"
         and len(candidate.edits) == 1
@@ -50,7 +53,9 @@ def apply_candidate(model: OnnxModel, candidate: Candidate) -> OnnxModel:
     result = model.copy()
     # Each edit addresses the result of the preceding edit.
     for edit_index, edit in enumerate(candidate.edits):
-        if isinstance(edit, DeleteNodes):
+        if isinstance(edit, ExtractNodes):
+            result = _extract(result, edit)
+        elif isinstance(edit, DeleteNodes):
             result._delete_nodes(
                 edit.indices, inference_source=model if edit_index == 0 else result
             )
@@ -103,6 +108,17 @@ def apply_candidate(model: OnnxModel, candidate: Candidate) -> OnnxModel:
         # inference. Subsequent edits must never see that stale snapshot.
         invalidate_derived(result)
     return result
+
+
+def _extract(model, edit):
+    from onnx_reduce.model.adapter import OnnxModel
+    from onnx_reduce.model.operations.extraction import extract_nodes
+
+    proto, ids = extract_nodes(model, edit)
+    try:
+        return OnnxModel(ir.from_proto(proto), _node_ids=ids, edit_options=model.edit_options)
+    except (ir.serde.SerdeError, ValueError, TypeError) as exc:
+        raise EditApplicationError(f"cannot import extracted fragment: {exc}") from exc
 
 
 def _delete_nodes(model: OnnxModel, indices: Iterable[int], *, inference_source: OnnxModel) -> None:

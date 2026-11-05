@@ -1,0 +1,1573 @@
+{
+  "date": "2026-11-05",
+  "condition_source": "simulated live traversal with optional fixed interface / selected output",
+  "baseline": "previous uncommitted live-fragment implementation, packaged and fingerprinted",
+  "baseline_archive_sha256": "3889d0a4cddb107eeec33bc377e4ebab43c0cdad0563c9a628fc0072628ceca4",
+  "source_hash_method": "sorted src/**/*.py relative path + NUL + contents",
+  "source_hashes": {
+    "baseline": "e9dfd4a673a48e0e6f8b68ceabab3d4d2f297341934b751424f827793243a66c",
+    "current": "f409ec96e91e1753c02919d9c57272475e9f86b79adb2cbf3319ddf2f93672c7"
+  },
+  "benchmark_sha256": "80d1be9c7f6d67fdf95b0480caaaaa99e39390ebf52b5c30dd343f421b10b3e1",
+  "environment": {
+    "python": "3.13.17 (main, Oct 21 2026, 17:49:22) [Clang 23.1.3 ]",
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+    "onnx": "1.23.2",
+    "onnxscript": "0.7.2"
+  },
+  "model_nodes": 1500,
+  "trigger_index": 1140,
+  "candidate_check_budget": 128,
+  "time_budget_seconds": 1,
+  "legacy_repeats": 3,
+  "stateful_staged_repeats": 1,
+  "model_edit_mode": "ir",
+  "raw_summaries": [
+    "output/live-fragments-interface-final-legacy/summary.json",
+    "output/live-fragments-interface-final-staged/summary.json"
+  ],
+  "pair_count": 38,
+  "runs": [
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.05829,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.059201,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.058739,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.059012,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.058689,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.060127,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.059664,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.059102,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.059438,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.058544,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_op",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.058613,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 5,
+          "cache_hits": 0,
+          "duration_seconds": 0.058888,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.222958,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.221145,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.221289,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.221391,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.220278,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.220871,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.222755,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.221274,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.222248,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.221872,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "live_name",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.221997,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 96,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "c966056d4748e84941dbd15a57744e586bc7657c9376ae8f2f24a82615a2a3be",
+          "failure_check_calls": 22,
+          "cache_hits": 5,
+          "duration_seconds": 0.221302,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 7.025981,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 7.06123,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 7.208395,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 7.042377,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 6.950301,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 7.1695,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 30,
+          "cache_hits": 0,
+          "duration_seconds": 1.069188,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 29,
+          "cache_hits": 0,
+          "duration_seconds": 1.08996,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 29,
+          "cache_hits": 0,
+          "duration_seconds": 1.084401,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 30,
+          "cache_hits": 0,
+          "duration_seconds": 1.071304,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "locked",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 30,
+          "cache_hits": 0,
+          "duration_seconds": 1.070332,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 29,
+          "cache_hits": 0,
+          "duration_seconds": 1.0849,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 7.029913,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 0,
+          "duration_seconds": 0.066211,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 0,
+          "duration_seconds": 0.065458,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 6.971691,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 0,
+          "duration_seconds": 6.93162,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 0,
+          "duration_seconds": 0.064884,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 30,
+          "cache_hits": 0,
+          "duration_seconds": 1.078381,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 0,
+          "duration_seconds": 0.065814,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 0,
+          "duration_seconds": 0.064926,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 30,
+          "cache_hits": 0,
+          "duration_seconds": 1.058541,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 30,
+          "cache_hits": 0,
+          "duration_seconds": 1.06935,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 0,
+          "duration_seconds": 0.065031,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 2,
+            "byte_size": 19742,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "244dfa6ab8e55e2f4a19367af762bf23e6d32b1daac1149500ef5c1130c330a4",
+          "failure_check_calls": 130,
+          "cache_hits": 54,
+          "duration_seconds": 1.977238,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 2,
+          "duration_seconds": 0.095812,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 2,
+          "duration_seconds": 0.081749,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 2,
+            "byte_size": 19742,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "244dfa6ab8e55e2f4a19367af762bf23e6d32b1daac1149500ef5c1130c330a4",
+          "failure_check_calls": 130,
+          "cache_hits": 54,
+          "duration_seconds": 1.98531,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "legacy",
+      "budget": "calls",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 364,
+            "tensor_elements": 2,
+            "byte_size": 19742,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "244dfa6ab8e55e2f4a19367af762bf23e6d32b1daac1149500ef5c1130c330a4",
+          "failure_check_calls": 130,
+          "cache_hits": 54,
+          "duration_seconds": 2.0014,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 2,
+          "duration_seconds": 0.081572,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 375,
+            "tensor_elements": 2,
+            "byte_size": 20336,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7c7d645b5cd8948b4061355892674fd8cb6f313d43dc671483e04ee18af41efc",
+          "failure_check_calls": 60,
+          "cache_hits": 36,
+          "duration_seconds": 1.06274,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 2,
+          "duration_seconds": 0.081779,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 1,
+      "runs": {
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 2,
+          "duration_seconds": 0.081677,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        },
+        "baseline": {
+          "final": {
+            "node_count": 375,
+            "tensor_elements": 2,
+            "byte_size": 20336,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7c7d645b5cd8948b4061355892674fd8cb6f313d43dc671483e04ee18af41efc",
+          "failure_check_calls": 59,
+          "cache_hits": 36,
+          "duration_seconds": 1.075245,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "legacy",
+      "budget": "time",
+      "repeat": 2,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 375,
+            "tensor_elements": 2,
+            "byte_size": 20336,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7c7d645b5cd8948b4061355892674fd8cb6f313d43dc671483e04ee18af41efc",
+          "failure_check_calls": 60,
+          "cache_hits": 36,
+          "duration_seconds": 1.06856,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 2,
+          "duration_seconds": 0.0817,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1468,
+            "tensor_elements": 1,
+            "byte_size": 75164,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "d13b0f8b75b498b65d65ee39cc49e373c6756aa3ba8b150c6c1c7a7b63ae6622",
+          "failure_check_calls": 130,
+          "cache_hits": 28,
+          "duration_seconds": 9.476351,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 2,
+          "duration_seconds": 0.068012,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1496,
+            "tensor_elements": 1,
+            "byte_size": 76428,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "2e037c43d76af5bbf06ec570e6bdbd06ef0c831ae0179fbe1fbb75a3d5d8e7ad",
+          "failure_check_calls": 22,
+          "cache_hits": 0,
+          "duration_seconds": 1.105623,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 2,
+          "duration_seconds": 0.067871,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 130,
+          "cache_hits": 16,
+          "duration_seconds": 3.463253,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 8,
+          "duration_seconds": 0.070481,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "fixed_io",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 1500,
+            "tensor_elements": 1,
+            "byte_size": 76596,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ba4dd25b0fbe95e041fc09039180910462911d583b259f05dc88435493b696ba",
+          "failure_check_calls": 80,
+          "cache_hits": 8,
+          "duration_seconds": 1.073055,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 1,
+            "byte_size": 88,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "5a9b940bf2a2f15d8a0ad75019286be32a502002147f5665cef9abd346e044de",
+          "failure_check_calls": 6,
+          "cache_hits": 8,
+          "duration_seconds": 0.071318,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "stateful",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 337,
+            "tensor_elements": 2,
+            "byte_size": 18271,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "ad27ffd499b3ad01c810f088dd0b0d659440ccad18113ed44b911b998fe394c0",
+          "failure_check_calls": 130,
+          "cache_hits": 28,
+          "duration_seconds": 2.618669,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 6,
+          "duration_seconds": 0.085475,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "stateful",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 361,
+            "tensor_elements": 2,
+            "byte_size": 19567,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "bb665bc16a7174a4dc84808d6cfd527f86b01b43c0487f9f8b97f1d4ac439114",
+          "failure_check_calls": 49,
+          "cache_hits": 8,
+          "duration_seconds": 1.014757,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 6,
+          "duration_seconds": 0.085499,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "staged",
+      "budget": "calls",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 375,
+            "tensor_elements": 2,
+            "byte_size": 20336,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7c7d645b5cd8948b4061355892674fd8cb6f313d43dc671483e04ee18af41efc",
+          "failure_check_calls": 130,
+          "cache_hits": 16,
+          "duration_seconds": 1.153774,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 12,
+          "duration_seconds": 0.089191,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    },
+    {
+      "case": "project_output",
+      "scheduler": "staged",
+      "budget": "time",
+      "repeat": 0,
+      "runs": {
+        "baseline": {
+          "final": {
+            "node_count": 375,
+            "tensor_elements": 2,
+            "byte_size": 20336,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "7c7d645b5cd8948b4061355892674fd8cb6f313d43dc671483e04ee18af41efc",
+          "failure_check_calls": 118,
+          "cache_hits": 16,
+          "duration_seconds": 1.016756,
+          "stop_reason": "budget_exhausted",
+          "independent_recheck": "interesting"
+        },
+        "current": {
+          "final": {
+            "node_count": 1,
+            "tensor_elements": 2,
+            "byte_size": 125,
+            "input_count": 1,
+            "output_count": 1,
+            "initializer_count": 0
+          },
+          "final_hash": "3d3720ca04702c5212b71991f6ebb65f41da04b2d35c77583c56be526d00b068",
+          "failure_check_calls": 10,
+          "cache_hits": 12,
+          "duration_seconds": 0.089702,
+          "stop_reason": "fixed_point",
+          "independent_recheck": "interesting"
+        }
+      }
+    }
+  ],
+  "real_internal_model": "not provided; completion unverified",
+  "validation": {
+    "python_3_11_tests": 478,
+    "python_3_12_tests": 478,
+    "python_3_13_tests": 478,
+    "lint_and_format": "passed",
+    "python_3_11_sdist_tests": 478,
+    "installed_wheel": {
+      "fixed_io": {
+        "final_nodes": 1,
+        "failure_check_calls": 6,
+        "independent_recheck": "interesting"
+      },
+      "project_output": {
+        "final_nodes": 1,
+        "failure_check_calls": 10,
+        "independent_recheck": "interesting"
+      }
+    },
+    "wheel_sha256": "f5f35e7d0a2430199cfbc7a741e84f23fb877dab58e4c1e29c3df09054c89c81"
+  }
+}
