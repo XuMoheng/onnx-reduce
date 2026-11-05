@@ -1,5 +1,6 @@
 """A fault carrier must stay reachable after aggressive graph isolation."""
 
+import numpy as np
 import onnx
 import pytest
 
@@ -7,7 +8,7 @@ from onnx_reduce.engine import EngineConfig, ReductionEngine
 from onnx_reduce.failure_check.contract import FailureCheckResult as F
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.passes.extract import ExtractNodesPass, ProbeFragmentsPass
-from tests.helpers import chain_model
+from tests.helpers import chain_model, dynamic_expand_model
 
 
 class LiveReluCheck:
@@ -161,3 +162,84 @@ def test_odd_partition_tail_precedes_deferred_interface_variants():
     )
     first_alias = next(i for i, c in enumerate(attempts) if c.edits[0].preserve_interface)
     assert tail < first_alias
+
+
+class StaticExpandCheck:
+    """Simulate a backend needing a live Expand with concrete tiling dimensions.
+
+    This is a synthetic contract, not an emulation of Typhoon's tiling limits.
+    The shape oracle is independent of the reducer's materialization code.
+    """
+
+    def run(self, path):
+        graph = onnx.shape_inference.infer_shapes(onnx.load(path)).graph
+        known = {t.name: onnx.numpy_helper.to_array(t) for t in graph.initializer}
+        for value in graph.input:
+            known.pop(value.name, None)
+        for node in graph.node:
+            if node.op_type == "Constant":
+                known[node.output[0]] = onnx.numpy_helper.to_array(node.attribute[0].t)
+            elif node.op_type in {"ConstantOfShape", "Mul", "Equal", "Where"} and all(
+                name in known for name in node.input
+            ):
+                args = [known[name] for name in node.input]
+                if node.op_type == "ConstantOfShape":
+                    result = np.ones(tuple(args[0]), dtype=np.int64)
+                elif node.op_type == "Mul":
+                    result = args[0] * args[1]
+                elif node.op_type == "Equal":
+                    result = args[0] == args[1]
+                else:
+                    result = np.where(*args)
+                known[node.output[0]] = result
+        producers = {name: node for node in graph.node for name in node.output if name}
+        pending = [v.name for v in graph.output]
+        live = set()
+        while pending:
+            name = pending.pop()
+            if name in live:
+                continue
+            live.add(name)
+            if name in producers:
+                pending.extend(producers[name].input)
+        infos = {v.name: v for v in (*graph.input, *graph.value_info, *graph.output)}
+        for node in graph.node:
+            if node.op_type != "Expand" or node.output[0] not in live:
+                continue
+            shape = known.get(node.input[1])
+            data = infos.get(node.input[0])
+            if (
+                shape is not None
+                and data is not None
+                and shape.tolist() == [1, 6, 3, 2, 2, 12, 32, 32]
+                and [d.dim_value for d in data.type.tensor_type.shape.dim]
+                == [1, 6, 1, 2, 2, 12, 32, 32]
+            ):
+                return F.INTERESTING
+        return F.NOT_INTERESTING
+
+
+@pytest.mark.parametrize("scheduler", ["legacy", "stateful", "staged"])
+@pytest.mark.parametrize("mode", ["ir", "auto"])
+@pytest.mark.parametrize("cache", [True, False])
+def test_1573_nodes_with_computed_expand_shape_reach_one_node(tmp_path, scheduler, mode, cache):
+    source = OnnxModel.from_proto(dynamic_expand_model(prefix=252, tail=1312))
+    assert source.node_count == 1573
+    assert not source.to_proto().graph.value_info
+    assert source.op_types[260] == "Expand"
+    reduced, report = ReductionEngine(
+        config=EngineConfig(
+            scheduler=scheduler,
+            model_edit_mode=mode,
+            cache_enabled=cache,
+            # Uncached final coverage executes repeated candidates again.
+            max_candidate_check_calls=64 if cache else 128,
+        )
+    ).run(source, StaticExpandCheck(), tmp_path)
+    assert reduced.op_types == ("Expand",)
+    assert reduced.node_ids == (260,)
+    assert reduced.input_names == ("expanded_input",)
+    assert report.stop_reason == "fixed_point"
+    assert report.artifact_recheck["outcome"] == "interesting"
+    assert not report.artifact_recheck["cache_hit"]
+    assert source.node_count == 1573

@@ -23,6 +23,7 @@ class ExtractNodes:
     indices: tuple[int, ...]
     outputs: tuple[str, ...] | None = None
     preserve_interface: bool = False
+    materialize_shapes: bool = False
 
 
 @dataclass(frozen=True)

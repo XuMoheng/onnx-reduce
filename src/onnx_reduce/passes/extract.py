@@ -19,7 +19,20 @@ class ExtractNodesPass:
             families[(node.domain, node.op_type)].append(index)
         # Rare families offer cheap witnesses. Interleave partitions so many
         # distinct operator types cannot starve bisection on a large graph.
-        representatives = sorted(families.values(), key=lambda items: (len(items), items[0]))
+        # Among equally rare families, shape consumers can expose a useful
+        # constant-boundary witness before a coarse partition is accepted and
+        # resets this stream. This also fits within the schedulers' pass turns.
+        representatives = sorted(
+            families.values(),
+            key=lambda items: (
+                len(items),
+                not (
+                    nodes[items[0]].domain == ""
+                    and nodes[items[0]].op_type in {"Expand", "Reshape"}
+                ),
+                items[0],
+            ),
+        )
         groups = ((items[0],) for items in representatives)
         partitions = (
             tuple(range(start, min(start + size, count)))
@@ -41,11 +54,26 @@ class ExtractNodesPass:
         if not hasattr(model, "candidate_snapshot"):
             return
         graph = model.candidate_snapshot().graph
+        producers = {name: i for i, node in enumerate(graph.node) for name in node.output if name}
+        weights = {tensor.name for tensor in graph.initializer}
         pending = deque()
         regions = 0
         half = max(1, len(graph.node) // 2)
         region_quantum = (len(graph.node) + half - 1) // half
         for group, priority in self._groups(graph.node):
+            selected = set(group)
+            materialize = any(
+                node.domain == ""
+                and node.op_type in {"Expand", "Reshape"}
+                and len(node.input) > 1
+                and node.input[1] not in weights
+                and node.input[1] in producers
+                and producers[node.input[1]] not in selected
+                and graph.node[producers[node.input[1]]].op_type != "Constant"
+                for node in (graph.node[i] for i in group)
+            )
+            if materialize:
+                yield Candidate((ExtractNodes(group, materialize_shapes=True),))
             yield Candidate((ExtractNodes(group),))
             variants = [None]
             if len(group) == 1:
@@ -54,6 +82,10 @@ class ExtractNodesPass:
                 # projection; multi-output nodes need per-output witnesses.
                 variants = [None] + ([(name,) for name in names] if len(names) > 1 else [])
                 for outputs in variants[1:]:
+                    if materialize:
+                        yield Candidate(
+                            (ExtractNodes(group, outputs=outputs, materialize_shapes=True),)
+                        )
                     yield Candidate((ExtractNodes(group, outputs=outputs),))
             else:
                 regions += 1

@@ -162,19 +162,37 @@ def extract_nodes(model, edit):
         },
     )
     graph.node.extend(nodes)
+    weights = view.weights
+    materialized = {}
+    if edit.materialize_shapes:
+        from onnx_reduce.model.operations.constant_shapes import constant_shapes
+
+        shape_names = dict.fromkeys(
+            node.input[1]
+            for node in nodes
+            if node.domain == ""
+            and node.op_type in {"Expand", "Reshape"}
+            and len(node.input) > 1
+            and node.input[1] in external
+            and node.input[1] not in weights
+        )
+        materialized = constant_shapes(model, shape_names)
+        if not materialized:
+            raise EditApplicationError("fragment has no bounded constant shape boundary")
+        weights = {**weights, **materialized}
     for name in needed:
         if name not in external:
             continue
-        if name in view.weights:
+        if name in weights:
             tensor = graph.initializer.add()
-            tensor.CopyFrom(view.weights[name])
+            tensor.CopyFrom(weights[name])
             tensor.name = name
         elif name in view.sparse_weights:
             graph.sparse_initializer.append(view.sparse_weights[name])
     input_names = [
         name
         for name in needed
-        if name in external and name not in view.weights and name not in view.sparse_weights
+        if name in external and name not in weights and name not in view.sparse_weights
     ]
     boundary = tuple(dict.fromkeys((*input_names, *outputs)))
     infos = {}
@@ -209,4 +227,10 @@ def extract_nodes(model, edit):
         _preserve_interface(graph, source.graph)
     proto = _copy_except(source, {"graph"})
     proto.graph.CopyFrom(graph)
+    if materialized:
+        try:
+            proto = onnx.shape_inference.infer_shapes(proto)
+        except Exception:
+            # The normal configured validator still decides candidate validity.
+            pass
     return proto, tuple(model.node_ids[i] for i in indices)

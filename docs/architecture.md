@@ -161,7 +161,18 @@ engine 把反馈交回 scheduler，并在接受后切换当前模型、保存 ch
 真实后端若先消除无用节点，就不会再触发原故障。这种候选失败不意味着保留的节点本身不能复现。
 `ExtractNodes` 因此明确表达另一种候选：保留指定主图节点，暴露仍向区域外使用或终端的输出，
 用外部依赖组成新的图输入，并保留实际需要的 initializer、稀疏资源及外层捕获。
-被裁掉的标准 Constant 若持有 TensorProto 值，可将该数据转为同名 initializer；不猜测其他计算的结果。
+被裁掉的标准 Constant 若持有 TensorProto 值，可将该数据转为同名 initializer。
+对 Expand / Reshape 的计算型 shape 边界，还增加 `materialize_shapes` 提取变体：
+在源图中按原 opset 求值小规模、完全由常量组成的整数表达式，将结果转为同名 initializer，
+再对候选推导 shape。普通提取候选仍会枚举；同等稀有的家族优先探测 shape 消费者，
+避免粗分区被接受后重置枚举，使这类候选迟迟得不到机会。
+求值仅支持 Identity、Add、Sub、Mul、Equal、Where、ConstantOfShape，
+常量必须为标量或一维的 int32 / int64 / bool；每个值最多 1024 个元素，
+每次提取最多访问 128 个值，依赖深度最多 64。
+不执行自定义算子、本地函数或依赖图输入的表达式（包括带 initializer 默认值的图输入），
+不分配超过限制的 ConstantOfShape 结果。不支持或求值失败时拒绝该变体，继续普通候选。
+这不读取实际运行数据，也不合成任意 shape；候选仍须复现同一故障才能接受。
+构造验证见[计算型 shape 边界](performance/dynamic-expand.md)。
 
 每个单节点还尝试分别暴露各个命名输出，避免多输出算子因额外输出而无法被单独接受。
 另提供 `preserve_interface` 变体：先匹配同名输入，再按完全一致的 TypeProto 匹配边界，

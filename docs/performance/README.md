@@ -6,6 +6,7 @@
 - [可复现实验](performance-baseline.md)：合成场景、调用/时间预算、采集与缓存对照。
 - [缩减质量](reduction-quality.md)：六个构造案例和典型架构的模拟故障；真实故障清单入口。
 - [活跃子图缩减](live-fragments.md)：1500 节点停滞复现、接口重建和预算对照。
+- [计算型 shape 边界](dynamic-expand.md)：常量表达式产生的 Expand shape 在提取时的数值保留。
 - [职责重构验收](refactor-verification.md)：同输入配置下的有序轨迹、接受、停止、覆盖和质量对照。
 - [历史记录](../history/README.md)：按批次保存当时设计、收益与退化。
 
