@@ -55,6 +55,24 @@ def test_max_candidate_check_calls_budget_is_reported(tmp_path):
     assert "Relu" in reduced.op_types
 
 
+@pytest.mark.parametrize("scheduler", ["legacy", "stateful", "staged"])
+def test_large_extent_chain_is_cut_before_spending_the_budget_on_dimensions(tmp_path, scheduler):
+    proto = chain_model(node_count=512, trigger_index=341)
+    for value in (*proto.graph.input, *proto.graph.output):
+        value.type.tensor_type.shape.dim[0].dim_value = 256
+    reduced, report = reduce_with_runner(
+        OnnxModel.from_proto(proto),
+        ReluFailureCheck(),
+        tmp_path,
+        scheduler=scheduler,
+        max_candidate_check_calls=1,
+    )
+    assert reduced.op_types == ("Relu",)
+    assert report.final.tensor_elements == 256
+    assert report.failure_check_calls == 3
+    assert report.artifact_recheck["outcome"] == "interesting"
+
+
 def test_report_serializes_all_contract_counters(tmp_path):
     model = OnnxModel.from_proto(chain_model(node_count=5, trigger_index=2))
     _, report = reduce_with_runner(model, ReluFailureCheck(), tmp_path)
@@ -63,6 +81,7 @@ def test_report_serializes_all_contract_counters(tmp_path):
     assert payload["failure_checks"]["calls"] == report.failure_check_calls
     assert payload["candidates"]["generated"] == report.candidates_generated
     assert set(payload["passes"]) == {
+        "compact_fragments",
         "probe_fragments",
         "extract_nodes",
         "drop_outputs",

@@ -289,6 +289,11 @@ class OnnxModel:
     def _infer_type_summary(self) -> bytes:
         return inference._infer_type_summary(self)
 
+    def infer_value_info(self, names: Iterable[str]) -> dict[str, onnx.ValueInfoProto]:
+        """Read inferred main-graph metadata through the shared run-local cache."""
+        values = self._infer_value_types(ir.Value(name=name) for name in names)
+        return {name: ir.serde.serialize_value(value) for name, value in values.items()}
+
     def cost(self) -> ModelCost:
         return validation.cost(self)
 

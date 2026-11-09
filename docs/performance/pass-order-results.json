@@ -1,0 +1,594 @@
+{
+  "date": "2026-11-09",
+  "scope": "Pass order only; identical candidate generators, validation, signature matching, cache, budgets and final fixed-point coverage",
+  "model": "Locally reconstructed 15-node opset-12 ordered-scope model, seed 17; no intranet data used",
+  "compiler_sha256": "9dd119bcbb6589fe5f33587225d4f375b4a104a98bf62a44eb0d924ae3f836c4",
+  "configuration": {
+    "compile_mode": "base",
+    "onnx_simplify": false,
+    "candidate_timeout_seconds": 10,
+    "time_budget_seconds": 300,
+    "scheduler": "legacy",
+    "objective": "nodes",
+    "combination_depth": 2,
+    "combination_limit": 256,
+    "model_edit_mode": "ir"
+  },
+  "timing": "Complete search including final independent recheck; compiler process reused except timeout restarts; worker import and warmups excluded",
+  "runs": [
+    {
+      "label": "control-repeat",
+      "pass_order": [
+        "compact_fragments",
+        "probe_fragments",
+        "drop_outputs",
+        "remove_unused",
+        "delete_nodes",
+        "bypass_nodes",
+        "simplify_attributes",
+        "shrink_tensors",
+        "reduce_subgraphs",
+        "combinations",
+        "extract_nodes"
+      ],
+      "seconds": 110.158999,
+      "stop_reason": "fixed_point",
+      "minimality": "pass_fixed_point",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1216517,
+        "byte_size": 4719444,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "final_hash": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+      "failure_checks": {
+        "calls": 214,
+        "cache_hits": 22,
+        "target_identity_mismatches": 0,
+        "interesting": 8,
+        "not_interesting": 204,
+        "inconclusive": 2
+      },
+      "candidate_counts": {
+        "generated": 408,
+        "invalid": 171,
+        "accepted": 6,
+        "not_cheaper": 3,
+        "valid_rate": 0.577778
+      },
+      "pass_stats": {
+        "compact_fragments": {
+          "generated": 3,
+          "invalid": 0,
+          "failure_check_calls": 3,
+          "accepted": 1,
+          "not_cheaper": 0
+        },
+        "probe_fragments": {
+          "generated": 72,
+          "invalid": 30,
+          "failure_check_calls": 42,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "drop_outputs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "remove_unused": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "delete_nodes": {
+          "generated": 36,
+          "invalid": 0,
+          "failure_check_calls": 36,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "bypass_nodes": {
+          "generated": 36,
+          "invalid": 23,
+          "failure_check_calls": 12,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "simplify_attributes": {
+          "generated": 18,
+          "invalid": 18,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "shrink_tensors": {
+          "generated": 56,
+          "invalid": 0,
+          "failure_check_calls": 48,
+          "accepted": 5,
+          "not_cheaper": 3
+        },
+        "reduce_subgraphs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "combinations": {
+          "generated": 175,
+          "invalid": 95,
+          "failure_check_calls": 71,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "extract_nodes": {
+          "generated": 12,
+          "invalid": 5,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        }
+      },
+      "pass_check_seconds": {
+        "compact_fragments": 2.9978644720395096,
+        "probe_fragments": 9.201752448047046,
+        "delete_nodes": 45.31538608804112,
+        "bypass_nodes": 1.5334288469748572,
+        "shrink_tensors": 11.690364473033696,
+        "combinations": 34.90735446260078
+      },
+      "artifact_recheck": {
+        "model": "control-repeat.onnx",
+        "digest": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      }
+    },
+    {
+      "label": "shrink-before-delete",
+      "pass_order": [
+        "compact_fragments",
+        "probe_fragments",
+        "drop_outputs",
+        "remove_unused",
+        "shrink_tensors",
+        "delete_nodes",
+        "bypass_nodes",
+        "simplify_attributes",
+        "reduce_subgraphs",
+        "combinations",
+        "extract_nodes"
+      ],
+      "seconds": 66.306361,
+      "stop_reason": "fixed_point",
+      "minimality": "pass_fixed_point",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1216517,
+        "byte_size": 4719444,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "final_hash": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+      "failure_checks": {
+        "calls": 174,
+        "cache_hits": 22,
+        "target_identity_mismatches": 0,
+        "interesting": 8,
+        "not_interesting": 166,
+        "inconclusive": 0
+      },
+      "candidate_counts": {
+        "generated": 333,
+        "invalid": 136,
+        "accepted": 6,
+        "not_cheaper": 3,
+        "valid_rate": 0.587879
+      },
+      "pass_stats": {
+        "compact_fragments": {
+          "generated": 3,
+          "invalid": 0,
+          "failure_check_calls": 3,
+          "accepted": 1,
+          "not_cheaper": 0
+        },
+        "probe_fragments": {
+          "generated": 72,
+          "invalid": 30,
+          "failure_check_calls": 42,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "drop_outputs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "remove_unused": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "shrink_tensors": {
+          "generated": 56,
+          "invalid": 0,
+          "failure_check_calls": 48,
+          "accepted": 5,
+          "not_cheaper": 3
+        },
+        "delete_nodes": {
+          "generated": 6,
+          "invalid": 0,
+          "failure_check_calls": 6,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "bypass_nodes": {
+          "generated": 6,
+          "invalid": 3,
+          "failure_check_calls": 2,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "simplify_attributes": {
+          "generated": 3,
+          "invalid": 3,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "reduce_subgraphs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "combinations": {
+          "generated": 175,
+          "invalid": 95,
+          "failure_check_calls": 71,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "extract_nodes": {
+          "generated": 12,
+          "invalid": 5,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        }
+      },
+      "pass_check_seconds": {
+        "compact_fragments": 2.9889142559841275,
+        "probe_fragments": 9.115487762901466,
+        "shrink_tensors": 12.16498622688232,
+        "delete_nodes": 3.047545224893838,
+        "bypass_nodes": 0.0328586749965325,
+        "combinations": 35.16378360474482
+      },
+      "artifact_recheck": {
+        "model": "shrink-before-delete.onnx",
+        "digest": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      }
+    },
+    {
+      "label": "shrink-before-delete-repeat",
+      "pass_order": [
+        "compact_fragments",
+        "probe_fragments",
+        "drop_outputs",
+        "remove_unused",
+        "shrink_tensors",
+        "delete_nodes",
+        "bypass_nodes",
+        "simplify_attributes",
+        "reduce_subgraphs",
+        "combinations",
+        "extract_nodes"
+      ],
+      "seconds": 66.095514,
+      "stop_reason": "fixed_point",
+      "minimality": "pass_fixed_point",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1216517,
+        "byte_size": 4719444,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "final_hash": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+      "failure_checks": {
+        "calls": 174,
+        "cache_hits": 22,
+        "target_identity_mismatches": 0,
+        "interesting": 8,
+        "not_interesting": 166,
+        "inconclusive": 0
+      },
+      "candidate_counts": {
+        "generated": 333,
+        "invalid": 136,
+        "accepted": 6,
+        "not_cheaper": 3,
+        "valid_rate": 0.587879
+      },
+      "pass_stats": {
+        "compact_fragments": {
+          "generated": 3,
+          "invalid": 0,
+          "failure_check_calls": 3,
+          "accepted": 1,
+          "not_cheaper": 0
+        },
+        "probe_fragments": {
+          "generated": 72,
+          "invalid": 30,
+          "failure_check_calls": 42,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "drop_outputs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "remove_unused": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "shrink_tensors": {
+          "generated": 56,
+          "invalid": 0,
+          "failure_check_calls": 48,
+          "accepted": 5,
+          "not_cheaper": 3
+        },
+        "delete_nodes": {
+          "generated": 6,
+          "invalid": 0,
+          "failure_check_calls": 6,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "bypass_nodes": {
+          "generated": 6,
+          "invalid": 3,
+          "failure_check_calls": 2,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "simplify_attributes": {
+          "generated": 3,
+          "invalid": 3,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "reduce_subgraphs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "combinations": {
+          "generated": 175,
+          "invalid": 95,
+          "failure_check_calls": 71,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "extract_nodes": {
+          "generated": 12,
+          "invalid": 5,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        }
+      },
+      "pass_check_seconds": {
+        "compact_fragments": 2.99105563206831,
+        "probe_fragments": 9.130533411167562,
+        "shrink_tensors": 12.141626802680548,
+        "delete_nodes": 3.059963111008983,
+        "bypass_nodes": 0.03323445201385766,
+        "combinations": 35.03497268498177
+      },
+      "artifact_recheck": {
+        "model": "shrink-before-delete-repeat.onnx",
+        "digest": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      }
+    },
+    {
+      "label": "shrink-before-probes",
+      "pass_order": [
+        "compact_fragments",
+        "shrink_tensors",
+        "probe_fragments",
+        "drop_outputs",
+        "remove_unused",
+        "delete_nodes",
+        "bypass_nodes",
+        "simplify_attributes",
+        "reduce_subgraphs",
+        "combinations",
+        "extract_nodes"
+      ],
+      "seconds": 57.74558,
+      "stop_reason": "fixed_point",
+      "minimality": "pass_fixed_point",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1216517,
+        "byte_size": 4719444,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "final_hash": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+      "failure_checks": {
+        "calls": 139,
+        "cache_hits": 22,
+        "target_identity_mismatches": 0,
+        "interesting": 8,
+        "not_interesting": 131,
+        "inconclusive": 0
+      },
+      "candidate_counts": {
+        "generated": 273,
+        "invalid": 111,
+        "accepted": 6,
+        "not_cheaper": 3,
+        "valid_rate": 0.588889
+      },
+      "pass_stats": {
+        "compact_fragments": {
+          "generated": 3,
+          "invalid": 0,
+          "failure_check_calls": 3,
+          "accepted": 1,
+          "not_cheaper": 0
+        },
+        "shrink_tensors": {
+          "generated": 56,
+          "invalid": 0,
+          "failure_check_calls": 48,
+          "accepted": 5,
+          "not_cheaper": 3
+        },
+        "probe_fragments": {
+          "generated": 12,
+          "invalid": 5,
+          "failure_check_calls": 7,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "drop_outputs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "remove_unused": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "delete_nodes": {
+          "generated": 6,
+          "invalid": 0,
+          "failure_check_calls": 6,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "bypass_nodes": {
+          "generated": 6,
+          "invalid": 3,
+          "failure_check_calls": 2,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "simplify_attributes": {
+          "generated": 3,
+          "invalid": 3,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "reduce_subgraphs": {
+          "generated": 0,
+          "invalid": 0,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "combinations": {
+          "generated": 175,
+          "invalid": 95,
+          "failure_check_calls": 71,
+          "accepted": 0,
+          "not_cheaper": 0
+        },
+        "extract_nodes": {
+          "generated": 12,
+          "invalid": 5,
+          "failure_check_calls": 0,
+          "accepted": 0,
+          "not_cheaper": 0
+        }
+      },
+      "pass_check_seconds": {
+        "compact_fragments": 3.0072964179562405,
+        "shrink_tensors": 12.284498086024541,
+        "probe_fragments": 0.9939419109723531,
+        "delete_nodes": 3.081971133942716,
+        "bypass_nodes": 0.07303698098985478,
+        "combinations": 35.04309587314492
+      },
+      "artifact_recheck": {
+        "model": "shrink-before-probes.onnx",
+        "digest": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      }
+    }
+  ],
+  "historical_control": {
+    "seconds": 110.894575,
+    "checks": 214,
+    "final_hash": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66"
+  },
+  "selected_default": "shrink-before-delete",
+  "median_seconds": {
+    "control": 110.526787,
+    "selected": 66.2009375
+  },
+  "guard_cases": {
+    "source": "Simulated conditions, not compiler regressions",
+    "total_runs": 57,
+    "selected_costs_match_control": 19,
+    "aggressive_order_regression": "With 512 nodes, extent 256, one candidate call: shrink-before-probes leaves 512 nodes; control and selected order leave one node"
+  },
+  "validation": {
+    "ruff": "Changed Python files passed lint and format checks",
+    "fresh_process_rechecks": 4,
+    "all_fresh_rechecks_reproduce_target": true,
+    "development_workspace_pytest": "561 passed in 30.10s",
+    "commit_snapshot_pytest": "518 passed in 29.86s"
+  },
+  "discarded_run": "The initial control run failed on temporary-file quota and is excluded. Only generated candidate/program/bin files were cleaned; reports and final models retained. Control and selected order were then rerun serially.",
+  "evidence_directory": "ordered-scope-pass-order-20261109",
+  "median_reduction_fraction": 0.4010416904636883
+}

@@ -280,7 +280,10 @@ uv run --locked onnx-reduce input.onnx --test '/absolute/path/check-backend' \
 
 ## 大图缩减停滞时
 
-当前默认启用活跃子图提取：先进行最多 16 次快速候选探测，再执行原有删除、旁路等策略，
+当前默认先尝试有界的复合子图片段：沿形状变化节点的依赖回溯，将同 dtype、同具体 shape
+的旁路、输出截断和无关资源清理合成一个候选。每个候选仍须通过校验并复现同一故障，
+不假设计算语义等价。未知 shape 和控制流会回退到后续策略。
+随后进行最多 16 次快速候选探测、输出及资源清理，再尝试缩维、节点删除和旁路等策略，
 之后补充完整提取扫描。它能直接尝试单个活跃算子及较小分区，同时重建输入输出，
 避免故障节点因尾部被删除而变成死代码。无需新增命令开关，原来的缩减命令即可使用。
 
@@ -297,7 +300,7 @@ uv run --locked onnx-reduce /path/to/original.onnx \
 
 若已有 360 节点结果，也可把它作为新输入继续缩减。原模型与该结果应使用同一故障判定条件；
 需要延续原故障身份时，沿用签名匹配或 staged 的已验证目标恢复。
-报告中的 `probe_fragments` 和 `extract_nodes` 记录提取收益。若大部分候选 `invalid`，
+报告中的 `compact_fragments`、`probe_fragments` 和 `extract_nodes` 记录提取收益。若大部分候选 `invalid`，
 查看 candidates.jsonl 中具体的类型/校验失败；若主要为 `not_interesting`，则查看独立判定日志，
 确认是目标故障消失还是目标签名变化。`budget_exhausted` 不代表已达到最小。
 

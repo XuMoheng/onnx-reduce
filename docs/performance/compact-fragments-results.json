@@ -1,0 +1,377 @@
+{
+  "date": "2026-11-09",
+  "case": "Locally reconstructed 15-node opset-12 ordered-scope model, seed 17; no intranet model used",
+  "target": "Base pass LowerTaskInstructions: Typhoon ordered body: operator crosses unrelated ordered scopes",
+  "compiler_sha256": "9dd119bcbb6589fe5f33587225d4f375b4a104a98bf62a44eb0d924ae3f836c4",
+  "configuration": {
+    "compile_mode": "base",
+    "onnx_simplify": false,
+    "candidate_timeout_seconds": 10,
+    "objective": "nodes",
+    "scheduler": "legacy",
+    "time_budget_seconds": 300,
+    "combination_depth": 2,
+    "combination_limit": 256
+  },
+  "method": "Serial runs with real Typhoon; warm runs reuse a compiler process and restart it after timeout; cold and CLI runs start fresh processes per check; first-worker initialization and six warmup checks excluded from engine timings",
+  "baseline_full_origin": "Earlier retained run on the same reconstructed input, frozen compiler and configuration; before-source.zip captures the reducer before the new pass",
+  "runs": {
+    "before-one": {
+      "duration_seconds": 0.280867,
+      "stop_reason": "budget_exhausted",
+      "final": {
+        "node_count": 15,
+        "tensor_elements": 1289992,
+        "byte_size": 4741474,
+        "input_count": 2,
+        "output_count": 1,
+        "initializer_count": 4
+      },
+      "failure_checks": {
+        "calls": 3,
+        "cache_hits": 0,
+        "target_identity_mismatches": 0,
+        "interesting": 2,
+        "not_interesting": 1,
+        "inconclusive": 0
+      },
+      "candidates": {
+        "generated": 3,
+        "invalid": 1,
+        "accepted": 0,
+        "not_cheaper": 0,
+        "valid_rate": 0.666667
+      },
+      "artifact_recheck": {
+        "model": "before-one.onnx",
+        "digest": "527c08633e40d9e61fe3255caca2318da2ca661df5ec8e34368813c5c774a534",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      },
+      "first_four": null
+    },
+    "after-one": {
+      "duration_seconds": 0.310749,
+      "stop_reason": "budget_exhausted",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1277957,
+        "byte_size": 4719442,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "failure_checks": {
+        "calls": 3,
+        "cache_hits": 0,
+        "target_identity_mismatches": 0,
+        "interesting": 3,
+        "not_interesting": 0,
+        "inconclusive": 0
+      },
+      "candidates": {
+        "generated": 2,
+        "invalid": 0,
+        "accepted": 1,
+        "not_cheaper": 0,
+        "valid_rate": 1.0
+      },
+      "artifact_recheck": {
+        "model": "after-one.onnx",
+        "digest": "38fde70be5fe44714b9d3568355a07c04ad6288f5629fb92d7dafc1af519392c",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      },
+      "first_four": {
+        "elapsed_seconds": 0.22084809897933155,
+        "stage": "coverage",
+        "reason": "accepted",
+        "failure_check_calls": 2,
+        "cost": {
+          "node_count": 4,
+          "byte_size": 4719442,
+          "output_count": 1,
+          "input_count": 1,
+          "initializer_count": 2,
+          "tensor_elements": 1277957
+        }
+      }
+    },
+    "after-unannotated-one": {
+      "duration_seconds": 0.330624,
+      "stop_reason": "budget_exhausted",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1277957,
+        "byte_size": 4719286,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "failure_checks": {
+        "calls": 3,
+        "cache_hits": 0,
+        "target_identity_mismatches": 0,
+        "interesting": 3,
+        "not_interesting": 0,
+        "inconclusive": 0
+      },
+      "candidates": {
+        "generated": 2,
+        "invalid": 0,
+        "accepted": 1,
+        "not_cheaper": 0,
+        "valid_rate": 1.0
+      },
+      "artifact_recheck": {
+        "model": "after-unannotated-one.onnx",
+        "digest": "1c07c379ba8cb283623984b73d461ed4ee19219e2aa7d5524eb30e79a16b9524",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      },
+      "first_four": {
+        "elapsed_seconds": 0.23060343199176714,
+        "stage": "coverage",
+        "reason": "accepted",
+        "failure_check_calls": 2,
+        "cost": {
+          "node_count": 4,
+          "byte_size": 4719286,
+          "output_count": 1,
+          "input_count": 1,
+          "initializer_count": 2,
+          "tensor_elements": 1277957
+        }
+      }
+    },
+    "after-cold-one": {
+      "duration_seconds": 2.639826,
+      "stop_reason": "budget_exhausted",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1277957,
+        "byte_size": 4719442,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "failure_checks": {
+        "calls": 3,
+        "cache_hits": 0,
+        "target_identity_mismatches": 0,
+        "interesting": 3,
+        "not_interesting": 0,
+        "inconclusive": 0
+      },
+      "candidates": {
+        "generated": 2,
+        "invalid": 0,
+        "accepted": 1,
+        "not_cheaper": 0,
+        "valid_rate": 1.0
+      },
+      "artifact_recheck": {
+        "model": "after-cold-one.onnx",
+        "digest": "38fde70be5fe44714b9d3568355a07c04ad6288f5629fb92d7dafc1af519392c",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      },
+      "first_four": {
+        "elapsed_seconds": 1.816804165020585,
+        "stage": "coverage",
+        "reason": "accepted",
+        "failure_check_calls": 2,
+        "cost": {
+          "node_count": 4,
+          "byte_size": 4719442,
+          "output_count": 1,
+          "input_count": 1,
+          "initializer_count": 2,
+          "tensor_elements": 1277957
+        }
+      }
+    },
+    "after-full": {
+      "duration_seconds": 110.894575,
+      "stop_reason": "fixed_point",
+      "final": {
+        "node_count": 4,
+        "tensor_elements": 1216517,
+        "byte_size": 4719444,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 2
+      },
+      "failure_checks": {
+        "calls": 214,
+        "cache_hits": 22,
+        "target_identity_mismatches": 0,
+        "interesting": 8,
+        "not_interesting": 204,
+        "inconclusive": 2
+      },
+      "candidates": {
+        "generated": 408,
+        "invalid": 171,
+        "accepted": 6,
+        "not_cheaper": 3,
+        "valid_rate": 0.577778
+      },
+      "artifact_recheck": {
+        "model": "after-full.onnx",
+        "digest": "2e355d82e048a3e8b3fa683cf778ff7cc9ff6f62d731a8e2e22fa24bec384f66",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      },
+      "first_four": {
+        "elapsed_seconds": 0.2345342459739186,
+        "stage": "coverage",
+        "reason": "accepted",
+        "failure_check_calls": 2,
+        "cost": {
+          "node_count": 4,
+          "byte_size": 4719442,
+          "output_count": 1,
+          "input_count": 1,
+          "initializer_count": 2,
+          "tensor_elements": 1277957
+        }
+      }
+    },
+    "cli-before-one": {
+      "duration_seconds": 3.024754,
+      "stop_reason": "budget_exhausted",
+      "final": {
+        "byte_size": 4741474,
+        "initializer_count": 4,
+        "input_count": 2,
+        "node_count": 15,
+        "output_count": 1,
+        "tensor_elements": 1289992
+      },
+      "failure_checks": {
+        "cache_hits": 0,
+        "calls": 3,
+        "inconclusive": 0,
+        "interesting": 2,
+        "not_interesting": 1,
+        "target_identity_mismatches": 0
+      },
+      "candidates": {
+        "accepted": 0,
+        "generated": 3,
+        "invalid": 1,
+        "not_cheaper": 0,
+        "valid_rate": 0.666667
+      },
+      "artifact_recheck": {
+        "cache_hit": false,
+        "digest": "527c08633e40d9e61fe3255caca2318da2ca661df5ec8e34368813c5c774a534",
+        "model": "cli-before-one.onnx",
+        "outcome": "interesting",
+        "read_back_validated": true
+      },
+      "first_four": null
+    },
+    "cli-one": {
+      "duration_seconds": 3.111971,
+      "stop_reason": "budget_exhausted",
+      "final": {
+        "byte_size": 4719442,
+        "initializer_count": 2,
+        "input_count": 1,
+        "node_count": 4,
+        "output_count": 1,
+        "tensor_elements": 1277957
+      },
+      "failure_checks": {
+        "cache_hits": 0,
+        "calls": 3,
+        "inconclusive": 0,
+        "interesting": 3,
+        "not_interesting": 0,
+        "target_identity_mismatches": 0
+      },
+      "candidates": {
+        "accepted": 1,
+        "generated": 2,
+        "invalid": 0,
+        "not_cheaper": 0,
+        "valid_rate": 1.0
+      },
+      "artifact_recheck": {
+        "cache_hit": false,
+        "digest": "38fde70be5fe44714b9d3568355a07c04ad6288f5629fb92d7dafc1af519392c",
+        "model": "cli-one.onnx",
+        "outcome": "interesting",
+        "read_back_validated": true
+      },
+      "first_four": {
+        "cost": {
+          "byte_size": 4719442,
+          "initializer_count": 2,
+          "input_count": 1,
+          "node_count": 4,
+          "output_count": 1,
+          "tensor_elements": 1277957
+        },
+        "elapsed_seconds": 2.1245872110011987,
+        "failure_check_calls": 2,
+        "reason": "accepted",
+        "stage": "coverage"
+      }
+    },
+    "before-full": {
+      "duration_seconds": 170.844511,
+      "stop_reason": "fixed_point",
+      "final": {
+        "node_count": 5,
+        "tensor_elements": 1216517,
+        "byte_size": 4719482,
+        "input_count": 1,
+        "output_count": 1,
+        "initializer_count": 1
+      },
+      "failure_checks": {
+        "calls": 293,
+        "cache_hits": 59,
+        "target_identity_mismatches": 0,
+        "interesting": 13,
+        "not_interesting": 274,
+        "inconclusive": 6
+      },
+      "candidates": {
+        "generated": 594,
+        "invalid": 241,
+        "accepted": 11,
+        "not_cheaper": 3,
+        "valid_rate": 0.592217
+      },
+      "artifact_recheck": {
+        "model": "warm-default.onnx",
+        "digest": "f0bfa4b771a3c18c4ac99b66efcabe867d55fc540345573e5862e7b72cb0451c",
+        "read_back_validated": true,
+        "outcome": "interesting",
+        "cache_hit": false
+      },
+      "first_four": null
+    }
+  },
+  "cli_wall_seconds": {
+    "before": 3.7198097439832054,
+    "after": 3.798034604988061
+  },
+  "validation": {
+    "ruff": "changed Python files passed",
+    "fresh_interpreter_rechecks": 4,
+    "all_fresh_rechecks_interesting": true,
+    "development_workspace_pytest": "558 passed in 30.10s",
+    "commit_snapshot_pytest": "518 passed in 29.86s"
+  },
+  "evidence_directory": "ordered-scope-compact-pass-20261109"
+}
