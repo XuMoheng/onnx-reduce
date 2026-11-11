@@ -13,4 +13,4 @@ except Exception as exc:
 has_relu = any(node.op_type == "Relu" for node in model.graph.node)
 if has_relu:
     print("assertion: DEMO_RELU")
-raise SystemExit(0 if has_relu else 1)
+raise SystemExit(1 if has_relu else 0)

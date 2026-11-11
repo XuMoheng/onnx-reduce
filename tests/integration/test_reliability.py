@@ -223,9 +223,9 @@ def test_signature_rejects_another_bug_and_does_not_cache_inconclusive(tmp_path)
         def observe(self, path):
             if path.name == "initial":
                 return FailureCheckObservation(
-                    FailureCheckResult.INTERESTING, 0, stderr="assertion A"
+                    FailureCheckResult.INTERESTING, 1, stderr="assertion A"
                 )
-            return FailureCheckObservation(FailureCheckResult.INTERESTING, 0, stderr="assertion B")
+            return FailureCheckObservation(FailureCheckResult.INTERESTING, 1, stderr="assertion B")
 
     evaluator = Evaluator(Observations(), tmp_path, signature_regex=r"assertion (\w+)")
     assert (
@@ -247,17 +247,24 @@ def test_signature_rejects_another_bug_and_does_not_cache_inconclusive(tmp_path)
     assert uncertain.calls == 2
 
 
-def test_baseline_signal_matching():
+@pytest.mark.parametrize("baseline_code, candidate_code", [(-6, -11), (7, 1)])
+def test_baseline_matches_the_same_signal_or_nonzero_exit_code(baseline_code, candidate_code):
     from onnx_reduce.failure_check.evaluator import TargetMatcher
 
     matcher = TargetMatcher()
     assert (
         matcher.match(
-            FailureCheckObservation(FailureCheckResult.INTERESTING, -6), initial=True
+            FailureCheckObservation(FailureCheckResult.INTERESTING, baseline_code), initial=True
         ).outcome
         is FailureCheckResult.INTERESTING
     )
-    result = matcher.match(FailureCheckObservation(FailureCheckResult.INTERESTING, -11))
+    assert (
+        matcher.match(
+            FailureCheckObservation(FailureCheckResult.INTERESTING, baseline_code)
+        ).outcome
+        is FailureCheckResult.INTERESTING
+    )
+    result = matcher.match(FailureCheckObservation(FailureCheckResult.INTERESTING, candidate_code))
     assert result.outcome is FailureCheckResult.NOT_INTERESTING
     assert result.target_identity_mismatch
 
@@ -282,14 +289,14 @@ def test_checkpoint_survives_failure_check_failure(tmp_path):
     assert (checkpoint.parent / "task.json").exists()
 
 
-def test_cli_final_output_recheck_fails_with_nonzero_exit(tmp_path):
+def test_cli_final_output_recheck_fails_when_test_passes(tmp_path):
     source = tmp_path / "source.onnx"
     output = tmp_path / "final.onnx"
     report_path = tmp_path / "report.json"
     onnx.save(chain_model(1, 0), source)
     script = tmp_path / "check with spaces.py"
     script.write_text(
-        "import sys\nraise SystemExit(1 if sys.argv[-1].endswith('final.onnx') else 0)\n"
+        "import sys\nraise SystemExit(0 if sys.argv[-1].endswith('final.onnx') else 1)\n"
     )
     command = shlex.join([sys.executable, str(script)])
     assert (
@@ -327,7 +334,7 @@ def test_runner_observes_bounded_output_and_quoted_argv(tmp_path):
     observation = FailureCheckRunner(failure_check_config, log_limit=100).observe(
         tmp_path / "model.onnx"
     )
-    assert observation.outcome is FailureCheckResult.INTERESTING
+    assert observation.outcome is FailureCheckResult.NOT_INTERESTING
     assert observation.stdout.strip() == "argument with spaces"
     assert len(observation.stderr) == 100
     assert observation.output_truncated
@@ -356,6 +363,7 @@ def test_cli_regex_preserves_target_instead_of_another_bug(tmp_path, scheduler):
         "import sys, onnx\n"
         "m = onnx.load(sys.argv[-1])\n"
         "print('assertion ' + ('A' if any(n.op_type == 'Relu' for n in m.graph.node) else 'B'))\n"
+        "raise SystemExit(1)\n"
     )
     assert (
         main(
@@ -395,7 +403,7 @@ def test_cli_external_weights_end_to_end(tmp_path):
     script.write_text(
         "import sys, onnx\n"
         "m = onnx.load(sys.argv[-1])\n"
-        "raise SystemExit(0 if len(m.graph.initializer) else 1)\n"
+        "raise SystemExit(1 if len(m.graph.initializer) else 0)\n"
     )
     assert (
         main(
@@ -451,10 +459,10 @@ def test_truncated_missing_signature_remains_inconclusive(tmp_path):
 
     matcher = TargetMatcher(signature_regex=r"assertion (\w+)")
     matcher.match(
-        FailureCheckObservation(FailureCheckResult.INTERESTING, 0, stdout="assertion A"),
+        FailureCheckObservation(FailureCheckResult.INTERESTING, 1, stdout="assertion A"),
         initial=True,
     )
     result = matcher.match(
-        FailureCheckObservation(FailureCheckResult.INTERESTING, 0, output_truncated=True)
+        FailureCheckObservation(FailureCheckResult.INTERESTING, 1, output_truncated=True)
     )
     assert result.outcome is FailureCheckResult.INCONCLUSIVE

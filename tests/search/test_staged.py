@@ -260,7 +260,7 @@ class SignatureCheck:
 
     def observe(self, path):
         self.calls += 1
-        return FailureCheckObservation(F.INTERESTING, returncode=0, stdout=f"BUG:{self.signature}")
+        return FailureCheckObservation(F.INTERESTING, returncode=1, stdout=f"BUG:{self.signature}")
 
 
 def original_run(tmp_path):
@@ -293,7 +293,7 @@ def test_finalize_from_restores_identity_and_starts_fresh_scan(tmp_path):
     assert json.loads((Path(report.work_directory) / "target.json").read_text())[
         "baseline_identity"
     ] == [
-        "exit:0",
+        "exit:1",
         ["A"],
     ]
 
@@ -310,6 +310,31 @@ def test_finalize_from_does_not_rebaseline_to_a_different_bug(tmp_path):
             signature_regex=r"BUG:(\w+)",
         )
     assert check.calls == 1
+
+
+@pytest.mark.parametrize("manifest_name", ["task.json", "replay.json"])
+@pytest.mark.parametrize("contract", [None, "zero-interesting-v1"])
+def test_finalize_from_rejects_older_exit_code_contract_before_backend(
+    tmp_path, manifest_name, contract
+):
+    model, first = original_run(tmp_path)
+    manifest_path = Path(first.work_directory) / manifest_name
+    manifest = json.loads(manifest_path.read_text())
+    if contract is None:
+        manifest.pop("failure_check_contract")
+    else:
+        manifest["failure_check_contract"] = contract
+    manifest_path.write_text(json.dumps(manifest))
+    check = SignatureCheck()
+    with pytest.raises(ValueError, match="exit-code contract differs; start a new run"):
+        run(
+            model,
+            check,
+            tmp_path / "finish",
+            finalize_from=first.work_directory,
+            signature_regex=r"BUG:(\w+)",
+        )
+    assert check.calls == 0
 
 
 @pytest.mark.parametrize("mismatch", ["model", "command", "timeout", "regex", "cwd", "manifest"])
@@ -362,7 +387,7 @@ def test_cli_fast_then_independent_complete(tmp_path):
     check = write_failure_check(
         tmp_path,
         "check.py",
-        "print('BUG:A'); raise SystemExit(0 if has_trigger else 1)",
+        "print('BUG:A'); raise SystemExit(1 if has_trigger else 0)",
     )
     common = ["--test", str(check), "--scheduler", "staged", "--signature-regex", r"BUG:(\w+)"]
     assert (

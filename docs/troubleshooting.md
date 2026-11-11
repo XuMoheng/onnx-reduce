@@ -5,7 +5,8 @@
 
 ## 读取退出码与报告
 
-判定脚本的 0 表示故障仍在；下面是 **onnx-reduce CLI** 的退出码，含义不同：
+判定脚本的 0 表示测试通过，普通非零表示故障仍在（默认 125 为无法判定）。
+下面是 **onnx-reduce CLI** 自身的退出码：
 
 | CLI 退出码 | 含义与下一步 |
 |---|---|
@@ -67,7 +68,7 @@ staged complete 的 `coverage_inconclusive` 表示完成扫描但仍有无法判
 
 | 相对运行目录的路径 | 内容与生成时机 |
 |---|---|
-| `task.json` | 引擎配置、判定配置、调用者工作目录；引擎开始时写入 |
+| `task.json` | 引擎配置、判定配置、退出码约定、调用者工作目录；引擎开始时写入 |
 | `initial/model.onnx` | 导入并重新序列化的原模型，供初检使用 |
 | `target.json` | 初检成功后记录目标模式、签名表达式与基线身份 |
 | `candidates.jsonl` | 候选编辑、决策及相关成本/校验原因；处理候选时生成 |
@@ -87,12 +88,14 @@ staged complete 的 `coverage_inconclusive` 表示完成扫描但仍有无法判
 当前尝试由 `candidate.sequence_number` 区分，不会为命中再写一份模型。
 `candidates.jsonl` 中 `edit_cache_hit=true` 也可用于识别编辑失败、校验失败或成本未下降的准备复用。
 
-`replay.json` 记录模型路径、摘要、判定配置、基线身份和工作目录，供手工复现参考；
+`replay.json` 记录模型路径、摘要、判定配置、退出码约定、基线身份和工作目录，供手工复现参考；
 当前没有直接读取它自动重放的 CLI 参数，也不会保存全部环境变量或后端程序。
+`task.json` 和 `replay.json` 中的 `failure_check_contract` 为 `nonzero-failure-v1`。
+独立收尾会拒绝缺少此标记或约定不同的旧记录；应更新旧判定脚本并开始新运行。
 
 ## 原模型无法通过初检
 
-### 命令无法执行或结果方向相反
+### 命令无法执行或未复现故障
 
 若终端提示 `cannot execute interestingness test`，检查 `--test` 的可执行文件路径和权限。
 命令以调用者工作目录运行，`.venv/bin/python`、脚本和配置的相对路径都基于此目录。
@@ -100,8 +103,9 @@ staged complete 的 `coverage_inconclusive` 表示完成扫描但仍有无法判
 
 若提示 `the original model is not interesting`，从 `checks/00000001/` 查看诊断，
 直接执行[使用指南中的判定脚本检查](usage.md#完整的编译错误判定示例)。
-后端编译失败时，包装脚本应该识别目标错误并返回 0；直接把编译器的普通非零错误码
-交给 reducer 会被视为未复现。
+判定命令返回 0 表示测试通过，不会作为故障复现。直接使用后端命令时，普通非零退出码
+会进入故障判定，再比较基线结束方式与可选签名；包装脚本应在识别到目标故障时返回 1。
+如果沿用了旧版“0 表示复现”的脚本，需要反转其退出码。
 
 ### 无法判定
 

@@ -10,7 +10,7 @@ from inspect import getattr_static
 from pathlib import Path
 
 from onnx_reduce.config import EngineConfig as EngineConfig
-from onnx_reduce.failure_check.contract import FailureCheckResult
+from onnx_reduce.failure_check.contract import FAILURE_CHECK_CONTRACT, FailureCheckResult
 from onnx_reduce.failure_check.evaluator import Evaluator
 from onnx_reduce.failure_check.runner import FailureCheckRunnable
 from onnx_reduce.passes.base import ReductionPass
@@ -57,9 +57,9 @@ class InitialNotInteresting(ReductionError):
             )
             return
         super().__init__(
-            "the original model is not interesting; the test direction may be reversed "
-            "(exit code 0 must mean the failure is still present); "
-            "also check the signature regex and retained check logs"
+            "the original model is not interesting; the test command may have passed "
+            "(exit code 0 means pass, so the target failure is absent); "
+            "check the signature regex and retained check logs too"
         )
 
 
@@ -157,6 +157,7 @@ class ReductionEngine:
             {
                 "engine": self.config.to_dict(),
                 "failure_check_config": failure_check_config_data,
+                "failure_check_contract": FAILURE_CHECK_CONTRACT,
                 "cwd": str(Path.cwd()),
             },
         )
@@ -196,7 +197,7 @@ class ReductionEngine:
             pass_stats={item.name: PassStats() for item in self.passes},
         )
         record_validation(validation, report)
-        self.progress("failure check contract: exit code 0 means the target failure is present")
+        self.progress("failure check contract: 0=pass (failure absent), nonzero=failure")
         initial_artifact = model.materialize(run_dir / "initial" / "model.onnx")
         result = evaluator.evaluate(
             initial_artifact.model_path,
@@ -348,6 +349,7 @@ class ReductionEngine:
             "baseline_identity": evaluator.matcher.baseline_identity,
             "cwd": str(Path.cwd()),
             "failure_check_config": failure_check_config_data,
+            "failure_check_contract": FAILURE_CHECK_CONTRACT,
             "stop_reason": report.stop_reason,
         }
         write_json(run_dir / "replay.json", replay)

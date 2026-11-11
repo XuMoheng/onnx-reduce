@@ -1,8 +1,8 @@
-"""The interestingness contract.
+"""Classify test commands using conventional pass/fail exit codes.
 
-The direction is intentionally the same as C-Vise: exit code zero means "the
-failure is still present".  Compiler crashes are first-class interesting
-outcomes because internal compiler errors are the primary M1 use case.
+Exit code zero means the test passed and the failure is absent. Ordinary
+nonzero exits and compiler crashes mean the failure is still present;
+configured inconclusive exit codes are handled separately.
 """
 
 from __future__ import annotations
@@ -12,6 +12,8 @@ import shlex
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
+
+FAILURE_CHECK_CONTRACT = "nonzero-failure-v1"
 
 
 class FailureCheckResult(Enum):
@@ -78,11 +80,11 @@ def classify_return_code(code: int, failure_check_config: FailureCheckConfig) ->
     """Map a child process return code to the public outcome vocabulary."""
 
     if code == 0:
-        return FailureCheckResult.INTERESTING
+        return FailureCheckResult.NOT_INTERESTING
     if code < 0:
         if failure_check_config.crash_is_interesting:
             return FailureCheckResult.INTERESTING
         return FailureCheckResult.NOT_INTERESTING
     if code in failure_check_config.inconclusive_exit_codes:
         return FailureCheckResult.INCONCLUSIVE
-    return FailureCheckResult.NOT_INTERESTING
+    return FailureCheckResult.INTERESTING

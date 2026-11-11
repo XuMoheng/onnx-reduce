@@ -138,7 +138,7 @@ def test_cli_performance_flag(tmp_path):
             [
                 str(model),
                 "--test",
-                f"{shlex.quote(sys.executable)} -c 'import sys; sys.exit(0)'",
+                f"{shlex.quote(sys.executable)} -c 'import sys; sys.exit(1)'",
                 "-o",
                 str(tmp_path / "reduced.onnx"),
                 "--max-candidate-check-calls",

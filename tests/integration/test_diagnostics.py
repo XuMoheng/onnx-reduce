@@ -66,9 +66,9 @@ def test_initial_failure_distinguishes_unknown_from_rejected(tmp_path, outcome):
     message = str(caught.value)
     if outcome is FailureCheckResult.INCONCLUSIVE:
         assert "inconclusive" in message
-        assert "direction" not in message
+        assert "may have passed" not in message
     else:
-        assert "direction" in message
+        assert "exit code 0 means pass" in message
     record = json.loads(next(tmp_path.glob("run-*/evaluations.jsonl")).read_text())
     assert record["outcome"] == outcome.value
 
@@ -150,7 +150,7 @@ def test_cli_interrupt_preserves_checkpoint_and_returns_130(tmp_path, capsys, mo
             raise KeyboardInterrupt
         from onnx_reduce.failure_check.runner import FailureCheckObservation
 
-        return FailureCheckObservation(FailureCheckResult.INTERESTING, 0)
+        return FailureCheckObservation(FailureCheckResult.INTERESTING, 1)
 
     monkeypatch.setattr(FailureCheckRunner, "observe", observe)
     assert main([str(source), "--test", "unused", "-o", str(output)]) == 130

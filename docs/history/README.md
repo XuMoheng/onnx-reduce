@@ -3,6 +3,9 @@
 此目录保存当时的设计、计划、实测与证据摘要；当前实现见[架构说明](../architecture.md)，
 当前性能结论见[性能概览](../performance/README.md)。文件中的批次名、旧模块路径和测试路径保留历史语境。
 
+历史记录也保留当时“判定命令返回 0 表示故障仍在”的约定。当前 `--test` 已改为常规退出码：
+0 表示通过、普通非零表示故障仍在；复用旧脚本前请按[当前判定契约](../usage.md#参数与退出码契约)调整。
+
 | 批次 | 设计/计划 | 实测 |
 |---|---|---|
 | 第一批 | [历史计划](performance/performance-todo.md) | [结果](performance/performance-batch1-results.md) |

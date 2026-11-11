@@ -29,12 +29,13 @@ def build_parser() -> argparse.ArgumentParser:
         prog="onnx-reduce",
         description=(
             "Reduce an ONNX model while preserving a user-defined failure. "
-            "The candidate model path is appended to the test command's arguments; "
-            "exit code 0 means the failure is still present."
+            "The candidate model path is appended to the test command's arguments. "
+            "Exit code 0 means pass (failure absent); ordinary nonzero exits mean failure "
+            "(125 is inconclusive by default)."
         ),
     )
     parser.add_argument("model", type=Path, help="ONNX model to reduce")
-    parser.add_argument("--test", required=True, help="interestingness test command")
+    parser.add_argument("--test", required=True, help="test command (0=pass, nonzero=failure)")
     parser.add_argument(
         "-o", "--output", required=True, type=Path, help="path for the reduced model"
     )

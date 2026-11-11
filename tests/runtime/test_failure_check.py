@@ -39,9 +39,10 @@ def runner(body: str, tmp_path, **kwargs) -> FailureCheckRunner:
     )
 
 
-def test_exit_zero_is_interesting_and_nonzero_is_not(tmp_path):
-    assert runner("raise SystemExit(0)", tmp_path).run("x") is FailureCheckResult.INTERESTING
-    assert runner("raise SystemExit(7)", tmp_path).run("x") is FailureCheckResult.NOT_INTERESTING
+@pytest.mark.parametrize("code", [0, 1, 2, 7, 124, 126, 127, 255])
+def test_exit_zero_passes_and_ordinary_nonzero_preserves_failure(tmp_path, code):
+    expected = FailureCheckResult.NOT_INTERESTING if code == 0 else FailureCheckResult.INTERESTING
+    assert runner(f"raise SystemExit({code})", tmp_path).run("x") is expected
 
 
 def test_signal_is_interesting_by_default_and_can_be_disabled(tmp_path):
@@ -69,6 +70,11 @@ def test_timeout_is_inconclusive_unless_configured_interesting(tmp_path):
 
 def test_configured_exit_code_is_inconclusive(tmp_path):
     test = runner("raise SystemExit(125)", tmp_path)
+    assert test.run("x") is FailureCheckResult.INCONCLUSIVE
+
+
+def test_custom_inconclusive_code_takes_precedence_over_failure(tmp_path):
+    test = runner("raise SystemExit(7)", tmp_path, inconclusive_exit_codes=(7,))
     assert test.run("x") is FailureCheckResult.INCONCLUSIVE
 
 
@@ -107,7 +113,7 @@ def test_escaped_descendant_cannot_hold_log_pipes_open(tmp_path, hang):
         assert time.monotonic() - started < 2
         assert observation.timed_out is hang
         assert observation.outcome is (
-            FailureCheckResult.INCONCLUSIVE if hang else FailureCheckResult.INTERESTING
+            FailureCheckResult.INCONCLUSIVE if hang else FailureCheckResult.NOT_INTERESTING
         )
         assert observation.stdout == "assertion A\n"
         assert observation.output_truncated  # EOF was never observed.
@@ -133,7 +139,7 @@ def test_large_output_on_both_streams_is_drained_and_bounded(tmp_path):
     observation = FailureCheckRunner(failure_check_config, log_limit=1024).observe(
         tmp_path / "model.onnx"
     )
-    assert observation.outcome is FailureCheckResult.INTERESTING
+    assert observation.outcome is FailureCheckResult.NOT_INTERESTING
     assert not observation.timed_out
     assert observation.stdout == "x" * 1024
     assert observation.stderr == "y" * 1024

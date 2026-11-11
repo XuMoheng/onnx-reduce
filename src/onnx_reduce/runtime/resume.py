@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from onnx_reduce.failure_check.contract import FAILURE_CHECK_CONTRACT
+
 
 def restore_target(run_directory, *, model_digest, config, failure_check_config, matcher):
     directory = Path(run_directory).resolve()
@@ -13,6 +15,11 @@ def restore_target(run_directory, *, model_digest, config, failure_check_config,
         target = json.loads((directory / "target.json").read_text())
         replay = json.loads((directory / "replay.json").read_text())
         report = json.loads((directory / "report.json").read_text())
+        if any(
+            manifest.get("failure_check_contract") != FAILURE_CHECK_CONTRACT
+            for manifest in (task, replay)
+        ):
+            raise ValueError("failure check exit-code contract differs; start a new run")
         normalized_check = json.loads(json.dumps(failure_check_config))
         if failure_check_config is None or task["failure_check_config"] != normalized_check:
             raise ValueError("failure check configuration differs or cannot be verified")

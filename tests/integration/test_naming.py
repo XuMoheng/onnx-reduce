@@ -8,7 +8,7 @@ from pathlib import Path
 from onnx_reduce.cli import build_parser
 from onnx_reduce.engine import EngineConfig, ReductionEngine
 from onnx_reduce.failure_check import FailureCheckConfig, FailureCheckResult
-from onnx_reduce.failure_check.contract import make_failure_check_config
+from onnx_reduce.failure_check.contract import FAILURE_CHECK_CONTRACT, make_failure_check_config
 from onnx_reduce.model import OnnxModel
 from onnx_reduce.types import ValidationResult
 from tests.helpers import chain_model
@@ -53,7 +53,8 @@ def test_run_files_use_consistent_configuration_and_report_fields(tmp_path):
     )
     run_dir = Path(report.work_directory)
     task = json.loads((run_dir / "task.json").read_text())
-    assert set(task) == {"engine", "failure_check_config", "cwd"}
+    assert set(task) == {"engine", "failure_check_config", "failure_check_contract", "cwd"}
+    assert task["failure_check_contract"] == FAILURE_CHECK_CONTRACT
     assert task["engine"] == config.to_dict()
     assert task["failure_check_config"] == {
         "command": [sys.executable],
@@ -71,9 +72,11 @@ def test_run_files_use_consistent_configuration_and_report_fields(tmp_path):
         "baseline_identity",
         "cwd",
         "failure_check_config",
+        "failure_check_contract",
         "stop_reason",
     }
     assert replay["failure_check_config"] == task["failure_check_config"]
+    assert replay["failure_check_contract"] == task["failure_check_contract"]
     payload = json.loads((run_dir / "report.json").read_text())
     assert set(payload) == {
         "version",

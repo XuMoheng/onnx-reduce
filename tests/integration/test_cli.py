@@ -5,6 +5,7 @@ import sys
 import textwrap
 
 import onnx
+import pytest
 
 from onnx_reduce.cli import main
 from tests.helpers import chain_model
@@ -26,7 +27,8 @@ def write_failure_check(tmp_path, name: str, body: str):
     return path
 
 
-def test_cli_end_to_end_error_reducer(tmp_path):
+@pytest.mark.parametrize("failure_code", [1, 7])
+def test_cli_end_to_end_error_reducer(tmp_path, failure_code):
     source = tmp_path / "model.onnx"
     output = tmp_path / "reduced.onnx"
     report_path = tmp_path / "report.json"
@@ -34,7 +36,7 @@ def test_cli_end_to_end_error_reducer(tmp_path):
     failure_check_script = write_failure_check(
         tmp_path,
         "error-failure_check_script.py",
-        "raise SystemExit(0 if has_trigger else 1)",
+        f"raise SystemExit({failure_code} if has_trigger else 0)",
     )
     code = main(
         [
@@ -67,7 +69,7 @@ def test_cli_accepts_crashing_compiler_failure_check(tmp_path):
         """\
         if has_trigger:
             os.kill(os.getpid(), signal.SIGSEGV)
-        raise SystemExit(1)
+        raise SystemExit(0)
         """,
     )
     code = main([str(source), "--test", str(failure_check_script), "--output", str(output)])
@@ -76,18 +78,31 @@ def test_cli_accepts_crashing_compiler_failure_check(tmp_path):
     assert [node.op_type for node in reduced.graph.node] == ["Relu"]
 
 
-def test_cli_rejects_reversed_interestingness_direction(tmp_path, capsys):
+@pytest.mark.parametrize("target_mode", ["baseline", "script"])
+def test_cli_rejects_passing_original_even_with_matching_signature(tmp_path, capsys, target_mode):
     source = tmp_path / "model.onnx"
     output = tmp_path / "not-written.onnx"
     onnx.save_model(chain_model(), source)
     failure_check_script = write_failure_check(
         tmp_path,
-        "reversed.py",
-        "raise SystemExit(0 if not has_trigger else 1)",
+        "passing.py",
+        "print('assertion A'); raise SystemExit(0 if has_trigger else 1)",
     )
-    code = main([str(source), "--test", str(failure_check_script), "--output", str(output)])
+    code = main(
+        [
+            str(source),
+            "--test",
+            str(failure_check_script),
+            "--output",
+            str(output),
+            "--target-mode",
+            target_mode,
+            "--signature-regex",
+            r"assertion (\w+)",
+        ]
+    )
     assert code == 2
-    assert "direction may be reversed" in capsys.readouterr().err
+    assert "exit code 0 means pass" in capsys.readouterr().err
     assert not output.exists()
 
 
@@ -99,7 +114,7 @@ def test_cli_output_is_bit_deterministic(tmp_path):
     failure_check_script = write_failure_check(
         tmp_path,
         "deterministic.py",
-        "raise SystemExit(0 if has_trigger else 1)",
+        "raise SystemExit(1 if has_trigger else 0)",
     )
     for output in (first, second):
         assert (
@@ -130,7 +145,7 @@ def test_cli_exposes_quality_objective_and_search_bounds(tmp_path):
     onnx.save_model(
         model([helper.make_node("Relu", ["x"], ["y"])], [value("x")], [value("y")]), source
     )
-    check = write_failure_check(tmp_path, "check.py", "raise SystemExit(0 if has_trigger else 1)")
+    check = write_failure_check(tmp_path, "check.py", "raise SystemExit(1 if has_trigger else 0)")
     assert (
         main(
             [

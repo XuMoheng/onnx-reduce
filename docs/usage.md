@@ -32,15 +32,18 @@ external data 模型还需要原始权重文件；加载时会将这些数据读
 
 | 判定进程结果 | 默认含义 |
 |---|---|
-| 退出码 `0` | 目标故障仍在（`interesting`） |
+| 退出码 `0` | 测试通过，目标故障不在（`not_interesting`） |
 | 退出码 `125` | 无法判定（`inconclusive`），不接受候选 |
-| 其他普通非零退出码 | 目标故障不在（`not_interesting`） |
+| 其他普通非零退出码 | 测试失败，目标故障仍在（`interesting`） |
 | 被信号终止 | 故障仍在；`--no-crash-interesting` 可改为不在 |
 | 超过 `--timeout` | 无法判定；`--timeout-interesting` 可改为仍在 |
 
-**退出码 0 表示复现目标故障。** 后端失败不等于判定脚本应该返回非零；
-脚本需要把后端结果转换为上述约定。环境缺失、设备不可用等情况应返回 125，
-不要把它们当作目标缺陷。
+**退出码 0 表示通过，普通非零表示失败。** 可以直接传入后端命令，
+也可以通过包装脚本识别具体目标故障：复现时返回 1，否则返回 0。
+环境缺失、设备不可用等无法判定的情况应返回 125。
+
+旧版使用“0 表示故障仍在”的判定脚本，需要反转为“1 表示故障仍在、0 表示不存在”。
+已有运行的 `--finalize-from` 仅接受相同退出码约定的运行记录；旧运行需重新开始缩减。
 
 ### 完整的编译错误判定示例
 
@@ -66,27 +69,27 @@ print(result.stdout, end="")
 reproduced = result.returncode != 0 and "YOUR_TARGET_ERROR" in result.stdout
 if reproduced:
     print("onnx-reduce-target: YOUR_TARGET_ERROR")
-raise SystemExit(0 if reproduced else 1)
+raise SystemExit(1 if reproduced else 0)
 ```
 
 该模板适用于运行时间和日志量可控的编译后端；它把后端日志暂存在内存中。
 如需识别许可证、设备或服务错误，请在目标判定前为这些情况添加返回 125 的分支。
 工具的 `--timeout` 约束整个脚本；超时会终止其 POSIX 进程组。
 
-先直接验证脚本。原模型复现时应打印目标标记并返回 0：
+先直接验证脚本。原模型复现时应打印目标标记并返回 1：
 
 ```bash
 uv run --locked python check_backend.py cases/original.onnx
 echo $?
 ```
 
-再用一个能正常通过后端的模型执行同一命令，应返回 1。
+再用一个能正常通过后端的模型执行同一命令，应返回 0。
 模拟缺少后端的环境时应返回 125，以确认脚本没有颠倒契约。
 
 ### 保持目标故障身份
 
 默认 `--target-mode baseline` 要求候选与原模型的**判定进程**结束方式一致：
-相同退出码、相同信号编号或同为超时。上面的包装脚本把所有目标故障转换为退出码 0，
+相同退出码、相同信号编号或同为超时。上面的包装脚本把所有目标故障转换为退出码 1，
 因此仍需脚本本身或签名区分具体缺陷。
 
 `--target-mode script` 信任脚本给出的 `interesting`，不比较结束方式。
@@ -95,7 +98,7 @@ echo $?
 两种模式均可配合 `--signature-regex`：在保留的 stdout 与 stderr 中查找第一个匹配。
 有捕获组时以全部捕获组作为签名，否则使用完整匹配；候选签名必须与原模型相同。
 应选稳定的错误编号或断言名称，避免把地址、临时路径或时间戳包含在签名中。
-原始结果还必须是 `interesting`，正则匹配本身不会把非零退出判为复现。
+原始结果还必须是 `interesting`，正则匹配本身不会把成功退出判为复现。
 签名缺失和日志截断的处理见[排障指南](troubleshooting.md#签名没有匹配或发生漂移)。
 
 ## 执行缩减
@@ -208,7 +211,7 @@ uv run --locked python check_backend.py results/reduced.onnx
 echo $?
 ```
 
-应返回 0 并打印相同目标标记。手动运行包装脚本不会执行 reducer 的基线签名比较，
+应返回 1 并打印相同目标标记。手动运行包装脚本不会执行 reducer 的基线签名比较，
 因此也要检查输出中的具体错误。报告含义与 CLI 退出码见[排障指南](troubleshooting.md#读取退出码与报告)。
 
 ## 常见问题
@@ -326,7 +329,7 @@ PYTHONPATH="$PWD/src" .venv/bin/python -m onnx_reduce \
   --report reduction-report.json
 ```
 
-判定脚本接收模型路径作为最后一个参数：仍触发目标故障时返回 0，未触发返回 1，
+判定脚本接收模型路径作为最后一个参数：仍触发目标故障时返回 1，未触发返回 0，
 无法判定返回 125。脚本应识别同一个目标故障；若需要工具核对诊断签名，可增加
 `--signature-regex`，表达式应匹配实际脚本输出，参见[故障判定脚本](#编写故障判定脚本)。
 
